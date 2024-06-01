@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, session, redirect, url_for
 from flask_server.models.user import User
-from flask_server import db
+from flask_server import db, mail
+from flask_mail import Message
 import re
 
 auth_bp = Blueprint('auth', __name__)
@@ -29,9 +30,24 @@ def signup():
     if not is_valid_password(password):
         return jsonify(success=False, message='Password does not meet the criteria'), 400
     
+    # Check if the username or email already exists
+    existing_user = User.query.filter((User.username == username) | (User.email == email)).first()
+    if existing_user:
+        if existing_user.username == username:
+            return jsonify(success=False, message='Username already exists'), 409
+        if existing_user.email == email:
+            return jsonify(success=False, message='Email already exists'), 409
+
     user = User(first_name=first_name, last_name=last_name, username=username, email=email, password=password)
     db.session.add(user)
     db.session.commit()
+
+    # Send welcome email
+    msg = Message("Welcome to Our Service!",
+                  sender="your_email@example.com",
+                  recipients=[email])
+    msg.body = f"Hello {first_name},\n\nThank you for signing up with our service. We are excited to have you on board!"
+    mail.send(msg)
 
     return jsonify(success=True, message='Account created successfully'), 201
 
@@ -40,15 +56,27 @@ def login():
     if request.method == 'POST':
         username_or_email = request.form['username_or_email']
         password = request.form['password']
+        token = request.form.get('token')  # OTP from the user
 
-        user = User.query.filter_by(username=username_or_email).first() or \
-               User.query.filter_by(email=username_or_email).first()
+        user = User.query.filter((User.username == username_or_email) | (User.email == username_or_email)).first()
         
         if user and user.verify_password(password):
-            session['user_id'] = user.id
-            return jsonify(success=True, message='Login successful'), 200
+            if user.twofa_enabled:
+                if token is None or not user.verify_totp(token):
+                    # Optionally send OTP via email
+                    msg = Message("Your OTP", sender="your_email@example.com", recipients=[user.email])
+                    msg.body = f"Your OTP is: {pyotp.TOTP(user.twofa_secret).now()}"
+                    mail.send(msg)
+                    return jsonify(success=False, message='2FA token required'), 400
+                else:
+                    session['user_id'] = user.id
+                    return jsonify(success=True, message='Login successful'), 200
+            else:
+                session['user_id'] = user.id
+                return jsonify(success=True, message='Login successful'), 200
         else:
             return jsonify(success=False, message='Invalid credentials'), 401
     else:
         # Redirect to login page or handle GET request differently
         pass  # Implement rendering the login form here
+
