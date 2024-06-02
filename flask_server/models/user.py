@@ -1,8 +1,11 @@
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy.ext.hybrid import hybrid_property
+from.roles import Role, Permission
 from flask_server import db
 import pyotp
 
 class User(db.Model):
+    __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(60))
     last_name = db.Column(db.String(60))
@@ -11,6 +14,13 @@ class User(db.Model):
     password_hash = db.Column(db.String(128))
     twofa_secret = db.Column(db.String(60), unique=True, nullable=True)  # Allow null for users without 2FA
     twofa_enabled = db.Column(db.Boolean, nullable=False, default=False)
+
+    # Many-to-many relationship with Role
+    roles = db.relationship('Role', secondary='user_roles', backref=db.backref('users', lazy='dynamic'))
+    
+    @hybrid_property
+    def has_role(self, *args):
+        return set(role.name for role in self.roles).intersection(args)
 
     @property
     def password(self):
@@ -31,3 +41,9 @@ class User(db.Model):
 
     def __repr__(self):
         return f'<User {self.first_name} {self.last_name}>'
+
+# Association table for the many-to-many relationship between users and roles
+user_roles = db.Table('user_roles',
+    db.Column('user_id', db.Integer(), db.ForeignKey('user.id', name='fk_user_roles_user'), primary_key=True),
+    db.Column('role_id', db.Integer(), db.ForeignKey('roles.id', name='fk_user_roles_role'), primary_key=True)
+)
