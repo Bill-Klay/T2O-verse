@@ -41,7 +41,23 @@ class User(db.Model):
 
     def __repr__(self):
         return f'<User {self.first_name} {self.last_name}>'
+    
+    def is_authenticated(self):
+        """Return True if the user is authenticated."""
+        return True
 
+    def is_active(self):
+        """Return True if this is an active user."""
+        return True
+
+    def is_anonymous(self):
+        """Return True if this is an anonymous user."""
+        return False
+
+    def get_id(self):
+        """Return the user's ID."""
+        return str(self.id)
+        
 # Association table for the many-to-many relationship between users and roles
 user_roles = db.Table('user_roles',
     db.Column('user_id', db.Integer(), db.ForeignKey('user.id', name='fk_user_roles_user'), primary_key=True),

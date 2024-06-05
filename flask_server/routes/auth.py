@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, session, redirect, url_for
 from flask_server.models.user import User
 from flask_server import db, mail
 from flask_mail import Message
+from flask_login import login_user, logout_user,login_required, current_user
 import re
 
 auth_bp = Blueprint('auth', __name__)
@@ -69,10 +70,14 @@ def login():
                     mail.send(msg)
                     return jsonify(success=False, message='2FA token required'), 400
                 else:
-                    session['user_id'] = user.id
+                    # session['user_id'] = user.id
+                    login_user(user)
+                    print(f"Loading user: {user}")
                     return jsonify(success=True, message='Login successful'), 200
             else:
-                session['user_id'] = user.id
+                # session['user_id'] = user.id
+                login_user(user)
+                print(f"Loading user: {user}")
                 return jsonify(success=True, message='Login successful'), 200
         else:
             return jsonify(success=False, message='Invalid credentials'), 401
@@ -80,3 +85,17 @@ def login():
         # Redirect to login page or handle GET request differently
         pass  # Implement rendering the login form here
 
+@auth_bp.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return jsonify(success=True, message='Logout successful'), 200
+
+@auth_bp.route('/check_auth_status')
+def check_auth_status():
+    # Use current_user instead of user
+    if current_user.is_authenticated:
+        print(f"Logged in user: {current_user.username}")
+    else:
+        print("No user is logged in.")
+    return jsonify(authenticated=current_user.is_authenticated)
