@@ -1,0 +1,15 @@
+curl -X POST http://localhost:5000/signup \
+-H "Content-Type: application/json" \
+-d '{"first_name":"Bilal", "last_name":"Khan", "username":"billklay", "email":"bilal.khan2998@gmail.com", "password":"SecureP@ssw0rd"}'
+
+curl -X POST http://localhost:5000/admin/create_permission \
+-H "Content-Type: application/json" \
+-d '{"name": "Edit"}'
+
+curl -X POST http://localhost:5000/assign_permission_to_role \
+-H "Content-Type: application/json" \
+-d '{"role_name": "Admin", "permission_name": "Edit"}'
+
+curl -X POST http://localhost:5000/login \
+-F "username_or_email=bilal.khan2998@gmail.com" \
+-F "password=SecureP@ssw0rd"

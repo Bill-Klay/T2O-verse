@@ -26,3 +26,19 @@ def assign_permission_to_role():
     role.permissions.append(permission)
     db.session.commit()
     return jsonify({'message': 'Permission assigned to role'}), 200
+
+@admin_bp.route('/create_permission', methods=['POST'])
+def create_permission():
+    data = request.json
+    permission_name = data.get('name')
+    if not permission_name:
+        return jsonify({'error': 'Permission name is required'}), 400
+
+    existing_permission = Permission.query.filter_by(name=permission_name).first()
+    if existing_permission:
+        return jsonify({'error': f'Permission "{permission_name}" already exists'}), 409
+
+    new_permission = Permission(name=permission_name)
+    db.session.add(new_permission)
+    db.session.commit()
+    return jsonify({'message': f'Permission "{permission_name}" created successfully'}), 201
