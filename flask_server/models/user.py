@@ -17,10 +17,9 @@ class User(db.Model):
 
     # Many-to-many relationship with Role
     roles = db.relationship('Role', secondary='user_roles', backref=db.backref('users', lazy='dynamic'))
-    
-    @hybrid_property
-    def has_role(self, *args):
-        return set(role.name for role in self.roles).intersection(args)
+
+    def has_role(self, *roles):
+        return not set(role.name for role in self.roles).isdisjoint(set(roles))
 
     @property
     def password(self):

@@ -12,7 +12,6 @@ login_manager = LoginManager()
 @login_manager.user_loader
 def load_user(user_id):
     """Check if user is logged-in upon page load."""
-    print(f"Loading-user: {user_id}")
     from.models.user import User
     return User.query.get(user_id)
 

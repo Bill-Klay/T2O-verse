@@ -72,12 +72,10 @@ def login():
                 else:
                     # session['user_id'] = user.id
                     login_user(user)
-                    print(f"Loading user: {user}")
                     return jsonify(success=True, message='Login successful'), 200
             else:
                 # session['user_id'] = user.id
                 login_user(user)
-                print(f"Loading user: {user}")
                 return jsonify(success=True, message='Login successful'), 200
         else:
             return jsonify(success=False, message='Invalid credentials'), 401
@@ -95,7 +93,9 @@ def logout():
 def check_auth_status():
     # Use current_user instead of user
     if current_user.is_authenticated:
+        print(current_user.is_authenticated)
         print(f"Logged in user: {current_user.username}")
+        return jsonify(success=True, message='User is currently logged in')
     else:
         print("No user is logged in.")
-    return jsonify(authenticated=current_user.is_authenticated)
+        return jsonify(success=False, message='User is not logged in')
