@@ -93,7 +93,6 @@ def logout():
 def check_auth_status():
     # Use current_user instead of user
     if current_user.is_authenticated:
-        print(current_user.is_authenticated)
         print(f"Logged in user: {current_user.username}")
         return jsonify(success=True, message='User is currently logged in')
     else:

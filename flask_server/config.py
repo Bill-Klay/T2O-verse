@@ -6,18 +6,21 @@ def get_logging_config(env):
             'filemode': 'a',
             'level': 'DEBUG',
             'file': 'dev.log',
+            'log_route_access': True,
             'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         },
         'production': {
             'filemode': 'a',
             'level': 'INFO',
             'file': 'prod.log',
+            'log_route_access': False,
             'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         },
         'testing': {
             'filemode': 'a',
             'level': 'WARNING',
             'file': 'test.log',
+            'log_route_access': False,
             'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         }
     }
