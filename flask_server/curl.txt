@@ -15,3 +15,11 @@ curl -X POST http://localhost:5000/login \
 -F "password=SecureP@ssw0rd" -c cookies.txt
 
 curl -X GET http://localhost:5000/logout -b cookies.txt
+
+curl -X POST http://localhost:5000/assign_role_to_user \
+-H "Content-Type: application/json" \
+-d '{"user_id": 1, "role_id": 1}' -b cookies.txt 
+
+curl -X POST http://localhost:5000/create_role \
+-H "Content-Type: application/json" \
+-d '{"name": "Admin"}'
