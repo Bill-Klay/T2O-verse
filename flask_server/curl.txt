@@ -23,3 +23,7 @@ curl -X POST http://localhost:5000/assign_role_to_user \
 curl -X POST http://localhost:5000/create_role \
 -H "Content-Type: application/json" \
 -d '{"name": "Admin"}'
+
+export FLASK_APP=app_run.py
+export FLASK_ENV=development
+export FLASK_DEBUG=1
