@@ -7,6 +7,7 @@ def get_logging_config(env):
             'level': 'DEBUG',
             'file': 'dev.log',
             'log_route_access': True,
+            'log_database_queries': True,
             'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         },
         'production': {
@@ -14,6 +15,7 @@ def get_logging_config(env):
             'level': 'INFO',
             'file': 'prod.log',
             'log_route_access': False,
+            'log_database_queries': False,
             'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         },
         'testing': {
@@ -21,17 +23,17 @@ def get_logging_config(env):
             'level': 'WARNING',
             'file': 'test.log',
             'log_route_access': False,
+            'log_database_queries': False,
             'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         }
     }
 
     return configs.get(env, configs['development'])  # Default to 'development' if env is not found
 
-
-DEBUG = True
-SECRET_KEY = 'your_secret_key'
 # Add more configurations as needed
+SECRET_KEY = 'your_secret_key'
 SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///default.db')
+SQLALCHEMY_ECHO = True
 ENV = os.getenv('FLASK_ENV', 'development').lower()
 MAIL_SERVER = 'sandbox.smtp.mailtrap.io'
 MAIL_PORT = 2525
