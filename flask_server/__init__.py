@@ -77,6 +77,19 @@ def create_app():
         def after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
             app.logger.info("Query Complete")
 
+    # Add SMTPHandler for mailing critical logs
+    if logging_config.get('smtp_handler'):
+        smtp_handler = logging.handlers.SMTPHandler(
+            mailhost=(app.config['MAIL_SERVER'], app.config['MAIL_PORT']),
+            fromaddr=app.config['MAIL_USERNAME'],
+            toaddrs=logging_config['smtp_handler']['to_addrs'],
+            subject='[Critical] Your Application Error',
+            credentials=(app.config['MAIL_USERNAME'], app.config['MAIL_PASSWORD']),
+            secure=() if app.config['MAIL_USE_TLS'] else None,
+        )
+        smtp_handler.setLevel(logging.CRITICAL)
+        app.logger.addHandler(smtp_handler)
+
     # Register blueprints here
     with app.app_context():
         # Event listener for query logging

@@ -17,6 +17,12 @@ def get_logging_config(env):
             'log_route_access': False,
             'log_database_queries': False,
             'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+            'smtp_handler': {
+                'to_addrs': ['admin@example.com'],  # List of recipients for critical logs
+                'subject_prefix': '[Critical] Your Application Error',
+                # Additional SMTP handler settings can be added here
+            }
+            
         },
         'testing': {
             'filemode': 'a',
