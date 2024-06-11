@@ -7,6 +7,7 @@ from flask_migrate import Migrate
 from flask_mail import Mail
 from flask_login import LoginManager
 from.config import get_logging_config
+from flask_wtf import CSRFProtect
 
 db = SQLAlchemy()
 mail = Mail()
@@ -46,6 +47,7 @@ def create_app():
     login_manager.init_app(app)
     mail.init_app(app)  # Initialize Flask-Mail
     migrate = Migrate(app, db)
+    csrf = CSRFProtect(app) # Initialize Flask-WTF CSRF protection
 
     # Route access logs
     if logging_config['log_route_access']:
