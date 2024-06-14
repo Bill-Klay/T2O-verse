@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import { signupFormValidation } from "@/utils/FormValidation";
+import { toast } from "react-toastify";
 
 const SignupPage = () => {
   const [isLoading, setLoading] = useState(true);
@@ -21,6 +22,56 @@ const SignupPage = () => {
     onSubmit: async (values) => {
       console.log("Values:", JSON.stringify(values, null, 4));
       // Add your form submission logic here (e.g., API call)
+      try {
+        const res = await fetch("http://192.168.100.123:5000/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            first_name: values.firstName,
+            last_name: values.lastName,
+            username: values.username,
+            email: values.email,
+            password: values.password,
+          }),
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          let errorMessage = "Something Went Wrong!";
+          if (errorData) {
+            errorMessage = errorData.message;
+          }
+          throw new Error(errorMessage);
+        }
+
+        const data = await res.json();
+
+        toast.success(`${data.message}`, {
+          position: "bottom-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      } catch (error: any) {
+        let errorMessage = "An error Occured";
+        if (error.message) {
+          errorMessage = error.message;
+        }
+        toast.error(`${errorMessage}`, {
+          position: "bottom-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      }
     },
   });
 
