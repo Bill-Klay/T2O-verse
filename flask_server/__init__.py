@@ -1,5 +1,5 @@
 import logging
-from flask import Flask, has_request_context, request
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import event
@@ -7,7 +7,7 @@ from flask_migrate import Migrate
 from flask_mail import Mail
 from flask_login import LoginManager
 from.config import get_logging_config
-from flask_wtf import CSRFProtect
+from flask_wtf.csrf import generate_csrf, validate_csrf
 
 db = SQLAlchemy()
 mail = Mail()
@@ -32,14 +32,14 @@ def create_app():
 
     # Load configurations
     app.config.from_pyfile('config.py')
-    CORS(app, resources={r'*': {'origins': 'http://localhost:3000'}})
+    CORS(app, resources={r'*': {'origins': 'http://localhost:3000', 'supports_credentials': True, 'allow_headers': ['Content-Type', 'X-CSRFToken']}})
     logging_config = get_logging_config(app.config['ENV'])
     logging.basicConfig(
         level=getattr(logging, logging_config['level'].upper()),
-        filename=logging_config['file'],
+        # filename=logging_config['file'],
         format=logging_config['format'],
         datefmt='%Y-%m-%d %H:%M:%S',
-        filemode=logging_config['filemode'],
+        # filemode=logging_config['filemode'],
         force=True  # Reconfigure logging if called multiple times
     )
 
@@ -47,12 +47,24 @@ def create_app():
     login_manager.init_app(app)
     mail.init_app(app)  # Initialize Flask-Mail
     migrate = Migrate(app, db)
-    csrf = CSRFProtect(app) # Initialize Flask-WTF CSRF protection
+
+    @app.route('/get_csrf_token', methods=['GET'])
+    def get_csrf_token():
+        return jsonify(csrf_token=generate_csrf())
 
     # Route access logs
     if logging_config['log_route_access']:
         @app.before_request
         def log_request_info():
+            # CSRF verification
+            skip_csrf_check = request.endpoint in app.config.get('CSRF_EXEMPT_ENDPOINTS', [])
+            if not skip_csrf_check:
+                try:
+                    validate_csrf(request.headers.get('X-CSRFToken'))
+                except Exception as e:
+                    app.logger.warning(f"CSRF validation failed for endpoint {request.endpoint}: {str(e)}")
+                    return jsonify(success=False, message='CSRF token validation failed'), 403
+            # Pre route logging
             client_ip = get_client_ip(request)
             user_agent = request.headers.get('User-Agent', 'Unknown')
             app.logger.info(f"Before Request: {request.method} {request.url} - Client IP: {client_ip} - User Agent: {user_agent}")

@@ -47,3 +47,7 @@ MAIL_USERNAME = 'acf7606c86c045'
 MAIL_PASSWORD = 'a94237314a7a25'
 MAIL_USE_TLS = True
 MAIL_USE_SSL = False
+CSRF_EXEMPT_ENDPOINTS = [
+    'auth.logout',
+    'get_csrf_token'
+]
