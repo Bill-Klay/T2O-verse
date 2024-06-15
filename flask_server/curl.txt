@@ -1,29 +1,43 @@
+# User sign up
 curl -X POST http://localhost:5000/signup \
 -H "Content-Type: application/json" \
 -d '{"first_name":"Bilal", "last_name":"Khan", "username":"billklay", "email":"bilal.khan2998@gmail.com", "password":"SecureP@ssw0rd"}'
 
+# Create a new permission
 curl -X POST http://localhost:5000/admin/create_permission \
 -H "Content-Type: application/json" \
 -d '{"name": "Edit"}'
 
+# Assign a role to the permission
 curl -X POST http://localhost:5000/assign_permission_to_role \
 -H "Content-Type: application/json" \
 -d '{"role_name": "Admin", "permission_name": "Edit"}'
 
-curl -X POST http://localhost:5000/login \
+# User login
+curl -b csrf_cookies.txt -X POST http://localhost:5000/login \
+-H "X-CSRFToken: IjhkMWM3MDJjMTgxNjUzZWI1MzQ3YzUyNGJmNTdkNjk4YjhiNDU2NDki.Zm4CYQ.eG0YDqAwNDQRVgFMJ9xFV6NxODA" \
 -F "username_or_email=bilal.khan2998@gmail.com" \
--F "password=SecureP@ssw0rd" -c cookies.txt
+-F "password=SecureP@ssw0rd" \
+-c login_cookies.txt
 
-curl -X GET http://localhost:5000/logout -b cookies.txt
+# Logout from session
+curl -b cookies.txt -X GET http://localhost:5000/logout 
 
+# Assign role to user
 curl -X POST http://localhost:5000/assign_role_to_user \
 -H "Content-Type: application/json" \
 -d '{"user_id": 1, "role_id": 1}' -b cookies.txt 
 
+# Create a new role 
 curl -X POST http://localhost:5000/create_role \
 -H "Content-Type: application/json" \
 -d '{"name": "Admin"}'
 
+# Generate CSRF token
+curl -X GET http://localhost:5000/get_csrf_token \
+-c csrf_cookies.txt
+
+# Necessary exports for the application factory function
 export FLASK_APP=app_run.py
 export FLASK_ENV=development
 export FLASK_DEBUG=1
