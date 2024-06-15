@@ -20,8 +20,6 @@ const SignupPage = () => {
     },
     validationSchema: signupFormValidation,
     onSubmit: async (values) => {
-      console.log("Values:", JSON.stringify(values, null, 4));
-      // Add your form submission logic here (e.g., API call)
       try {
         const res = await fetch("http://192.168.100.123:5000/signup", {
           method: "POST",
@@ -84,7 +82,7 @@ const SignupPage = () => {
           isLoading ? "opacity-0" : "opacity-100"
         }`}
       >
-        <h1 className="font-bold size-8 text-2xl mb-4 w-full">
+        <h1 className="font-bold size-8 text-2xl mb-4 w-full text-primary">
           Create Account:
         </h1>
         <div className="flex justify-between">

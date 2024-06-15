@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import { loginFormValidation } from "@/utils/FormValidation";
+import { toast } from "react-toastify";
 
 const LoginPage = () => {
   const [isLoading, setLoading] = useState(true);
@@ -16,7 +17,54 @@ const LoginPage = () => {
     },
     validationSchema: loginFormValidation,
     onSubmit: async (values) => {
-      console.log("Values:...", JSON.stringify(values, null, 4));
+      const formData = new FormData();
+      formData.append("username_or_email", values.username_or_email);
+      formData.append("password", values.password);
+      formData.append("token", "");
+      try {
+        const res = await fetch("http://192.168.100.123:5000/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: formData,
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          let errorMessage = "Something Went Wrong!";
+          if (errorData) {
+            errorMessage = errorData.message;
+          }
+          throw new Error(errorMessage);
+        }
+
+        const data = await res.json();
+
+        toast.success(`${data.message}`, {
+          position: "bottom-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      } catch (error: any) {
+        let errorMessage = "An error Occured";
+        if (error.message) {
+          errorMessage = error.message;
+        }
+        toast.error(`${errorMessage}`, {
+          position: "bottom-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      }
     },
   });
 
