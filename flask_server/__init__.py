@@ -57,14 +57,19 @@ def create_app():
         @app.before_request
         def log_request_info():
             # CSRF verification
-            skip_csrf_check = request.endpoint in app.config.get('CSRF_EXEMPT_ENDPOINTS', [])
-            if not skip_csrf_check:
-                try:
-                    validate_csrf(request.headers.get('X-CSRFToken'))
-                except Exception as e:
-                    app.logger.warning(f"CSRF validation failed for endpoint {request.endpoint}: {str(e)}")
-                    return jsonify(success=False, message='CSRF token validation failed'), 403
+            if request.method in ['POST', 'PUT', 'DELETE', 'PATCH']:
+                skip_csrf_check = request.endpoint in app.config.get('CSRF_EXEMPT_ENDPOINTS', [])
+                if not skip_csrf_check:
+                    try:
+                        print(request.headers.get('X-CSRFToken'))
+                        validate_csrf(request.headers.get('X-CSRFToken'))
+                    except Exception as e:
+                        app.logger.warning(f"CSRF validation failed for endpoint {request.endpoint}: {str(e)}")
+                        return jsonify(success=False, message='CSRF token validation failed'), 403
             # Pre route logging
+            # Skip logging for static files or CSRF token generation
+            if request.path.startswith('/static') or request.path == '/get_csrf_token':
+                return
             client_ip = get_client_ip(request)
             user_agent = request.headers.get('User-Agent', 'Unknown')
             app.logger.info(f"Before Request: {request.method} {request.url} - Client IP: {client_ip} - User Agent: {user_agent}")
