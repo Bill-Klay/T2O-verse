@@ -68,23 +68,38 @@ def create_app():
                         return jsonify(success=False, message='CSRF token validation failed'), 403
             # Pre route logging
             # Skip logging for static files or CSRF token generation
-            if request.path.startswith('/static') or request.path == '/get_csrf_token':
-                return
+            # if request.path.startswith('/static') or request.path == '/get_csrf_token':
+            #     return
             client_ip = get_client_ip(request)
             user_agent = request.headers.get('User-Agent', 'Unknown')
-            app.logger.info(f"Before Request: {request.method} {request.url} - Client IP: {client_ip} - User Agent: {user_agent}")
+            log_message = f"Before Request: {request.method} {request.url} - Client IP: {client_ip} - User Agent: {user_agent}"
+
+            # Insert log entry into the database
+            new_log_entry = LogEntry(log_level='INFO', message=log_message, client_ip=client_ip, user_agent=user_agent)
+            db.session.add(new_log_entry)
+            db.session.commit()
+
+            app.logger.info(log_message)
 
         @app.after_request
         def log_response_info(response):
             client_ip = get_client_ip(request)
             user_agent = request.headers.get('User-Agent', 'Unknown')
-            app.logger.info(f"Before Request: {request.method} {request.url} - Client IP: {client_ip} - User Agent: {user_agent}")
+            log_message = f"After Request: {request.method} {request.url} - Client IP: {client_ip} - User Agent: {user_agent}"
+            new_log_entry = LogEntry(log_level='INFO', message=log_message, client_ip=client_ip, user_agent=user_agent)
+            db.session.add(new_log_entry)
+            db.session.commit()
+            app.logger.info(log_message)
             return response
 
         @app.errorhandler(Exception)
         def log_exceptions(e):
             client_ip = get_client_ip(request)
             user_agent = request.headers.get('User-Agent', 'Unknown')
+            log_message = f'Unhandled error: {e} - Request: {request.method} {request.url} - Client IP: {client_ip} - User Agent: {user_agent}'
+            new_log_entry = LogEntry(log_level='INFO', message=log_message, client_ip=client_ip, user_agent=user_agent)
+            db.session.add(new_log_entry)
+            db.session.commit()
             app.logger.error(f'Unhandled error: {e} - Request: {request.method} {request.url} - Client IP: {client_ip} - User Agent: {user_agent}', exc_info=e)
             return "Oops Something went wrong.", 500
 
@@ -111,6 +126,7 @@ def create_app():
 
     # Register blueprints here
     with app.app_context():
+        from.models.logs import LogEntry
         # Event listener for query logging
         if logging_config['log_database_queries']:
             event.listens_for(db.engine, "before_cursor_execute")(before_cursor_execute)
