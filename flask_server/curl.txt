@@ -37,7 +37,15 @@ curl -X POST http://localhost:5000/create_role \
 curl -X GET http://localhost:5000/get_csrf_token \
 -c csrf_cookies.txt
 
+curl -b login_cookies.txt -X GET http://localhost:5000/check_auth_status
+
 # Necessary exports for the application factory function
 export FLASK_APP=app_run.py
 export FLASK_ENV=development
 export FLASK_DEBUG=1
+
+# Important commands to work with
+sqlite3 default.db .tables
+sqlite3 default.db "SELECT * FROM user"
+flask db migrate
+flask db upgrade
