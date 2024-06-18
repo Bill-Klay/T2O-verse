@@ -56,6 +56,24 @@ class User(db.Model):
     def get_id(self):
         """Return the user's ID."""
         return str(self.id)
+
+    def update_twofa(self, enabled):
+        """
+        Enable or disable 2FA for the user.
+        :param enabled: Boolean indicating whether to enable 2FA.
+        """
+        if enabled:
+            # Generate a new secret if 2FA is being enabled
+            self.twofa_secret = pyotp.random_base32()
+            db.session.commit()
+            # Return the provisioning URI for the authenticator app
+            return self.get_totp_uri()
+        else:
+            # Clear the secret if disabling 2FA
+            self.twofa_secret = None
+            self.twofa_enabled = False
+            db.session.commit()
+            return None
         
 # Association table for the many-to-many relationship between users and roles
 user_roles = db.Table('user_roles',

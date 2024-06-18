@@ -83,6 +83,19 @@ def login():
         # Redirect to login page or handle GET request differently
         pass  # Implement rendering the login form here
 
+@auth_bp.route('/update_twofa', methods=['POST'])
+@login_required
+def update_twofa():
+    data = request.json
+    enabled = data.get('enabled', False)
+
+    # Update the current user's 2FA settings and get the provisioning URI if applicable
+    uri = current_user.update_twofa(enabled)
+    if uri:
+        return jsonify(success=True, message='2FA enabled', uri=uri), 200
+    else:
+        return jsonify(success=True, message='2FA disabled'), 200
+
 @auth_bp.route('/logout')
 @login_required
 def logout():

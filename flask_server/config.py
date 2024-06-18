@@ -49,5 +49,6 @@ MAIL_USE_TLS = True
 MAIL_USE_SSL = False
 CSRF_EXEMPT_ENDPOINTS = [
     'auth.logout',
+    'auth.signup',
     'get_csrf_token'
 ]
