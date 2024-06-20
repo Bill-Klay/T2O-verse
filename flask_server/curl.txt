@@ -6,6 +6,7 @@ curl -X POST http://localhost:5000/signup \
 # Create a new permission
 curl -X POST http://localhost:5000/admin/create_permission \
 -H "Content-Type: application/json" \
+-H "X-CSRFToken: IjhkMWM3MDJjMTgxNjUzZWI1MzQ3YzUyNGJmNTdkNjk4YjhiNDU2NDki.Zm4CYQ.eG0YDqAwNDQRVgFMJ9xFV6NxODA" \
 -d '{"name": "Edit"}'
 
 # Assign a role to the permission
@@ -15,13 +16,12 @@ curl -X POST http://localhost:5000/assign_permission_to_role \
 
 # User login
 curl -b csrf_cookies.txt -X POST http://localhost:5000/login \
--H "X-CSRFToken: IjhkMWM3MDJjMTgxNjUzZWI1MzQ3YzUyNGJmNTdkNjk4YjhiNDU2NDki.Zm4CYQ.eG0YDqAwNDQRVgFMJ9xFV6NxODA" \
 -F "username_or_email=bilal.khan2998@gmail.com" \
 -F "password=SecureP@ssw0rd" \
 -c login_cookies.txt
 
 # Logout from session
-curl -b cookies.txt -X GET http://localhost:5000/logout 
+curl -b login_cookies.txt -X GET http://localhost:5000/logout
 
 # Assign role to user
 curl -X POST http://localhost:5000/assign_role_to_user \
@@ -34,9 +34,10 @@ curl -X POST http://localhost:5000/create_role \
 -d '{"name": "Admin"}'
 
 # Generate CSRF token
-curl -X GET http://localhost:5000/get_csrf_token \
+curl -b login_cookies.txt -X GET http://localhost:5000/get_csrf_token \
 -c csrf_cookies.txt
 
+# Check user status
 curl -b login_cookies.txt -X GET http://localhost:5000/check_auth_status
 
 # Necessary exports for the application factory function
