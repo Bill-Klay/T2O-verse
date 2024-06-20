@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 
 def get_logging_config(env):
     configs = {
@@ -38,6 +39,10 @@ def get_logging_config(env):
 
 # Add more configurations as needed
 SECRET_KEY = 'your_secret_key'
+SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'None'
+PERMANENT_SESSION_LIFETIME = timedelta(days=1)
 SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///default.db')
 SQLALCHEMY_ECHO = True
 ENV = os.getenv('FLASK_ENV', 'development').lower()
@@ -50,5 +55,6 @@ MAIL_USE_SSL = False
 CSRF_EXEMPT_ENDPOINTS = [
     'auth.logout',
     'auth.signup',
+    'auth.login',
     'get_csrf_token'
 ]
