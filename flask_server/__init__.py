@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import event
 from flask_migrate import Migrate
 from flask_mail import Mail
-from flask_login import LoginManager
+from flask_login import LoginManager, login_required
 from.config import get_logging_config
 from flask_wtf.csrf import generate_csrf, validate_csrf
 
@@ -32,7 +32,11 @@ def create_app():
 
     # Load configurations
     app.config.from_pyfile('config.py')
-    CORS(app, resources={r'*': {'origins': 'http://localhost:3000', 'supports_credentials': True, 'allow_headers': ['Content-Type', 'X-CSRFToken']}})
+    allowed_origins = [
+        'http://localhost:3000',
+        'http://192.168.100.236:3000'
+    ]
+    CORS(app, resources={r'*': {'origins': allowed_origins, 'supports_credentials': True, 'allow_headers': ['Content-Type', 'X-CSRFToken']}})
     logging_config = get_logging_config(app.config['ENV'])
     logging.basicConfig(
         level=getattr(logging, logging_config['level'].upper()),
@@ -49,6 +53,7 @@ def create_app():
     migrate = Migrate(app, db)
 
     @app.route('/get_csrf_token', methods=['GET'])
+    @login_required
     def get_csrf_token():
         return jsonify(csrf_token=generate_csrf())
 
@@ -61,7 +66,6 @@ def create_app():
                 skip_csrf_check = request.endpoint in app.config.get('CSRF_EXEMPT_ENDPOINTS', [])
                 if not skip_csrf_check:
                     try:
-                        print(request.headers.get('X-CSRFToken'))
                         validate_csrf(request.headers.get('X-CSRFToken'))
                     except Exception as e:
                         app.logger.warning(f"CSRF validation failed for endpoint {request.endpoint}: {str(e)}")
@@ -101,7 +105,7 @@ def create_app():
             db.session.add(new_log_entry)
             db.session.commit()
             app.logger.error(f'Unhandled error: {e} - Request: {request.method} {request.url} - Client IP: {client_ip} - User Agent: {user_agent}', exc_info=e)
-            return "Oops Something went wrong.", 500
+            return jsonify(success=False, message="Oops, somehting went wrong"), 500
 
     # Database ORM events log
     if logging_config['log_database_queries']:
