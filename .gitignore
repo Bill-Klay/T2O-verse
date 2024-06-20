@@ -190,6 +190,7 @@ cython_debug/
 
 # local env files
 /next_client/.env*.local
+/next_client/.env
 
 # vercel
 /next_client/.vercel

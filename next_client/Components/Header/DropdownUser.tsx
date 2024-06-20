@@ -1,9 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const router = useRouter();
 
   const trigger = useRef<any>(null);
   const dropdown = useRef<any>(null);
@@ -33,6 +37,51 @@ const DropdownUser = () => {
     document.addEventListener("keydown", keyHandler);
     return () => document.removeEventListener("keydown", keyHandler);
   });
+
+  const logout = async () => {
+    try {
+      const res = await fetch("http://192.168.100.123:5000/logout", {
+        method: "GET",
+        credentials: "include",
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        let errorMessage = "Something Went Wrong!";
+        if (errorData) {
+          errorMessage = errorData.message;
+        }
+        throw new Error(errorMessage);
+      }
+      const data = await res.json();
+      console.log("RESPONSE...", JSON.stringify(data, null, 4));
+      toast.success(`${data.message}`, {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      router.push(`/`);
+    } catch (error: any) {
+      let errorMessage = "An error Occured";
+      if (error.message) {
+        errorMessage = error.message;
+      }
+      toast.error(`${errorMessage}`, {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    }
+  };
 
   return (
     <div className="relative">
@@ -161,7 +210,10 @@ const DropdownUser = () => {
             </Link>
           </li>
         </ul>
-        <button className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base">
+        <button
+          className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
+          onClick={logout}
+        >
           <svg
             className="fill-current"
             width="22"

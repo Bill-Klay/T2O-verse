@@ -1,11 +1,12 @@
 import React from "react";
 import DefaultLayout from "@/Components/Layouts/DefaultLayout";
 import TestComponent from "../TestComponent/page";
+import Link from "next/link";
 
 const Dashboard = () => {
   return (
     <DefaultLayout>
-      <TestComponent />
+      <Link href={"/TestComponent"}>goto test</Link>
     </DefaultLayout>
   );
 };

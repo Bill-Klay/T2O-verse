@@ -2,6 +2,8 @@
 import { useState, ReactNode } from "react";
 import Sidebar from "../Sidebar";
 import Header from "../Header";
+import ToastProvider from "@/Providers/ToastProvider";
+// import { AuthProvider } from "@/config/context/AuthProvider";
 
 export default function DefaultLayout({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -16,7 +18,9 @@ export default function DefaultLayout({ children }: { children: ReactNode }) {
         {/* <!-- ===== Content Area Start ===== --> */}
         <div className="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
           {/* <!-- ===== Header Start ===== --> */}
-          <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+          <ToastProvider>
+            <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+          </ToastProvider>
           {/* <!-- ===== Header End ===== --> */}
 
           {/* <!-- ===== Main Content Start ===== --> */}
