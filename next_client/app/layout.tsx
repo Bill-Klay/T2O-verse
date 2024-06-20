@@ -1,12 +1,6 @@
 import type { Metadata } from "next";
-import { Lato } from "next/font/google";
-import "./globals.css";
-
-const lato = Lato({
-  weight: ["400", "700"],
-  style: ["normal", "italic"],
-  subsets: ["latin"],
-});
+import "@/css/satoshi.css";
+import "@/css/style.css";
 
 export const metadata: Metadata = {
   title: "T2O-Verse",
@@ -20,7 +14,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={lato.className}>{children}</body>
+      <body suppressHydrationWarning={true}>
+        <div className="dark:bg-boxdark-2 dark:text-bodydark">{children}</div>
+      </body>
     </html>
   );
 }
