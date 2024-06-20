@@ -19,6 +19,11 @@ def load_user(user_id):
     from.models.user import User
     return User.query.get(user_id)
 
+@login_manager.unauthorized_handler
+def unauthorized():
+    print("Invalid access... please log in")
+    return jsonify(success=False, message="Please log in to access this resource."), 401
+
 def get_client_ip(request):
     if 'X-Forwarded-For' in request.headers:
         # Assuming the first IP is the client's IP, but this may vary
