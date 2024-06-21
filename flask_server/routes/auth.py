@@ -3,6 +3,7 @@ from flask_server.models.user import User
 from flask_server import db, mail
 from flask_mail import Message
 from flask_login import login_user, logout_user,login_required, current_user
+from flask_wtf.csrf import generate_csrf
 import re
 
 auth_bp = Blueprint('auth', __name__)
@@ -18,6 +19,17 @@ def is_valid_password(password):
     """
     pattern = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$%*?&])[A-Za-z\d@$%*?&]{8,}$"
     return bool(re.match(pattern, password))
+
+def user_to_dict(user):
+    return {
+        'id': user.id,
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'username': user.username,
+        'email': user.email,
+        'twofa_enabled': user.twofa_enabled,
+        'roles': [role.name for role in user.roles]  # Assuming Role model has a name attribute
+    }
 
 @auth_bp.route('/signup', methods=['POST'])
 def signup():
@@ -72,11 +84,13 @@ def login():
                 else:
                     # session['user_id'] = user.id
                     login_user(user)
-                    return jsonify(success=True, message='Login successful'), 200
+                    user_details = user_to_dict(user)
+                    #return jsonify(success=True, message='Login successful', user=user_details, csrf_token=generate_csrf()), 200
             else:
                 # session['user_id'] = user.id
                 login_user(user)
-                return jsonify(success=True, message='Login successful'), 200
+                user_details = user_to_dict(user)
+                return jsonify(success=True, message='Login successful', user=user_details, csrf_token=generate_csrf()), 200
         else:
             return jsonify(success=False, message='Invalid credentials'), 401
     else:
