@@ -58,22 +58,19 @@ def create_app():
     migrate = Migrate(app, db)
 
     # Route access logs
-    if logging_config['log_route_access']:
-        @app.before_request
-        def log_request_info():
-            # CSRF verification
-            if request.method in ['POST', 'PUT', 'DELETE', 'PATCH']:
-                skip_csrf_check = request.endpoint in app.config.get('CSRF_EXEMPT_ENDPOINTS', [])
-                if not skip_csrf_check:
-                    try:
-                        validate_csrf(request.headers.get('X-CSRFToken'))
-                    except Exception as e:
-                        app.logger.warning(f"CSRF validation failed for endpoint {request.endpoint}: {str(e)}")
-                        return jsonify(success=False, message='CSRF token validation failed'), 403
-            # Pre route logging
-            # Skip logging for static files or CSRF token generation
-            # if request.path.startswith('/static') or request.path == '/get_csrf_token':
-            #     return
+    @app.before_request
+    def log_request_info():
+        # CSRF verification
+        if request.method in ['POST', 'PUT', 'DELETE', 'PATCH']:
+            skip_csrf_check = request.endpoint in app.config.get('CSRF_EXEMPT_ENDPOINTS', [])
+            if not skip_csrf_check:
+                try:
+                    validate_csrf(request.headers.get('X-CSRFToken'))
+                except Exception as e:
+                    app.logger.warning(f"CSRF validation failed for endpoint {request.endpoint}: {str(e)}")
+                    return jsonify(success=False, message='CSRF token validation failed'), 403
+        # Pre route logging
+        if logging_config['log_route_access']:
             client_ip = get_client_ip(request)
             user_agent = request.headers.get('User-Agent', 'Unknown')
             log_message = f"Before Request: {request.method} {request.url} - Client IP: {client_ip} - User Agent: {user_agent}"
@@ -85,8 +82,9 @@ def create_app():
 
             app.logger.info(log_message)
 
-        @app.after_request
-        def log_response_info(response):
+    @app.after_request
+    def log_response_info(response):
+        if logging_config['log_route_access']:
             client_ip = get_client_ip(request)
             user_agent = request.headers.get('User-Agent', 'Unknown')
             log_message = f"After Request: {request.method} {request.url} - Client IP: {client_ip} - User Agent: {user_agent}"
@@ -94,10 +92,11 @@ def create_app():
             db.session.add(new_log_entry)
             db.session.commit()
             app.logger.info(log_message)
-            return response
+        return response
 
-        @app.errorhandler(Exception)
-        def log_exceptions(e):
+    @app.errorhandler(Exception)
+    def log_exceptions(e):
+        if logging_config['log_route_access']:
             client_ip = get_client_ip(request)
             user_agent = request.headers.get('User-Agent', 'Unknown')
             log_message = f'Unhandled error: {e} - Request: {request.method} {request.url} - Client IP: {client_ip} - User Agent: {user_agent}'
@@ -105,15 +104,14 @@ def create_app():
             db.session.add(new_log_entry)
             db.session.commit()
             app.logger.error(f'Unhandled error: {e} - Request: {request.method} {request.url} - Client IP: {client_ip} - User Agent: {user_agent}', exc_info=e)
-            return jsonify(success=False, message="Oops, somehting went wrong"), 500
+        return jsonify(success=False, message="Oops, somehting went wrong"), 500
 
     # Database ORM events log
-    if logging_config['log_database_queries']:
-        def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
-            app.logger.info(f"Start Query:\n{statement}\nwith {parameters}")
-        
-        def after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
-            app.logger.info("Query Complete")
+    def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+        app.logger.info(f"Start Query:\n{statement}\nwith {parameters}")
+    
+    def after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+        app.logger.info("Query Complete")
 
     # Add SMTPHandler for mailing critical logs
     if logging_config.get('smtp_handler'):
