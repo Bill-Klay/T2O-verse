@@ -7,7 +7,7 @@ from flask_migrate import Migrate
 from flask_mail import Mail
 from flask_login import LoginManager, login_required
 from.config import get_logging_config
-from flask_wtf.csrf import generate_csrf, validate_csrf
+from flask_wtf.csrf import validate_csrf
 
 db = SQLAlchemy()
 mail = Mail()
@@ -56,11 +56,6 @@ def create_app():
     login_manager.init_app(app)
     mail.init_app(app)  # Initialize Flask-Mail
     migrate = Migrate(app, db)
-
-    @app.route('/get_csrf_token', methods=['GET'])
-    @login_required
-    def get_csrf_token():
-        return jsonify(csrf_token=generate_csrf())
 
     # Route access logs
     if logging_config['log_route_access']:
