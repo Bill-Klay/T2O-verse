@@ -33,10 +33,6 @@ curl -X POST http://localhost:5000/create_role \
 -H "Content-Type: application/json" \
 -d '{"name": "Admin"}'
 
-# Generate CSRF token
-curl -b login_cookies.txt -X GET http://localhost:5000/get_csrf_token \
--c csrf_cookies.txt
-
 # Check user status
 curl -b login_cookies.txt -X GET http://localhost:5000/check_auth_status
 
