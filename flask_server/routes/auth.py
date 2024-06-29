@@ -85,12 +85,18 @@ def login():
                     # session['user_id'] = user.id
                     login_user(user)
                     user_details = user_to_dict(user)
-                    #return jsonify(success=True, message='Login successful', user=user_details, csrf_token=generate_csrf()), 200
+                    response = jsonify(success=True, message='Login successful', user=user_details)
+                    response = make_response(response)
+                    response.set_cookie('X-CSRFToken', generate_csrf(), secure=True, httponly=True, samesite='Strict')
+                    return response, 200
             else:
                 # session['user_id'] = user.id
                 login_user(user)
                 user_details = user_to_dict(user)
-                return jsonify(success=True, message='Login successful', user=user_details, csrf_token=generate_csrf()), 200
+                response = jsonify(success=True, message='Login successful', user=user_details)
+                response = make_response(response)
+                response.set_cookie('X-CSRFToken', generate_csrf(), secure=True, httponly=True, samesite='Strict')
+                return response, 200
         else:
             return jsonify(success=False, message='Invalid credentials'), 401
     else:
