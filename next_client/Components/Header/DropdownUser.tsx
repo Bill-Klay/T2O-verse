@@ -3,11 +3,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const router = useRouter();
+  const { setAuth }: any = useAuth();
 
   const trigger = useRef<any>(null);
   const dropdown = useRef<any>(null);
@@ -40,7 +42,7 @@ const DropdownUser = () => {
 
   const logout = async () => {
     try {
-      const res = await fetch("http://192.168.100.123:5000/logout", {
+      const res = await fetch("http://localhost:5000/logout", {
         method: "GET",
         credentials: "include",
       });
@@ -52,6 +54,7 @@ const DropdownUser = () => {
         }
         throw new Error(errorMessage);
       }
+      localStorage.removeItem("auth");
       const data = await res.json();
       console.log("RESPONSE...", JSON.stringify(data, null, 4));
       toast.success(`${data.message}`, {

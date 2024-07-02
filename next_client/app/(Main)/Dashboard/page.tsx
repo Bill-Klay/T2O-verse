@@ -1,12 +1,14 @@
 import React from "react";
 import DefaultLayout from "@/Components/Layouts/DefaultLayout";
-import TestComponent from "../TestComponent/page";
-import Link from "next/link";
+import Profile from "./Profile/page";
+import { AuthProvider } from "@/config/context/AuthProvider";
 
 const Dashboard = () => {
   return (
     <DefaultLayout>
-      <Link href={"/TestComponent"}>goto test</Link>
+      <AuthProvider>
+        <Profile />
+      </AuthProvider>
     </DefaultLayout>
   );
 };

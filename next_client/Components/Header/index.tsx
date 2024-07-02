@@ -5,6 +5,7 @@ import DropdownNotification from "./DropdownNotification";
 import DropdownUser from "./DropdownUser";
 import Image from "next/image";
 import { useEffect } from "react";
+import { AuthProvider } from "@/config/context/AuthProvider";
 
 const Header = (props: {
   sidebarOpen: string | boolean | undefined;
@@ -131,7 +132,9 @@ const Header = (props: {
           </ul>
 
           {/* <!-- User Area --> */}
-          <DropdownUser />
+          <AuthProvider>
+            <DropdownUser />
+          </AuthProvider>
           {/* <!-- User Area --> */}
         </div>
       </div>

@@ -7,8 +7,10 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import LoginSignupLayout from "@/Components/Layouts/LoginSignupLayout";
+import { useAuth } from "@/hooks/useAuth";
 
 const LoginPage = () => {
+  const { setAuth }: any = useAuth();
   const router = useRouter();
 
   const Formik = useFormik({
@@ -23,12 +25,24 @@ const LoginPage = () => {
       formData.append("password", values.password);
       formData.append("token", "");
       try {
-        const res = await fetch("http://192.168.100.123:5000/login", {
+        const res = await fetch("http://localhost:5000/login", {
           method: "POST",
           body: formData,
           credentials: "include",
         });
+        console.log("Response:...", res);
+
         if (!res.ok) {
+          if (res.status === 400) {
+            setAuth({
+              username_or_email: values.username_or_email,
+              password: values.password,
+            });
+            router.push(
+              `/TwoFA?username_or_email=${values.username_or_email}password=${values.password}`
+            );
+            return;
+          }
           const errorData = await res.json();
           let errorMessage = "Something Went Wrong!";
           if (errorData) {
@@ -36,7 +50,11 @@ const LoginPage = () => {
           }
           throw new Error(errorMessage);
         }
+
         const data = await res.json();
+        console.log("DATA:...", JSON.stringify(data, null, 4));
+        const user = data.user;
+        setAuth(user);
         toast.success(`${data.message}`, {
           position: "bottom-right",
           autoClose: 3000,

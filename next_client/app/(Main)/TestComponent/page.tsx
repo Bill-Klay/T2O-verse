@@ -1,26 +1,43 @@
 import React from "react";
-import { getCookies } from "next-client-cookies/server";
-import { csrf_request } from "@/lib/csrf_request";
-// import { useAuth } from "@/hooks/useAuth";
+import { cookies } from "next/headers";
 
-// // const { setAuth }: any = useAuth();
-// const reqToken = async () => {
+const reqToken = async () => {
+  const cookieStore = cookies();
+  const cookie = cookieStore.get("session");
 
-//   // const
-//   console.log("Token...", data.message);
-//   // console.log("Cookie", get)
-//   return "worked";
-// };
+  const resp = await fetch("http://localhost:3000/api/setCookie", {
+    method: "GET",
+    headers: {
+      Cookie: `session=${cookie?.value}`,
+    },
+  });
+
+  const check = await resp.json();
+
+  const res = await fetch("http://localhost:5000/check_auth_status", {
+    method: "GET",
+    // credentials: "include",
+    headers: {
+      Cookie: `session=${cookie?.value}`,
+    },
+  });
+
+  const data = await res.json();
+  return data;
+};
 
 const TestComponent = async () => {
-  let flag = "Did not work";
-  flag = await csrf_request();
-  // const token = await reqToken();
-  // const csrtToken = await token;
-  // console.log("Token....", csrtToken);
+  const cookieStore = cookies();
+  let flag;
+  flag = await reqToken();
+  let flag1 = cookieStore.get("session")?.value;
+
   return (
     <div className="border-2">
-      Amerikaya: {typeof window} {"Cookie" + JSON.stringify(flag, null, 4)}
+      Amerikaya: {typeof window}{" "}
+      {"Cookie" +
+        JSON.stringify(flag, null, 4) +
+        JSON.stringify(flag1, null, 4)}
     </div>
   );
 };
