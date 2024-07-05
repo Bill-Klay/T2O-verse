@@ -4,8 +4,8 @@ import React, { useRef, useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import Breadcrumb from "@/Components/Breadcrumbs/Breadcrumb";
 import QRCode from "react-qr-code";
-import { getCookie } from "cookies-next";
 import { getURI } from "@/Actions/getUriAction";
+import OTPInput from "react-otp-input";
 
 const Profile = () => {
   const [showModal, setShowModal] = useState(false);
@@ -13,6 +13,7 @@ const Profile = () => {
   const profileRef = useRef<HTMLDivElement>(null);
   const [modalStyle, setModalStyle] = useState({});
   const [uri, setURI] = useState("");
+  const [token, setToken] = useState("");
 
   const handleClick = () => {
     setShowModal(!showModal);
@@ -29,14 +30,6 @@ const Profile = () => {
     }
   }, [showModal]);
 
-  // useEffect(() => {
-  //   (async () => {
-  //     if (showModal) {
-  //       const CSRFToken = getCookie("X-CSRFToken");
-  //     }
-  //   })();
-  // }, [showModal]);
-
   return (
     <>
       {/* MODAL */}
@@ -52,20 +45,8 @@ const Profile = () => {
                 {/*header*/}
                 <div className="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
                   <h3 className="text-3xl font-semibold">Scan QR Code</h3>
-                  {/* <button
-                    className="p-1 ml-auto bg-transparent border-0 text-black opacity-50 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
-                    onClick={() => setShowModal(false)}
-                  >
-                    <span className="bg-transparent text-black  h-6 w-6 text-2xl block outline-none focus:outline-none">
-                      ×
-                    </span>
-                  </button> */}
                 </div>
-                {/*body*/}
                 <div className="relative p-6 flex-auto">
-                  {/* <p className="my-4 text-center text-blueGray-500 text-lg leading-relaxed">
-                    QR CODE HERE
-                  </p> */}
                   {uri?.length > 0 ? (
                     <QRCode
                       size={100}
@@ -75,26 +56,34 @@ const Profile = () => {
                         width: "100%",
                       }}
                       value={uri}
-                      // viewBox={`0 0 256 256`}
                     />
                   ) : null}
+                </div>
+                <div className="relative w-full flex flex-col justify-center items-center">
+                  <span>Confirmation</span>
+                  <OTPInput
+                    value={token}
+                    onChange={setToken}
+                    numInputs={6}
+                    renderSeparator={<span>--</span>}
+                    renderInput={(props) => (
+                      <input
+                        {...props}
+                        className="w-full rounded-md border border-strokedark bg-transparent py-1 text-center text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      />
+                    )}
+                  />
                 </div>
                 {/*footer*/}
                 <div className="flex items-center justify-center p-6 rounded-b">
                   <button
                     className=" cursor-pointer rounded-lg border border-primary bg-primary p-2 text-white transition hover:bg-opacity-90 disabled:bg-strokedark disabled:border-strokedark"
                     type="button"
+                    disabled={token === ""}
                     onClick={() => setShowModal(false)}
                   >
-                    Done
+                    Enable
                   </button>
-                  {/* <button
-                    className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                    type="button"
-                    onClick={() => setShowModal(false)}
-                  >
-                    Save Changes
-                  </button> */}
                 </div>
               </div>
             </div>

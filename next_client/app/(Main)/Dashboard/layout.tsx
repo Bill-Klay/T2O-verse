@@ -1,16 +1,13 @@
-import React from "react";
 import DefaultLayout from "@/Components/Layouts/DefaultLayout";
-import Profile from "./Profile/page";
 import { AuthProvider } from "@/config/context/AuthProvider";
+import { ReactNode } from "react";
 
-const Dashboard = () => {
+const DashboardLayout = ({ children }: { children: ReactNode }) => {
   return (
     <DefaultLayout>
-      <AuthProvider>
-        <Profile />
-      </AuthProvider>
+      <AuthProvider>{children}</AuthProvider>
     </DefaultLayout>
   );
 };
 
-export default Dashboard;
+export default DashboardLayout;
