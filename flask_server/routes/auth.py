@@ -106,7 +106,7 @@ def login():
         pass  # Implement rendering the login form here
 
 @auth_bp.route('/update_twofa', methods=['POST'])
-# @login_required
+@login_required
 def update_twofa():
     data = request.json
     enabled = data.get('enabled', False)
@@ -117,6 +117,11 @@ def update_twofa():
         return jsonify(success=True, message='2FA enabled', uri=uri), 200
     else:
         return jsonify(success=True, message='2FA disabled'), 200
+
+@auth_bp.route('twofa_uri', methods=['GET'])
+@login_required
+def fetch_twofa_uri():
+    return current_user.fetch_twofa_uri()
 
 @auth_bp.route('/logout')
 @login_required
