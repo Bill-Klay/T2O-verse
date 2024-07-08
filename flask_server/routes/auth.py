@@ -1,9 +1,11 @@
-from flask import Blueprint, request, jsonify, session, redirect, url_for
+from flask import Blueprint, request, jsonify, session, redirect, url_for, current_app, make_response
 from flask_server.models.user import User
 from flask_server import db, mail
 from flask_mail import Message
 from flask_login import login_user, logout_user,login_required, current_user
 from flask_wtf.csrf import generate_csrf
+from itsdangerous import TimedSerializer
+import pyotp
 import re
 
 auth_bp = Blueprint('auth', __name__)
@@ -104,7 +106,7 @@ def login():
         pass  # Implement rendering the login form here
 
 @auth_bp.route('/update_twofa', methods=['POST'])
-@login_required
+# @login_required
 def update_twofa():
     data = request.json
     enabled = data.get('enabled', False)
@@ -131,3 +133,48 @@ def check_auth_status():
     else:
         print("No user is logged in.")
         return jsonify(success=False, message='User is not logged in')
+
+def generate_password_reset_token(email, expires_in=600):
+    serializer = TimedSerializer(current_app.config['SECRET_KEY'], expires_in=expires_in)
+    return serializer.dumps(email, salt='password-reset')
+
+@auth_bp.route('/forgot_password', methods=['POST'])
+def forgot_password():
+    email = request.json.get('email')
+    if not email:
+        return jsonify(success=False, message='Email is required'), 400
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify(success=False, message='Email not found'), 404
+
+    token = generate_password_reset_token(email)
+    reset_url = url_for('auth.reset_password', token=token, _external=True)
+    msg = Message('Password Reset Requested', sender='noreply@yourdomain.com', recipients=[email])
+    msg.body = f'''To reset your password, visit the following link:
+{reset_url}
+If you did not make this request then simply ignore this email and no changes will be made.
+'''
+    mail.send(msg)
+    return jsonify(success=True, message='Password reset email sent'), 200
+
+@auth_bp.route('/reset_password/<token>', methods=['POST'])
+def reset_password(token):
+    email = request.json.get('email')
+    password = request.json.get('password')
+    if not email or not password:
+        return jsonify(success=False, message='Email and password are required'), 400
+
+    serializer = TimedSerializer(current_app.config['SECRET_KEY'])
+    try:
+        email = serializer.loads(token, salt='password-reset', max_age=600)
+    except:
+        return jsonify(success=False, message='The password reset link is invalid or has expired'), 400
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify(success=False, message='Email not found'), 404
+
+    user.set_password(password)
+    db.session.commit()
+    return jsonify(success=True, message='Password has been reset'), 200
