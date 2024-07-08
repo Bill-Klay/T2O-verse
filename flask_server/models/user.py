@@ -65,6 +65,7 @@ class User(db.Model):
         if enabled:
             # Generate a new secret if 2FA is being enabled
             self.twofa_secret = pyotp.random_base32()
+            self.twofa_enabled = True
             db.session.commit()
             # Return the provisioning URI for the authenticator app
             return self.get_totp_uri()
