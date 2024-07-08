@@ -120,7 +120,7 @@ def update_twofa():
 @auth_bp.route('/twofa_uri', methods=['GET'])
 @login_required
 def fetch_twofa_uri():
-    return jsonify(success=True, message='2FA confirmation', uri=uri), 200
+    return jsonify(success=True, message='2FA confirmation', uri=current_user.fetch_twofa_uri()), 200
 
 @auth_bp.route('/logout')
 @login_required
