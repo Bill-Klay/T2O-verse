@@ -113,7 +113,7 @@ def update_twofa():
     token = data.get('token')
 
     # Update the current user's 2FA settings
-    success = user.update_twofa(enabled=True, token='provided_token')
+    success = user.update_twofa(enabled, token)
     if success:
         return jsonify(success=True, message="2FA updated successfully"), 200
     else:
