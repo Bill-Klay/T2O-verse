@@ -62,9 +62,6 @@ class User(db.Model):
         Enable or disable 2FA for the user.
         :param enabled: Boolean indicating whether to enable 2FA.
         """
-        print(enabled)
-        print(token)
-        print(self.verify_totp(token))
         if token and self.verify_totp(token):
             if enabled:
                 # Enable 2FA
