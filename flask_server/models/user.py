@@ -67,11 +67,12 @@ class User(db.Model):
             self.twofa_enabled = True
             db.session.commit()
             return True
-        elif not enabled and self.verify_totp(token):
+        elif ((not enabled) and (self.verify_totp(token))):
             # Clear the secret if disabling 2FA
             self.twofa_secret = None
             self.twofa_enabled = False
             db.session.commit()
+            print("2FA is being disabled")
             return False
     
     def fetch_twofa_uri(self):

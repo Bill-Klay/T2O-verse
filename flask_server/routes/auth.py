@@ -71,7 +71,7 @@ def login():
     if request.method == 'POST':
         username_or_email = request.form['username_or_email']
         password = request.form['password']
-        token = request.form.get('token')  # OTP from the user
+        token = request.form.get('token', None)  # OTP from the user
 
         user = User.query.filter((User.username == username_or_email) | (User.email == username_or_email)).first()
         
