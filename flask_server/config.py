@@ -40,8 +40,8 @@ def get_logging_config(env):
 # Add more configurations as needed
 SECRET_KEY = 'your_secret_key'
 SESSION_COOKIE_SECURE = False
-SESSION_COOKIE_HTTPONLY = False
-SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
 PERMANENT_SESSION_LIFETIME = timedelta(days=1)
 WTF_CSRF_TIME_LIMIT = timedelta(days=1)
 SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///default.db')
