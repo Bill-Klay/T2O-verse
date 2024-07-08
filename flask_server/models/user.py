@@ -62,17 +62,18 @@ class User(db.Model):
         Enable or disable 2FA for the user.
         :param enabled: Boolean indicating whether to enable 2FA.
         """
-        if enabled and self.verify_totp(token):
-            # Enable 2FA param for client
-            self.twofa_enabled = True
+        if token and self.verify_totp(token):
+            if enabled:
+                # Enable 2FA
+                self.twofa_enabled = True
+            else:
+                # Disable 2FA
+                self.twofa_secret = None
+                self.twofa_enabled = False
             db.session.commit()
             return True
-        elif ((not enabled) and (self.verify_totp(token))):
-            # Clear the secret if disabling 2FA
-            self.twofa_secret = None
-            self.twofa_enabled = False
-            db.session.commit()
-            print("2FA is being disabled")
+        else:
+            # Token is invalid or not provided
             return False
     
     def fetch_twofa_uri(self):

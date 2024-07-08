@@ -112,12 +112,12 @@ def update_twofa():
     enabled = data.get('enabled', False)
     token = data.get('token')
 
-    # Update the current user's 2FA settings and get the provisioning URI if applicable
-    if current_user.update_twofa(enabled, token):
-        return jsonify(success=True, message='2FA enabled'), 200
+    # Update the current user's 2FA settings
+    success = user.update_twofa(enabled=True, token='provided_token')
+    if success:
+        return jsonify(success=True, message="2FA updated successfully"), 200
     else:
-        print(current_user.update_twofa(enabled, token))
-        return jsonify(success=True, message='2FA disabled'), 200
+        return jsonify(success=False, message="Failed to update 2FA. Invalid token or not provided."), 200
 
 @auth_bp.route('/twofa_uri', methods=['GET'])
 @login_required
