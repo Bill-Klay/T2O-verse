@@ -43,7 +43,7 @@ SESSION_COOKIE_SECURE = False
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 PERMANENT_SESSION_LIFETIME = timedelta(days=1)
-WTF_CSRF_TIME_LIMIT = timedelta(days=1)
+# WTF_CSRF_TIME_LIMIT = timedelta(days=1)
 SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///default.db')
 SQLALCHEMY_ECHO = False
 ENV = os.getenv('FLASK_ENV', 'development').lower()
