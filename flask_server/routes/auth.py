@@ -110,9 +110,10 @@ def login():
 def update_twofa():
     data = request.json
     enabled = data.get('enabled', False)
+    token = data.get('token')
 
     # Update the current user's 2FA settings and get the provisioning URI if applicable
-    if current_user.update_twofa(enabled):
+    if current_user.update_twofa(enabled, token):
         return jsonify(success=True, message='2FA enabled'), 200
     else:
         return jsonify(success=True, message='2FA disabled'), 200
