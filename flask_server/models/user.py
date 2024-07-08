@@ -72,7 +72,7 @@ class User(db.Model):
             self.twofa_secret = None
             self.twofa_enabled = False
             db.session.commit()
-            return None
+            return False
     
     def fetch_twofa_uri(self):
         # Generate a new secret if 2FA is being enabled
