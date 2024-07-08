@@ -116,6 +116,7 @@ def update_twofa():
     if current_user.update_twofa(enabled, token):
         return jsonify(success=True, message='2FA enabled'), 200
     else:
+        print(current_user.update_twofa(enabled, token))
         return jsonify(success=True, message='2FA disabled'), 200
 
 @auth_bp.route('/twofa_uri', methods=['GET'])
