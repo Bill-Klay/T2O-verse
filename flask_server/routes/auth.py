@@ -158,11 +158,11 @@ def forgot_password():
     reset_url = url_for('auth.reset_password', token=token, _external=True)
     msg = Message('Password Reset Requested', sender='noreply@yourdomain.com', recipients=[email])
     msg.body = f'''To reset your password, visit the following link:
-{reset_url}
-If you did not make this request then simply ignore this email and no changes will be made.
-'''
+                {reset_url}
+                If you did not make this request then simply ignore this email and no changes will be made.
+                '''
     mail.send(msg)
-    return jsonify(success=True, message='Password reset email sent'), 200
+    return jsonify(success=True, message='Password reset email sent', url=reset_url), 200
 
 @auth_bp.route('/reset_password/<token>', methods=['POST'])
 def reset_password(token):
