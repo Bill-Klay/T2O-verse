@@ -39,6 +39,7 @@ def get_logging_config(env):
 
 # Add more configurations as needed
 SECRET_KEY = 'your_secret_key'
+PASSWORD_RESET_SALT = 'unique_salt_for_password_reset'
 SESSION_COOKIE_SECURE = False
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
@@ -57,5 +58,8 @@ CSRF_EXEMPT_ENDPOINTS = [
     'auth.logout',
     'auth.signup',
     'auth.login',
+    'auth.forgot_password',
+    'auth.reset_password',
+    'auth.verify_token',
     'get_csrf_token'
 ]

@@ -140,10 +140,6 @@ def check_auth_status():
         print("No user is logged in.")
         return jsonify(success=False, message='User is not logged in')
 
-def generate_password_reset_token(email, expires_in=600):
-    serializer = TimedSerializer(current_app.config['SECRET_KEY'])
-    return serializer.dumps(email, salt='password-reset')
-
 @auth_bp.route('/forgot_password', methods=['POST'])
 def forgot_password():
     email = request.json.get('email')
@@ -154,15 +150,16 @@ def forgot_password():
     if not user:
         return jsonify(success=False, message='Email not found'), 404
 
-    token = generate_password_reset_token(email)
+    serializer = TimedSerializer(current_app.config['SECRET_KEY'])
+    token = serializer.dumps(email, salt=current_app.config['PASSWORD_RESET_SALT'])
     reset_url = url_for('auth.reset_password', token=token, _external=True)
     msg = Message('Password Reset Requested', sender='noreply@yourdomain.com', recipients=[email])
     msg.body = f'''To reset your password, visit the following link:
-                {reset_url}
-                If you did not make this request then simply ignore this email and no changes will be made.
-                '''
+    {reset_url}
+    If you did not make this request then simply ignore this email and no changes will be made.
+    '''
     mail.send(msg)
-    return jsonify(success=True, message='Password reset email sent', url=reset_url), 200
+    return jsonify(success=True, message='Password reset email sent'), 200
 
 @auth_bp.route('/reset_password/<token>', methods=['POST'])
 def reset_password(token):
@@ -173,7 +170,7 @@ def reset_password(token):
 
     serializer = TimedSerializer(current_app.config['SECRET_KEY'])
     try:
-        email = serializer.loads(token, salt='password-reset')
+        email = serializer.loads(token, salt=current_app.config['PASSWORD_RESET_SALT'])
     except:
         return jsonify(success=False, message='The password reset link is invalid or has expired'), 400
 
