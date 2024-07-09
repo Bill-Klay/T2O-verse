@@ -141,7 +141,7 @@ def check_auth_status():
         return jsonify(success=False, message='User is not logged in')
 
 def generate_password_reset_token(email, expires_in=600):
-    serializer = TimedSerializer(current_app.config['SECRET_KEY'], expires_in=expires_in)
+    serializer = TimedSerializer(current_app.config['SECRET_KEY'])
     return serializer.dumps(email, salt='password-reset')
 
 @auth_bp.route('/forgot_password', methods=['POST'])
@@ -173,7 +173,7 @@ def reset_password(token):
 
     serializer = TimedSerializer(current_app.config['SECRET_KEY'])
     try:
-        email = serializer.loads(token, salt='password-reset', max_age=600)
+        email = serializer.loads(token, salt='password-reset')
     except:
         return jsonify(success=False, message='The password reset link is invalid or has expired'), 400
 
@@ -181,6 +181,6 @@ def reset_password(token):
     if not user:
         return jsonify(success=False, message='Email not found'), 404
 
-    user.set_password(password)
+    user.password = password
     db.session.commit()
     return jsonify(success=True, message='Password has been reset'), 200
