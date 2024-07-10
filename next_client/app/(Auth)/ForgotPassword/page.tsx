@@ -1,16 +1,35 @@
 "use client";
 
-import { useFormik } from "formik";
-import { loginFormValidation } from "@/utils/FormValidation";
-import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
+import { FormEvent } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useAuth } from "@/hooks/useAuth";
+import { useState } from "react";
 
-const LoginPage = () => {
-  const { setAuth }: any = useAuth();
-  const router = useRouter();
+const ForgotPasswordPage = () => {
+  const [email, setEmail] = useState("");
+
+  const forgotPassword = async (
+    event: FormEvent<HTMLFormElement>,
+    email: string
+  ) => {
+    event.preventDefault();
+    try {
+      const res = await fetch("http://localhost:5000/forgot_password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+        }),
+      });
+
+      const resData = await res.json();
+      return resData;
+    } catch (error) {
+      console.log("Error: ", error);
+    }
+  };
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center">
@@ -28,7 +47,7 @@ const LoginPage = () => {
                 />
               </Link>
 
-              <p className="2xl:px-5">Password Recovery</p>
+              <p className="2xl:px-5">Reset Password</p>
             </div>
           </div>
 
@@ -37,12 +56,17 @@ const LoginPage = () => {
               <h2 className="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2">
                 Enter Email
               </h2>
-              <form>
+              <form
+                onSubmit={(event) => {
+                  forgotPassword(event, email);
+                }}
+                noValidate
+              >
                 <div className="relative">
                   <input
                     id="email"
                     name="email"
-                    // onChange={Formik.handleChange}
+                    onChange={(event) => setEmail(event.target.value)}
                     type="email"
                     placeholder="Enter email"
                     className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
@@ -84,4 +108,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default ForgotPasswordPage;

@@ -28,6 +28,21 @@ export const loginFormValidation = Yup.object({
     .required("Password is required"),
 });
 
+export const passwordValidation = Yup.object({
+  password: Yup.string()
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$%*?&])[A-Za-z\d@$%*?&]{8,}$/,
+      "Invalid Format"
+    )
+    .required("Password is required"),
+  confirm_password: Yup.string()
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$%*?&])[A-Za-z\d@$%*?&]{8,}$/,
+      "Invalid Format"
+    )
+    .required("Password is required"),
+});
+
 export const signupFormValidation = Yup.object({
   firstName: Yup.string().required("First name is required"),
   lastName: Yup.string().required("Last name is required"),
