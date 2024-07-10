@@ -36,6 +36,9 @@ curl -X POST http://localhost:5000/create_role \
 # Check user status
 curl -b login_cookies.txt -X GET http://localhost:5000/check_auth_status
 
+# Paginated logs
+curl -i "http://localhost:5000/logs?page=2&per_page=20"
+
 # Necessary exports for the application factory function
 export FLASK_APP=app_run.py
 export FLASK_ENV=development
