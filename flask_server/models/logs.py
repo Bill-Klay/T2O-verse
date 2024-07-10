@@ -11,3 +11,13 @@ class LogEntry(db.Model):
 
     def __repr__(self):
         return f'<LogEntry {self.id}>'
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'timestamp': self.timestamp.isoformat(),
+            'log_level': self.log_level,
+            'message': self.message,
+            'client_ip': self.client_ip,
+            'user_agent': self.user_agent
+        }
