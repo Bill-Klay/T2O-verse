@@ -1,55 +1,82 @@
+"use client";
+
 import { LOGS } from "@/types/Logs";
-import Image from "next/image";
+import { useState, useEffect } from "react";
+import { getLogsAction } from "@/Actions/Log_Actions";
+import ReactPaginate from "react-paginate";
 
-const logData: LOGS[] = [
-  {
-    id: 1,
-    timestamp: "2024-07-01 06:33:02.262918",
-    log_level: "INFO",
-    message:
-      "Before Request: POST http://localhost:5000/login - Client IP: 127.0.0.1 - User Agent: Thunder Client (https://www.thunderclient.com)",
-    client_ip: "127.0.0.1",
-    user_agent: "Thunder Client (https://www.thunderclient.com)",
-  },
-  {
-    id: 2,
-    timestamp: "2024-07-01 06:33:02.574180",
-    log_level: "INFO",
-    message:
-      "Before Request: POST http://localhost:5000/login - Client IP: 127.0.0.1 - User Agent: Thunder Client (https://www.thunderclient.com)",
-    client_ip: "127.0.0.1",
-    user_agent: "Thunder Client (https://www.thunderclient.com)",
-  },
-  {
-    id: 3,
-    timestamp: "2024-07-01 06:33:02.726179",
-    log_level: "INFO",
-    message:
-      "Before Request: POST http://localhost:5000/login - Client IP: 127.0.0.1 - User Agent: Thunder Client (https://www.thunderclient.com)",
-    client_ip: "127.0.0.1",
-    user_agent: "Thunder Client (https://www.thunderclient.com)",
-  },
-  {
-    id: 4,
-    timestamp: "2024-07-01 06:41:50.547266",
-    log_level: "INFO",
-    message:
-      "After Request: POST http://localhost:5000/update_twofa - Client IP: 127.0.0.1 - User Agent: Thunder Client (https://www.thunderclient.com)",
-    client_ip: "127.0.0.1",
-    user_agent: "Thunder Client (https://www.thunderclient.com)",
-  },
-  {
-    id: 5,
-    timestamp: "2024-07-01 06:42:59.952625",
-    log_level: "INFO",
-    message:
-      "After Request: POST http://localhost:5000/update_twofa - Client IP: 127.0.0.1 - User Agent: Thunder Client (https://www.thunderclient.com)",
-    client_ip: "127.0.0.1",
-    user_agent: "Thunder Client (https://www.thunderclient.com)",
-  },
-];
+type LogProps = {
+  currentLogs: LOGS[];
+};
 
-const TableOne = () => {
+const Logs = ({ currentLogs }: LogProps) => {
+  return (
+    <>
+      {currentLogs?.map((log: LOGS) => (
+        <div
+          className={`grid grid-cols-6 ${
+            log.id === currentLogs.length - 1
+              ? ""
+              : "border-b border-stroke dark:border-strokedark"
+          }`}
+          key={log.id}
+        >
+          <div className="flex items-center justify-center p-2.5 xl:p-5">
+            <p className="text-black dark:text-white">{log.id}</p>
+          </div>
+          <div className="flex items-center justify-center p-2.5 xl:p-5">
+            <p className="text-black dark:text-white">{log.timestamp}</p>
+          </div>
+          <div className="flex items-center justify-center p-2.5 xl:p-5">
+            <p className="text-black dark:text-white">{log.log_level}</p>
+          </div>
+          <div className="flex items-center justify-center p-2.5 xl:p-5">
+            <p className="text-meta-10">{log.message}</p>
+          </div>
+          <div className="flex items-center justify-center p-2.5 xl:p-5">
+            <p className="text-black dark:text-white">{log.client_ip}</p>
+          </div>
+          <div className="flex items-center justify-center p-2.5 xl:p-5">
+            <p className="text-meta-5">{log.user_agent}</p>
+          </div>
+        </div>
+      ))}
+    </>
+  );
+};
+
+const TableOne = ({ logsPerPage }: any) => {
+  const [logs, setLogs] = useState<LOGS[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [logOffset, setLogOffset] = useState(0);
+
+  const endOffset = logOffset + logsPerPage;
+  const currentLogs = logs.slice(logOffset, endOffset);
+  // const pageCount = Math.ceil(logs.length / logsPerPage);
+
+  const handlePageClick = async (event: any) => {
+    const data = await getLogsAction({
+      page: event.selected + 1,
+      per_page: 10,
+    });
+    setTotalPages(data.total_pages);
+    setLogs(data.logs);
+    const newOffset = (event.selected * logsPerPage) % logs.length;
+    console.log(
+      `User requested page number ${event.selected}, which is offset ${newOffset}`
+    );
+    setLogOffset(newOffset);
+  };
+
+  useEffect(() => {
+    (async () => {
+      const data = await getLogsAction({ page: 1, per_page: 10 });
+      console.log("Total-Pages: ", data.total_pages);
+      setTotalPages(data.total_pages);
+      setLogs(data.logs);
+    })();
+  }, []);
+
   return (
     <div className="rounded-sm border border-stroke bg-white px-2 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
       <h4 className="mb-6 text-xl font-semibold text-black dark:text-white">
@@ -87,36 +114,28 @@ const TableOne = () => {
             </h5>
           </div>
         </div>
-
-        {logData.map((log, key) => (
-          <div
-            className={`grid grid-cols-6 ${
-              key === logData.length - 1
-                ? ""
-                : "border-b border-stroke dark:border-strokedark"
-            }`}
-            key={key}
-          >
-            <div className="flex items-center justify-center p-2.5 xl:p-5">
-              <p className="text-black dark:text-white">{log.id}</p>
-            </div>
-            <div className="flex items-center justify-center p-2.5 xl:p-5">
-              <p className="text-black dark:text-white">{log.timestamp}</p>
-            </div>
-            <div className="flex items-center justify-center p-2.5 xl:p-5">
-              <p className="text-black dark:text-white">{log.log_level}</p>
-            </div>
-            <div className="flex items-center justify-center p-2.5 xl:p-5">
-              <p className="text-meta-10">{log.message}</p>
-            </div>
-            <div className="flex items-center justify-center p-2.5 xl:p-5">
-              <p className="text-black dark:text-white">{log.client_ip}</p>
-            </div>
-            <div className="flex items-center justify-center p-2.5 xl:p-5">
-              <p className="text-meta-5">{log.user_agent}</p>
-            </div>
-          </div>
-        ))}
+        <Logs currentLogs={currentLogs} />
+        <div className="flex justify-center mt-4">
+          <ReactPaginate
+            breakLabel="..."
+            nextLabel="Next ->"
+            onPageChange={handlePageClick}
+            pageRangeDisplayed={5}
+            pageCount={totalPages}
+            previousLabel="<- Previous"
+            renderOnZeroPageCount={null}
+            containerClassName="flex justify-center space-x-2"
+            pageClassName="px-3 py-1 border border-gray-300 rounded"
+            pageLinkClassName="text-black"
+            previousClassName="px-3 py-1 border border-gray-300 rounded"
+            previousLinkClassName="text-black"
+            nextClassName="px-3 py-1 border border-gray-300 rounded"
+            nextLinkClassName="text-black"
+            breakClassName="px-3 py-1 border border-gray-300 rounded"
+            breakLinkClassName="text-black"
+            activeClassName="bg-meta-10 text-white"
+          />
+        </div>
       </div>
     </div>
   );

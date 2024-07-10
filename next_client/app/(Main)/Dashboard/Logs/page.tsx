@@ -12,9 +12,8 @@ const TablesPage = () => {
   return (
     <>
       <Breadcrumb pageName="Tables" />
-      <>{typeof window}</>
       <div className="flex flex-col gap-10">
-        <TableOne />
+        <TableOne logsPerPage={10} />
       </div>
     </>
   );
