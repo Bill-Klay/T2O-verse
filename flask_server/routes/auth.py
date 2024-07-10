@@ -22,17 +22,6 @@ def is_valid_password(password):
     pattern = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$%*?&])[A-Za-z\d@$%*?&]{8,}$"
     return bool(re.match(pattern, password))
 
-def user_to_dict(user):
-    return {
-        'id': user.id,
-        'first_name': user.first_name,
-        'last_name': user.last_name,
-        'username': user.username,
-        'email': user.email,
-        'twofa_enabled': user.twofa_enabled,
-        'roles': [role.name for role in user.roles]  # Assuming Role model has a name attribute
-    }
-
 @auth_bp.route('/signup', methods=['POST'])
 def signup():
     data = request.get_json()
@@ -86,16 +75,14 @@ def login():
                 else:
                     # session['user_id'] = user.id
                     login_user(user)
-                    user_details = user_to_dict(user)
-                    response = jsonify(success=True, message='Login successful', user=user_details)
+                    response = jsonify(success=True, message='Login successful', user=user.user_to_dict())
                     response = make_response(response)
                     response.set_cookie('X-CSRFToken', generate_csrf(), secure=True, httponly=True, samesite='Strict')
                     return response, 200
             else:
                 # session['user_id'] = user.id
                 login_user(user)
-                user_details = user_to_dict(user)
-                response = jsonify(success=True, message='Login successful', user=user_details)
+                response = jsonify(success=True, message='Login successful', user=user.user_to_dict())
                 response = make_response(response)
                 response.set_cookie('X-CSRFToken', generate_csrf(), secure=True, httponly=True, samesite='Strict')
                 return response, 200

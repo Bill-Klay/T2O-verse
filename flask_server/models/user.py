@@ -81,6 +81,17 @@ class User(db.Model):
         self.twofa_secret = pyotp.random_base32()
         db.session.commit()
         return self.get_totp_uri()
+
+    def user_to_dict(self):
+        return {
+            'id': self.id,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'username': self.username,
+            'email': self.email,
+            'twofa_enabled': self.twofa_enabled,
+            'roles': [role.name for role in self.roles]  # Assuming Role model has a name attribute
+        }
         
 # Association table for the many-to-many relationship between users and roles
 user_roles = db.Table('user_roles',
