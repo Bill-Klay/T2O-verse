@@ -33,3 +33,42 @@ def get_logs():
 @login_required
 def current_user_details():
     return jsonify(success=True, message=current_user.user_to_dict()), 200
+
+@home_bp.route('/update_profile', methods=['POST'])
+@login_required
+def update_profile():
+    data = request.get_json()
+    user = current_user
+    
+    # Extract updated fields from the request
+    first_name = data.get('first_name')
+    last_name = data.get('last_name')
+    email = data.get('email')
+    username = data.get('username')
+    password = data.get('password')
+
+    # Validate input (you may add more comprehensive validation as needed)
+    if not first_name or not last_name or not email or not username:
+        return jsonify({"error": "First name, last name, username, and email are required."}), 400
+
+    # Check if email or username is already taken by another user
+    existing_user_email = User.query.filter(User.email == email, User.id != user.id).first()
+    existing_username = User.query.filter(User.username == username, User.id != user.id).first()  # New check for username uniqueness
+    if existing_user_email:
+        return jsonify({"error": "Email already in use."}), 400
+    if existing_username:
+        return jsonify({"error": "Username already exists."}), 400
+
+    # Update user details
+    user.first_name = first_name
+    user.last_name = last_name
+    user.email = email
+    user.username = username  # New addition for updating username
+
+    # Update password if provided
+    if password:
+        user.password = password
+
+    db.session.commit()
+
+    return jsonify({"success": True, "message": "Profile updated successfully."}), 200
