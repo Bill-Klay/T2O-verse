@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { base_url } from "@/lib/Constants";
 
 const SignupPage = () => {
   const [type, setType] = useState("password");
@@ -33,7 +34,7 @@ const SignupPage = () => {
     validationSchema: signupFormValidation,
     onSubmit: async (values) => {
       try {
-        const res = await fetch("http://localhost:5000/signup", {
+        const res = await fetch(`${base_url}/signup`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

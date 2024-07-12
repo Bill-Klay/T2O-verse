@@ -3,7 +3,7 @@ import React, { FormEvent, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import OTPInput from "react-otp-input";
-
+import { base_url } from "@/lib/Constants";
 import { toast } from "react-toastify";
 
 const TwoFA = () => {
@@ -17,7 +17,7 @@ const TwoFA = () => {
     formData.append("password", auth.password);
     formData.append("token", token);
     try {
-      const res = await fetch("http://localhost:5000/login", {
+      const res = await fetch(`${base_url}/login`, {
         method: "POST",
         body: formData,
         credentials: "include",

@@ -1,9 +1,10 @@
 "use server";
+import { base_url } from "@/lib/Constants";
 import { cookies } from "next/headers";
 
 export const getURI = async () => {
   const session = cookies().get("session");
-  const res = await fetch("http://localhost:5000/twofa_uri", {
+  const res = await fetch(`${base_url}/twofa_uri`, {
     method: "GET",
     headers: {
       Cookie: `${session?.name}=${session?.value}`,
@@ -21,7 +22,7 @@ export const getURI = async () => {
 export const setTwoFA = async (flag: boolean, token: string) => {
   const session = cookies().get("session");
   const CSRFToken = cookies().get("X-CSRFToken");
-  const res = await fetch("http://localhost:5000/update_twofa", {
+  const res = await fetch(`${base_url}/update_twofa`, {
     method: "POST",
     headers: {
       "X-CSRFToken": `${CSRFToken?.value}`,

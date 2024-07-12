@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
+import { base_url } from "@/lib/Constants";
 
 const LoginPage = () => {
   const [type, setType] = useState("password");
@@ -36,7 +37,7 @@ const LoginPage = () => {
       formData.append("password", values.password);
       formData.append("token", "");
       try {
-        const res = await fetch("http://localhost:5000/login", {
+        const res = await fetch(`${base_url}/login`, {
           method: "POST",
           body: formData,
           credentials: "include",

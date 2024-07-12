@@ -4,12 +4,12 @@ import Image from "next/image";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import { base_url } from "@/lib/Constants";
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const router = useRouter();
-  const { setAuth }: any = useAuth();
 
   const trigger = useRef<any>(null);
   const dropdown = useRef<any>(null);
@@ -42,7 +42,7 @@ const DropdownUser = () => {
 
   const logout = async () => {
     try {
-      const res = await fetch("http://localhost:5000/logout", {
+      const res = await fetch(`${base_url}/logout`, {
         method: "GET",
         credentials: "include",
       });
@@ -189,7 +189,7 @@ const DropdownUser = () => {
           </li>
           <li>
             <Link
-              href="/settings"
+              href="/Dashboard/Settings"
               className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
             >
               <svg

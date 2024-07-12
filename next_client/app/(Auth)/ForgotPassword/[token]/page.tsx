@@ -7,6 +7,7 @@ import { useState } from "react";
 import { passwordValidation } from "@/utils/FormValidation";
 import { usePathname } from "next/navigation";
 import { toast } from "react-toastify";
+import { base_url } from "@/lib/Constants";
 
 const ResetPasswordPage = () => {
   const [type, setType] = useState("password");
@@ -65,19 +66,16 @@ const ResetPasswordPage = () => {
       console.log("EMAIL:....", email);
       try {
         if (values.password === values.confirm_password) {
-          const res = await fetch(
-            `http://localhost:5000/reset_password/${routeNToken}`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                email,
-                password: values.password,
-              }),
-            }
-          );
+          const res = await fetch(`${base_url}/reset_password/${routeNToken}`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email,
+              password: values.password,
+            }),
+          });
           const data = await res.json();
           toast.success(`${data.message}`, {
             position: "bottom-right",

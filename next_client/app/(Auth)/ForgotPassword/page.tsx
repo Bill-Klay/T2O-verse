@@ -4,6 +4,8 @@ import { FormEvent } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
+import { base_url } from "@/lib/Constants";
+import { toast } from "react-toastify";
 
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState("");
@@ -14,7 +16,7 @@ const ForgotPasswordPage = () => {
   ) => {
     event.preventDefault();
     try {
-      const res = await fetch("http://localhost:5000/forgot_password", {
+      const res = await fetch(`${base_url}/forgot_password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -25,9 +27,34 @@ const ForgotPasswordPage = () => {
       });
 
       const resData = await res.json();
-      return resData;
-    } catch (error) {
+      if (resData.success) {
+        toast.success(`${resData.message}`, {
+          position: "bottom-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      }
+    } catch (error: any) {
       console.log("Error: ", error);
+      let errorMessage = "An error Occured";
+      if (error.message) {
+        errorMessage = error.message;
+      }
+      toast.error(`${errorMessage}`, {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     }
   };
 

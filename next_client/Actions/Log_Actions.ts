@@ -1,6 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { base_url } from "@/lib/Constants";
 
 type Props = {
   page: number;
@@ -10,7 +11,7 @@ type Props = {
 export const getLogsAction = async ({ page, per_page }: Props) => {
   const session = cookies().get("session");
   const response = await fetch(
-    `http://192.168.100.167:5000/logs?page=${page}&per_page=${per_page}`,
+    `${base_url}/logs?page=${page}&per_page=${per_page}`,
     {
       method: "GET",
       headers: {
