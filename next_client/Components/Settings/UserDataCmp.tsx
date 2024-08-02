@@ -1,9 +1,8 @@
-import Image from "next/image";
 import { UserData } from "@/types/UserData";
+import Image from "next/image";
 
 const UserDataCmp = (user_data: any) => {
-  const { first_name, last_name, email, username, roles, twofa_enabled } =
-    user_data.user_data;
+  const userData = user_data.user_data;
   return (
     <>
       <Image
@@ -17,32 +16,32 @@ const UserDataCmp = (user_data: any) => {
           height: "auto",
         }}
       />
-      {/* {JSON.stringify(user_data, null, 4)} */}
+      {/* {JSON.stringify(userData, null, 4)} */}
       <div className="px-4 pb-6 text-center lg:pb-8 xl:pb-11.5">
         <div className="mt-8 grid grid-cols-2">
           <h3 className="mb-1.5 text-lg font-semibold text-meta-5 dark:text-meta-5">
             <span className="font-semibold text-black dark:text-white">
               Name:
             </span>
-            {" " + first_name} {last_name}
+            {" " + userData?.first_name} {userData?.last_name}
           </h3>
           <h3 className="mb-1.5 text-lg font-semibold text-black dark:text-white">
             <span className="font-semibold text-black dark:text-white">
               Email:
             </span>
-            {" " + email}
+            {" " + userData?.email}
           </h3>
           <h3 className="mt-2 mb-1.5 text-lg font-semibold text-meta-5 dark:text-meta-5">
             <span className="font-semibold text-black dark:text-white">
               Username:
             </span>
-            {" " + username}
+            {" " + userData?.username}
           </h3>
           <h3 className="mt-2 mb-1.5 text-lg font-semibold text-black dark:text-white">
             <span className="font-semibold text-black dark:text-white">
               Roles:
             </span>
-            {roles?.map((role: string) => (
+            {userData?.roles?.map((role: string) => (
               <p className="mt-4.5" key={role}>
                 {role}
               </p>
@@ -54,7 +53,7 @@ const UserDataCmp = (user_data: any) => {
             <span className="font-semibold text-black dark:text-white">
               Two-Factor Authentication:
             </span>
-            {twofa_enabled ? " Enabled" : " Disabled"}
+            {userData?.twofa_enabled ? " Enabled" : " Disabled"}
           </h3>
         </div>
       </div>

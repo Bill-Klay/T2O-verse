@@ -23,6 +23,6 @@ export const getLogsAction = async ({ page, per_page }: Props) => {
     }
   );
   const data = await response.json();
-  console.log(data.total_pages);
+  // console.log(data.total_pages);
   return data;
 };

@@ -4,15 +4,13 @@ import { ReactNode } from "react";
 import ReactPaginate from "react-paginate";
 
 type TableProps = {
-  children: ReactNode;
   handlePageClick: (event: any) => void;
   total_pages: number;
 };
 
-const TableOne = ({ children, handlePageClick, total_pages }: TableProps) => {
+const TableOne = ({ handlePageClick, total_pages }: TableProps) => {
   return (
     <>
-      {children}
       <div className="flex justify-center mt-4">
         <ReactPaginate
           breakLabel="..."

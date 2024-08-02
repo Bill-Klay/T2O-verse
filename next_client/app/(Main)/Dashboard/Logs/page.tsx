@@ -3,7 +3,7 @@
 import { LOGS } from "@/types/Logs";
 import { useState, useEffect } from "react";
 import { getLogsAction } from "@/Actions/Log_Actions";
-import Table from "@/Components/Tables/LogTable/PagionationCmp";
+import Pagination from "@/Components/Tables/LogTable/PaginationCmp";
 import { Logs } from "@/Components/Tables/LogTable/LogsCmp";
 
 const LogTablePage = () => {
@@ -39,9 +39,10 @@ const LogTablePage = () => {
     })();
   }, []);
   return (
-    <Table handlePageClick={handlePageClick} total_pages={totalPages}>
+    <>
       <Logs currentLogs={currentLogs} />
-    </Table>
+      <Pagination handlePageClick={handlePageClick} total_pages={totalPages} />
+    </>
   );
 };
 

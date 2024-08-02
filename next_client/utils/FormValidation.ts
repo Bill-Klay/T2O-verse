@@ -62,3 +62,21 @@ export const signupFormValidation = Yup.object({
     )
     .required("Password is required"),
 });
+
+export const profileUpdateValidation = Yup.object({
+  first_name: Yup.string().min(2).required("First name is required"),
+  last_name: Yup.string().min(2).required("Last name is required"),
+  email: Yup.string()
+    .email("Invalid email address")
+    .required("Email is required"),
+  username: Yup.string()
+    .matches(
+      /^[a-zA-Z0-9_]{3,30}$/,
+      "Username must be 3-30 characters long and can only contain letters, numbers, and underscores"
+    )
+    .required("Username is required"),
+  password: Yup.string().matches(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$%*?&])[A-Za-z\d@$%*?&]{8,}$/,
+    "Invalid Format"
+  ),
+});
