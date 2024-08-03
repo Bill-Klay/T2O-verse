@@ -10,6 +10,7 @@ import { profileUpdateValidation } from "@/utils/FormValidation";
 
 const SettingsPage = () => {
   const [userData, setUserData] = useState<UserData>();
+  const [cnf_password, setCnfPassword] = useState("");
 
   const fetchCurrentUser = async () => {
     const res = await fetch(`/api/current_user_details`, {
@@ -39,33 +40,44 @@ const SettingsPage = () => {
     validationSchema: profileUpdateValidation,
     onSubmit: async (values) => {
       console.log(JSON.stringify(values, null, 4));
-      toast.success(`Hello Friend`, {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+      try {
+        const res = await fetch(`/api/update_profile`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            first_name: values.first_name,
+            last_name: values.last_name,
+            email: values.email,
+            username: values.username,
+            password: values.password,
+            cnf_password: cnf_password,
+          }),
+        });
+
+        if (!res.ok) {
+          const error = await res.json();
+          const errorMessage = error.message;
+          throw new Error(`${errorMessage}`);
+        } else {
+          const status = await res.json();
+          toast.success(`${status.message}`, {
+            position: "bottom-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+        }
+      } catch (error) {
+        console.log("Error >>", error);
+      }
     },
   });
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    console.log("Hello");
-    toast.success(`Hello Friend`, {
-      position: "bottom-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-    });
-  };
 
   return (
     <>
@@ -189,6 +201,9 @@ const SettingsPage = () => {
               id="cnf-password"
               name="cnf-password"
               type="password"
+              onChange={(event) => {
+                setCnfPassword(event.target.value);
+              }}
               className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
             />
           </div>
