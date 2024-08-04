@@ -17,7 +17,7 @@ const UserDataCmp = (user_data: any) => {
         }}
       />
       {/* {JSON.stringify(userData, null, 4)} */}
-      <div className="px-4 pb-6 text-center lg:pb-8 xl:pb-11.5">
+      <div className="px-4 pb-3 text-center lg:pb-5 xl:pb-5">
         <div className="mt-8 grid grid-cols-2">
           <h3 className="mb-1.5 text-lg font-semibold text-meta-5 dark:text-meta-5">
             <span className="font-semibold text-black dark:text-white">
