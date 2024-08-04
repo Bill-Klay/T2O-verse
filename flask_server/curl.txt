@@ -33,6 +33,11 @@ curl -X POST http://localhost:5000/create_role \
 -H "Content-Type: application/json" \
 -d '{"name": "Admin"}'
 
+# Fetch all current permission, role, and user details
+curl -X GET http://localhost:5000/roles
+curl -X GET http://localhost:5000/permissions
+curl -X GET http://localhost:5000/users/details
+
 # Check user status
 curl -b login_cookies.txt -X GET http://localhost:5000/check_auth_status
 
