@@ -25,6 +25,8 @@ def get_permissions():
 def create_role():
     data = request.json
     new_role = Role(name=data['name'])
+    if not new_role:
+        return jsonify({'error': 'Role name is required'}), 400
     db.session.add(new_role)
     db.session.commit()
     return jsonify({'message': 'New role created'}), 201
