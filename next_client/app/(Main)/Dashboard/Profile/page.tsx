@@ -68,7 +68,10 @@ const Profile = () => {
                   Roles:
                 </h4>
                 {auth.roles?.map((role: string) => (
-                  <p className="mt-4.5" key={role}>
+                  <p
+                    className="inline-block text-black font-semibold"
+                    key={role}
+                  >
                     {role}
                   </p>
                 ))}

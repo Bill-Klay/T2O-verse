@@ -37,12 +37,12 @@ const UserDataCmp = (user_data: any) => {
             </span>
             {" " + userData?.username}
           </h3>
-          <h3 className="mt-2 mb-1.5 text-lg font-semibold text-black dark:text-white">
+          <h3 className="mt-2 mb-1.5 text-lg font-semibold text-black dark:text-white space-x-2">
             <span className="font-semibold text-black dark:text-white">
               Roles:
             </span>
             {userData?.roles?.map((role: string) => (
-              <p className="mt-4.5" key={role}>
+              <p className="inline-block" key={role}>
                 {role}
               </p>
             ))}

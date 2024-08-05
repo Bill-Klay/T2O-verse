@@ -315,7 +315,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                   >
-                    <g clip-path="url(#clip0_130_9756)">
+                    <g clipPath="url(#clip0_130_9756)">
                       <path
                         d="M2 2.5C1.44771 2.5 1 2.94772 1 3.5V15.5C1 16.0523 1.44771 16.5 2 16.5H16C16.5523 16.5 17 16.0523 17 15.5V3.5C17 2.94772 16.5523 2.5 16 2.5H2ZM3 4.5H6V14.5H3V4.5ZM7.5 4.5H10.5V9.5H7.5V4.5ZM12 4.5H15V12.5H12V4.5Z"
                         fill="currentColor"

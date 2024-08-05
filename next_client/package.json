@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.1.0",
     "cookies-next": "^4.2.1",
     "formik": "^2.4.6",
     "next": "14.2.3",
