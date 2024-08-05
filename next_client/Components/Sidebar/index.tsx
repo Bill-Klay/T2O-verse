@@ -300,6 +300,43 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               </li>
               {/* <!-- Menu Item Tables --> */}
 
+              {/* <!-- Menu Item Kanban --> */}
+              <li>
+                <Link
+                  href="/Dashboard/Kanban"
+                  className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                    pathname.includes("kanban") && "bg-graydark dark:bg-meta-4"
+                  }`}
+                >
+                  <svg
+                    width="18"
+                    height="19"
+                    viewBox="0 0 18 19"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <g clip-path="url(#clip0_130_9756)">
+                      <path
+                        d="M2 2.5C1.44771 2.5 1 2.94772 1 3.5V15.5C1 16.0523 1.44771 16.5 2 16.5H16C16.5523 16.5 17 16.0523 17 15.5V3.5C17 2.94772 16.5523 2.5 16 2.5H2ZM3 4.5H6V14.5H3V4.5ZM7.5 4.5H10.5V9.5H7.5V4.5ZM12 4.5H15V12.5H12V4.5Z"
+                        fill="currentColor"
+                      />
+                    </g>
+                    <defs>
+                      <clipPath id="clip0_130_9756">
+                        <rect
+                          width="18"
+                          height="18"
+                          fill="white"
+                          transform="translate(0 0.052124)"
+                        />
+                      </clipPath>
+                    </defs>
+                  </svg>
+                  Kanban
+                </Link>
+              </li>
+              {/* <!-- Menu Item Tables --> */}
+
               {/* <!-- Menu Item Forms --> */}
               <SidebarLinkGroup
                 activeCondition={

@@ -12,7 +12,7 @@ import RoleCmp from "@/Components/Settings/RoleCmp";
 const SettingsPage = () => {
   const [userData, setUserData] = useState<UserData>();
   const [cnf_password, setCnfPassword] = useState("");
-  const [type, setType] = useState(false);
+  const [type, setType] = useState(true);
 
   const fetchCurrentUser = async () => {
     const res = await fetch(`/api/current_user_details`, {
