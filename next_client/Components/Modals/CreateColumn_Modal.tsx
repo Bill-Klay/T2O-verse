@@ -1,22 +1,28 @@
+import { Board } from "@/types/KanbanTypes";
 import { Dispatch, SetStateAction, useState } from "react";
 import { toast } from "react-toastify";
 
 type ModalProps = {
-  showModal: boolean;
+  showColumnModal: boolean;
   modalStyle: object;
-  setShowModal: Dispatch<SetStateAction<boolean>>;
+  setShowColumnModal: Dispatch<SetStateAction<boolean>>;
+  board: Board | undefined;
+  getColumns: (board: Board) => void;
 };
 
-const CreateKanban_Modal = ({
-  showModal,
+const CreateColumn_Modal = ({
+  showColumnModal,
   modalStyle,
-  setShowModal,
+  setShowColumnModal,
+  board,
+  getColumns,
 }: ModalProps) => {
-  const [kanban_name, setKanbanName] = useState("");
+  const [columnName, setColumnName] = useState("");
+  const [columnPosition, setColumnPosition] = useState("");
 
   const handleClick = async () => {
     try {
-      if (kanban_name.length <= 2) {
+      if (columnName.length <= 2) {
         toast.error(`Length Should be Greater Than 2`, {
           position: "bottom-right",
           autoClose: 3000,
@@ -28,32 +34,37 @@ const CreateKanban_Modal = ({
           theme: "light",
         });
       } else {
-        const res = await fetch(`/api/kanban_board`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: kanban_name,
-          }),
-        });
+        if (!!board?.id) {
+          const res = await fetch(`/api/kanban_column`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              board_id: board.id,
+              name: columnName,
+              position: columnPosition,
+            }),
+          });
 
-        if (!res.ok) {
-          throw new Error("Something Went Wrong");
+          if (!res.ok) {
+            throw new Error("Something Went Wrong");
+          }
+
+          const res_data = await res.json();
+          toast.success(`Column ${res_data.id} Created Succesfully`, {
+            position: "bottom-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+          getColumns(board);
+          setShowColumnModal(!showColumnModal);
         }
-
-        const res_data = await res.json();
-        toast.success(`Board Created Succesfully`, {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-        setShowModal(!showModal);
       }
     } catch (error) {
       console.log("Error >>", error);
@@ -62,7 +73,7 @@ const CreateKanban_Modal = ({
 
   return (
     <>
-      {showModal ? (
+      {showColumnModal ? (
         <>
           <div
             className="fixed z-50  outline-none focus:outline-none "
@@ -77,17 +88,34 @@ const CreateKanban_Modal = ({
                 </h2>
                 <div className="flex flex-col items-start">
                   <label
-                    htmlFor="kanban_name"
+                    htmlFor="columnName"
                     className="mb-2.5 font-medium text-black dark:text-white"
                   >
-                    Kanban Name:{" "}
+                    Column Name:{" "}
                   </label>
                   <input
-                    id="kanban_name"
-                    name="kanban_name"
+                    id="columnName"
+                    name="columnName"
                     type="text"
                     onChange={(event) => {
-                      setKanbanName(event.target.value);
+                      setColumnName(event.target.value);
+                    }}
+                    className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  />
+                </div>
+                <div className="flex flex-col items-start">
+                  <label
+                    htmlFor="columnPosition"
+                    className="mb-2.5 font-medium text-black dark:text-white"
+                  >
+                    Column Position:{" "}
+                  </label>
+                  <input
+                    id="columnPosition"
+                    name="columnPosition"
+                    type="number"
+                    onChange={(event) => {
+                      setColumnPosition(event.target.value);
                     }}
                     className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
                   />
@@ -102,7 +130,7 @@ const CreateKanban_Modal = ({
                   </button>
                   <button
                     onClick={() => {
-                      setShowModal(false);
+                      setShowColumnModal(false);
                     }}
                     className="cursor-pointer rounded-lg border border-rose-700 py-2 px-6 text-rose-700 transition hover:bg-opacity-90 disabled:bg-strokedark disabled:border-strokedark"
                   >
@@ -119,4 +147,4 @@ const CreateKanban_Modal = ({
   );
 };
 
-export default CreateKanban_Modal;
+export default CreateColumn_Modal;

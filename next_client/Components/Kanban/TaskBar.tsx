@@ -1,10 +1,25 @@
-const TaskBar = () => {
+import { Dispatch, SetStateAction } from "react";
+
+interface Props {
+  board_name: string;
+  showTicketModal: boolean;
+  setShowTicketModal: Dispatch<SetStateAction<boolean>>;
+}
+
+const TaskBar = ({
+  board_name,
+  showTicketModal,
+  setShowTicketModal,
+}: Props) => {
   return (
     <div className="overflow-hidden rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark flex justify-between items-center px-6 py-2">
       <h2 className="text-title-md2 font-semibold text-black dark:text-white">
-        Tasks
+        {board_name}
       </h2>
       <button
+        onClick={() => {
+          setShowTicketModal(!showTicketModal);
+        }}
         className="w-fit rounded-sm border border-primary bg-primary px-4 py-2
         text-white transition hover:bg-opacity-90 flex"
       >

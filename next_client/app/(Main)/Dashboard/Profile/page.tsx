@@ -63,13 +63,13 @@ const Profile = () => {
                 {auth.first_name + " " + auth.last_name}
               </h3>
               <p className="font-semibold text-2xl">{auth.username}</p>
-              <div className="mx-auto max-w-180 mt-5">
+              <div className="mx-auto max-w-180 mt-5 space-x-2">
                 <h4 className="font-semibold text-black dark:text-white">
                   Roles:
                 </h4>
                 {auth.roles?.map((role: string) => (
                   <p
-                    className="inline-block text-black font-semibold"
+                    className="inline-block text-black font-semibold "
                     key={role}
                   >
                     {role}
