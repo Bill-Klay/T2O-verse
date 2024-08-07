@@ -90,5 +90,6 @@ def handle_tickets(column_id):
             ticket.title = data.get('title', ticket.title)
             ticket.description = data.get('description', ticket.description)
             ticket.position = data.get('position', ticket.position)
+            ticket.column_id = data.get('position', ticket.position)
             db.session.commit()
             return jsonify({'id': ticket.id, 'title': ticket.title, 'description': ticket.description, 'position': ticket.position}), 200
