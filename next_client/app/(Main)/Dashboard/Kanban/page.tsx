@@ -11,6 +11,7 @@ import { base_url } from "@/lib/Constants";
 import { Board, Column, ColumnWithTickets } from "@/types/KanbanTypes";
 import { DragEndEvent } from "@dnd-kit/core";
 import { useEffect, useState, useRef, ChangeEvent } from "react";
+import { toast } from "react-toastify";
 
 const Kanban = () => {
   const [taskList, setTaskList] = useState(Lists);
@@ -39,7 +40,7 @@ const Kanban = () => {
   //   setTaskList(updatedList);
   // }
 
-  function handleDragEnd(event: DragEndEvent) {
+  async function handleDragEnd(event: DragEndEvent) {
     const new_col_id = event.over?.id as number;
     const task_id = event.active?.id as number;
 
@@ -77,6 +78,35 @@ const Kanban = () => {
     });
     console.log("Updated LIST >>>", updatedColumnsList);
     setColumnsList(updatedColumnsList);
+
+    try {
+      const res = await fetch(`/api/kanban_ticket`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          updatedTicket,
+          old_column_id: movedTicket.position,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to update task position");
+      }
+      toast.success(`Updated successfully`, {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    } catch (error) {
+      console.log("Error updating task position >>", error);
+    }
   }
 
   const getBoards = async () => {
@@ -126,35 +156,7 @@ const Kanban = () => {
     } catch (error) {
       console.log("Error >>", error);
     }
-
-    // try {
-    //   const res = await fetch(`${base_url}/boards/${board?.id}/columns`, {
-    //     method: "GET",
-    //     credentials: "include",
-    //   });
-
-    //   const columns = await res.json();
-    //   console.log("Columns >>", columns);
-    //   setColumnsList(columns);
-    // } catch (error) {
-    //   console.log("Error >>", error);
-    // }
   };
-
-  // const getTickets = async () => {
-  //   try {
-  //     const res = await fetch(`${base_url}//boards/${board?.id}/columns`, {
-  //       method: "GET",
-  //       credentials: "include",
-  //     });
-
-  //     const columns = await res.json();
-  //     console.log("Columns >>", columns);
-  //     setColumnsList(columns);
-  //   } catch (error) {
-  //     console.log("Error >>", error);
-  //   }
-  // };
 
   const handleBoardChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const selectedIndex = event.target.selectedIndex;
@@ -177,7 +179,7 @@ const Kanban = () => {
         transform: "translate(-50%, -50%)",
       });
     }
-  }, [showModal, showColumnModal]);
+  }, [showModal, showColumnModal, showTicketModal]);
 
   useEffect(() => {
     getBoards();
@@ -210,6 +212,7 @@ const Kanban = () => {
         getColumns={getColumnsNTickets}
       />
       <CreateTicket_Modal
+        title="Create"
         showTicketModal={showTicketModal}
         modalStyle={modalStyle}
         setShowTicketModal={setShowTicketModal}
@@ -257,9 +260,12 @@ const Kanban = () => {
                       <KanbanItem
                         key={item.id}
                         id={item.id}
-                        col_id={item.position}
+                        col_id={column.id}
+                        position={item.position}
                         title={item.title}
                         description={item.description}
+                        board={board}
+                        getColumns={getColumnsNTickets}
                       />
                     ) : null
                   )}

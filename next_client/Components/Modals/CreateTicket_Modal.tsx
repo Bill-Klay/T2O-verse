@@ -3,6 +3,7 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { toast } from "react-toastify";
 
 type ModalProps = {
+  title: string;
   showTicketModal: boolean;
   modalStyle: object;
   setShowTicketModal: Dispatch<SetStateAction<boolean>>;
@@ -12,6 +13,7 @@ type ModalProps = {
 };
 
 const CreateTicket_Modal = ({
+  title,
   showTicketModal,
   modalStyle,
   setShowTicketModal,
@@ -87,7 +89,7 @@ const CreateTicket_Modal = ({
               <div className="py-4 px-8 rounded-md border border-stroke shadow-default relative flex flex-col w-full bg-white outline-none focus:outline-none">
                 {/*header*/}
                 <h2 className="mb-5 text-title-md2 font-semibold text-black dark:text-white">
-                  Create Kanban Ticket
+                  {title} Kanban Ticket
                 </h2>
                 <div className="flex flex-col items-start">
                   <label

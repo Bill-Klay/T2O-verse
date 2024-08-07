@@ -1,17 +1,29 @@
 "use client";
 
+import { Board } from "@/types/KanbanTypes";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 interface Props {
   id: number;
   col_id: number;
+  position: number;
   title: string;
   description: string;
+  board: Board;
+  getColumns: (board: Board) => void;
 }
 
-const KanbanItem = ({ id, col_id, title, description }: Props) => {
+const KanbanItem = ({
+  id,
+  col_id,
+  title,
+  description,
+  board,
+  getColumns,
+}: Props) => {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: id,
   });
@@ -24,6 +36,41 @@ const KanbanItem = ({ id, col_id, title, description }: Props) => {
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
+  };
+
+  const handleDelete = async () => {
+    console.log("Hello");
+    try {
+      const res = await fetch(`/api/kanban_ticket`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id,
+          col_id,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`${res.headers}`);
+      }
+
+      toast.success(`Deleted Succesfully`, {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+
+      getColumns(board);
+    } catch (error) {
+      console.log("Error >>", error);
+    }
   };
 
   return (
@@ -73,6 +120,9 @@ const KanbanItem = ({ id, col_id, title, description }: Props) => {
           <div className="py-1" role="none">
             <button
               type="submit"
+              onPointerDown={(event) => {
+                event.stopPropagation();
+              }}
               className="flex w-full px-4 py-2 text-left text-sm text-black hover:bg-gray-100"
               role="menuitem"
             >
@@ -97,6 +147,10 @@ const KanbanItem = ({ id, col_id, title, description }: Props) => {
             </button>
             <button
               type="submit"
+              onClick={() => handleDelete()}
+              onPointerDown={(event) => {
+                event.stopPropagation();
+              }}
               className="flex w-full px-4 py-2 text-left text-sm text-rose-700 hover:bg-gray-100"
               role="menuitem"
             >
