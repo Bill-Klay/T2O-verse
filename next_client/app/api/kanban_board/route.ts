@@ -31,3 +31,34 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(error, { status: 500 });
   }
 }
+
+export async function PUT(req: NextRequest) {
+  const session = cookies().get("session");
+  const CSRFToken = cookies().get("X-CSRFToken");
+  const req_data = await req.json();
+
+  try {
+    const res = await fetch(`${base_url}/boards`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Cookie: `${session?.name}=${session?.value}`,
+        "X-CSRFToken": `${CSRFToken?.value}`,
+      },
+      body: JSON.stringify({
+        id: req_data.id,
+        name: req_data.name,
+      }),
+    });
+
+    if (res.status === 403) {
+      const errorMessage = await res.json();
+      return NextResponse.json(errorMessage.error, { status: 403 });
+    }
+
+    const res_data = await res.json();
+    return NextResponse.json(res_data, { status: 200 });
+  } catch (error) {
+    return NextResponse.json(error, { status: 500 });
+  }
+}

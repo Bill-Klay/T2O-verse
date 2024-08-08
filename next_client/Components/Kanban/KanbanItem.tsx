@@ -1,9 +1,9 @@
 "use client";
 
-import { Board } from "@/types/KanbanTypes";
+import { Board, Column } from "@/types/KanbanTypes";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { toast } from "react-toastify";
 
 interface Props {
@@ -14,6 +14,8 @@ interface Props {
   description: string;
   board: Board;
   getColumns: (board: Board) => void;
+  showTicketModal: boolean;
+  setShowTicketModal: Dispatch<SetStateAction<boolean>>;
 }
 
 const KanbanItem = ({
@@ -23,6 +25,8 @@ const KanbanItem = ({
   description,
   board,
   getColumns,
+  showTicketModal,
+  setShowTicketModal,
 }: Props) => {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: id,
@@ -120,6 +124,9 @@ const KanbanItem = ({
           <div className="py-1" role="none">
             <button
               type="submit"
+              onClick={() => {
+                setShowTicketModal(!showTicketModal);
+              }}
               onPointerDown={(event) => {
                 event.stopPropagation();
               }}

@@ -4,9 +4,10 @@ import KanbanColumn from "@/Components/Kanban/KanbanColumn";
 import KanbanContainer from "@/Components/Kanban/KanbanContainer";
 import KanbanItem from "@/Components/Kanban/KanbanItem";
 import TaskBar from "@/Components/Kanban/TaskBar";
-import CreateColumn_Modal from "@/Components/Modals/CreateColumn_Modal";
-import CreateKanban_Modal from "@/Components/Modals/CreateKanban_Modal";
-import CreateTicket_Modal from "@/Components/Modals/CreateTicket_Modal";
+import CreateColumn_Modal from "@/Components/Modals/KanbanModals/CreateColumn_Modal";
+import CreateKanban_Modal from "@/Components/Modals/KanbanModals/CreateKanban_Modal";
+import CreateTicket_Modal from "@/Components/Modals/KanbanModals/CreateTicket_Modal";
+import UpdateKanban_Modal from "@/Components/Modals/KanbanModals/UpdateKanban_Modal";
 import { base_url } from "@/lib/Constants";
 import { Board, Column, ColumnWithTickets } from "@/types/KanbanTypes";
 import { DragEndEvent } from "@dnd-kit/core";
@@ -19,6 +20,7 @@ const Kanban = () => {
   const [columnsList, setColumnsList] = useState<ColumnWithTickets[]>([]);
   const [board, setBoard] = useState<Board>();
   const [showModal, setShowModal] = useState(false);
+  const [showUpdateKanban, setShowUpdateKanban] = useState(false);
   const [showColumnModal, setShowColumnModal] = useState(false);
   const [showTicketModal, setShowTicketModal] = useState(false);
   const boardRef = useRef<HTMLDivElement>(null);
@@ -170,7 +172,8 @@ const Kanban = () => {
     if (
       (showModal && boardRef.current) ||
       (showColumnModal && boardRef.current) ||
-      (showTicketModal && boardRef.current)
+      (showTicketModal && boardRef.current) ||
+      (showUpdateKanban && boardRef.current)
     ) {
       const rect = boardRef.current.getBoundingClientRect();
       setModalStyle({
@@ -179,7 +182,7 @@ const Kanban = () => {
         transform: "translate(-50%, -50%)",
       });
     }
-  }, [showModal, showColumnModal, showTicketModal]);
+  }, [showModal, showColumnModal, showTicketModal, showUpdateKanban]);
 
   useEffect(() => {
     getBoards();
@@ -204,6 +207,14 @@ const Kanban = () => {
         modalStyle={modalStyle}
         setShowModal={setShowModal}
       />
+      <UpdateKanban_Modal
+        board={board}
+        setBoard={setBoard}
+        showUpdateKanban={showUpdateKanban}
+        setShowUpdateKanban={setShowUpdateKanban}
+        modalStyle={modalStyle}
+        getBoards={getBoards}
+      />
       <CreateColumn_Modal
         showColumnModal={showColumnModal}
         modalStyle={modalStyle}
@@ -212,7 +223,6 @@ const Kanban = () => {
         getColumns={getColumnsNTickets}
       />
       <CreateTicket_Modal
-        title="Create"
         showTicketModal={showTicketModal}
         modalStyle={modalStyle}
         setShowTicketModal={setShowTicketModal}
@@ -244,9 +254,11 @@ const Kanban = () => {
         {!!board && board?.name !== "" ? (
           <>
             <TaskBar
-              board_name={board.name}
+              board={board}
               showTicketModal={showTicketModal}
               setShowTicketModal={setShowTicketModal}
+              showUpdateKanban={showUpdateKanban}
+              setShowUpdateKanban={setShowUpdateKanban}
             />
             <KanbanContainer onDragEnd={handleDragEnd}>
               {columnsList.map((column) => (
@@ -255,20 +267,20 @@ const Kanban = () => {
                   col_id={column.id}
                   col_name={column.name}
                 >
-                  {column.tickets.map((item) =>
-                    item.position === column.id ? (
-                      <KanbanItem
-                        key={item.id}
-                        id={item.id}
-                        col_id={column.id}
-                        position={item.position}
-                        title={item.title}
-                        description={item.description}
-                        board={board}
-                        getColumns={getColumnsNTickets}
-                      />
-                    ) : null
-                  )}
+                  {column.tickets.map((item) => (
+                    <KanbanItem
+                      key={item.id}
+                      id={item.id}
+                      col_id={column.id}
+                      position={item.position}
+                      title={item.title}
+                      description={item.description}
+                      board={board}
+                      getColumns={getColumnsNTickets}
+                      showTicketModal={showTicketModal}
+                      setShowTicketModal={setShowTicketModal}
+                    />
+                  ))}
                 </KanbanColumn>
               ))}
               <button
