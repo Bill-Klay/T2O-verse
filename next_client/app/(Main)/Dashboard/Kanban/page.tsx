@@ -8,6 +8,7 @@ import CreateColumn_Modal from "@/Components/Modals/KanbanModals/CreateColumn_Mo
 import CreateKanban_Modal from "@/Components/Modals/KanbanModals/CreateKanban_Modal";
 import CreateTicket_Modal from "@/Components/Modals/KanbanModals/CreateTicket_Modal";
 import UpdateKanban_Modal from "@/Components/Modals/KanbanModals/UpdateKanban_Modal";
+import UpdateTicket_Modal from "@/Components/Modals/KanbanModals/UpdateTicket_Modal";
 import { base_url } from "@/lib/Constants";
 import { Board, Column, ColumnWithTickets } from "@/types/KanbanTypes";
 import { DragEndEvent } from "@dnd-kit/core";
@@ -15,7 +16,6 @@ import { useEffect, useState, useRef, ChangeEvent } from "react";
 import { toast } from "react-toastify";
 
 const Kanban = () => {
-  const [taskList, setTaskList] = useState(Lists);
   const [boardsList, setBoardsList] = useState<Board[]>([]);
   const [columnsList, setColumnsList] = useState<ColumnWithTickets[]>([]);
   const [board, setBoard] = useState<Board>();
@@ -25,22 +25,6 @@ const Kanban = () => {
   const [showTicketModal, setShowTicketModal] = useState(false);
   const boardRef = useRef<HTMLDivElement>(null);
   const [modalStyle, setModalStyle] = useState({});
-
-  // function handleDragEnd(event: DragEndEvent) {
-  //   const col_id = event.over?.id as number;
-  //   const task_id = event.active?.id as number;
-  //   const position = event.active.data.current?.position;
-
-  //   console.log("Data >>>", event.over);
-
-  //   if (position === col_id) return;
-
-  //   const updatedList = taskList.map((item) =>
-  //     item.id === task_id ? { ...item, position: col_id } : item
-  //   );
-
-  //   setTaskList(updatedList);
-  // }
 
   async function handleDragEnd(event: DragEndEvent) {
     const new_col_id = event.over?.id as number;
@@ -270,15 +254,11 @@ const Kanban = () => {
                   {column.tickets.map((item) => (
                     <KanbanItem
                       key={item.id}
-                      id={item.id}
                       col_id={column.id}
-                      position={item.position}
-                      title={item.title}
-                      description={item.description}
+                      ticket={item}
                       board={board}
                       getColumns={getColumnsNTickets}
-                      showTicketModal={showTicketModal}
-                      setShowTicketModal={setShowTicketModal}
+                      columnsList={columnsList}
                     />
                   ))}
                 </KanbanColumn>
@@ -340,98 +320,5 @@ const Kanban = () => {
     </>
   );
 };
-
-const Lists = [
-  {
-    id: 1,
-    position: 1,
-    title: "Create Task",
-    description: "Define the requirements and objectives.",
-  },
-  {
-    id: 2,
-    position: 2,
-    title: "Design Wireframe",
-    description: "Create a basic layout for the project.",
-  },
-  {
-    id: 3,
-    position: 3,
-    title: "Develop Feature A",
-    description: "Implement the primary functionality.",
-  },
-  {
-    id: 4,
-    position: 1,
-    title: "Review Code",
-    description: "Perform code review for quality assurance.",
-  },
-  {
-    id: 5,
-    position: 2,
-    title: "Test Feature A",
-    description: "Conduct testing for the new feature.",
-  },
-  {
-    id: 6,
-    position: 3,
-    title: "Deploy to Staging",
-    description: "Deploy the application to the staging environment.",
-  },
-  {
-    id: 7,
-    position: 1,
-    title: "Gather Feedback",
-    description: "Collect feedback from stakeholders.",
-  },
-  {
-    id: 8,
-    position: 2,
-    title: "Fix Bugs",
-    description: "Address issues found during testing.",
-  },
-  {
-    id: 9,
-    position: 3,
-    title: "Prepare Release Notes",
-    description: "Document changes for the release.",
-  },
-  {
-    id: 10,
-    position: 1,
-    title: "Release to Production",
-    description: "Deploy the application to the production environment.",
-  },
-  {
-    id: 11,
-    position: 2,
-    title: "Monitor Performance",
-    description: "Ensure the application is running smoothly.",
-  },
-  {
-    id: 12,
-    position: 3,
-    title: "Plan Next Sprint",
-    description: "Prepare tasks for the upcoming sprint.",
-  },
-  {
-    id: 13,
-    position: 1,
-    title: "Update Documentation",
-    description: "Ensure all documentation is up to date.",
-  },
-  {
-    id: 14,
-    position: 2,
-    title: "Conduct Retrospective",
-    description: "Review the last sprint and identify improvements.",
-  },
-  {
-    id: 15,
-    position: 3,
-    title: "Optimize Database",
-    description: "Improve database performance and efficiency.",
-  },
-];
 
 export default Kanban;
