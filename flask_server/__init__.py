@@ -8,6 +8,7 @@ from flask_mail import Mail
 from flask_login import LoginManager, login_required
 from.config import get_logging_config
 from flask_wtf.csrf import validate_csrf
+from flask_socketio import SocketIO
 
 db = SQLAlchemy()
 mail = Mail()
@@ -37,6 +38,10 @@ def create_app():
 
     # Load configurations
     app.config.from_pyfile('config.py')
+
+    # Initialize Flask-SocketIO
+    socketio = SocketIO(app, cors_allowed_origins="*")  # Adjust CORS settings as needed
+
     allowed_origins = [
         'http://localhost:3000',
         'http://192.168.100.236:3000'
@@ -138,4 +143,4 @@ def create_app():
         from .routes import init_routes
         init_routes(app)
 
-    return app
+    return app, socketio
