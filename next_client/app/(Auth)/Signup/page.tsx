@@ -88,11 +88,11 @@ const SignupPage = () => {
   });
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center">
-      <div className="xl:w-1/2 rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+    <div className="flex xl:py-17 min-h-screen flex-col items-center justify-center">
+      <div className="xl:w-2/3 rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="flex flex-wrap items-center">
           <div className="hidden w-full xl:block xl:w-1/3">
-            <div className="px-26 py-17.5 text-center">
+            <div className="xl:px-18 xl:py-15 text-center">
               <Link className="mb-5.5 inline-block" href="/">
                 <h1 className="font-bold text-2xl mb-2">T2O-Verse</h1>
                 <Image
@@ -108,7 +108,7 @@ const SignupPage = () => {
           </div>
 
           <div className="w-full border-stroke dark:border-strokedark xl:w-2/3 xl:border-l-2">
-            <div className="w-full p-4 sm:p-12.5 xl:p-17.5">
+            <div className="w-full p-4 sm:p-12.5 xl:py-8">
               <h2 className="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2">
                 Sign Up
               </h2>
