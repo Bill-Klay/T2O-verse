@@ -250,6 +250,7 @@ const Kanban = () => {
                   key={column.id}
                   col_id={column.id}
                   col_name={column.name}
+                  board={board}
                 >
                   {column.tickets.map((item) => (
                     <KanbanItem
