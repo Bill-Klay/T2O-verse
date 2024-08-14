@@ -190,6 +190,7 @@ const Kanban = () => {
         showModal={showModal}
         modalStyle={modalStyle}
         setShowModal={setShowModal}
+        getBoards={getBoards}
       />
       <UpdateKanban_Modal
         board={board}
@@ -250,6 +251,7 @@ const Kanban = () => {
                   key={column.id}
                   col_id={column.id}
                   col_name={column.name}
+                  getColumns={getColumnsNTickets}
                   board={board}
                 >
                   {column.tickets.map((item) => (

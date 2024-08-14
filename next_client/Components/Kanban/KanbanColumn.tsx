@@ -14,6 +14,7 @@ import UpdateColumn_Modal from "../Modals/KanbanModals/UpdateColumn_Modal";
 interface Props {
   col_id: number;
   col_name: string;
+  getColumns: () => void;
   board: Board | undefined;
 }
 
@@ -22,6 +23,7 @@ const KanbanColumn = ({
   col_name,
   col_id,
   board,
+  getColumns,
 }: PropsWithChildren<Props>) => {
   const [showUpdateColumn, setShowUpdateColumn] = useState(false);
   const { isOver, setNodeRef } = useDroppable({
@@ -34,6 +36,9 @@ const KanbanColumn = ({
         showUpdateColumn={showUpdateColumn}
         setShowUpdateColumn={setShowUpdateColumn}
         board={board}
+        col_id={col_id}
+        col_name={col_name}
+        getColumns={getColumns}
       />
       <div ref={setNodeRef} className="flex flex-col items-start">
         <div className="w-full flex justify-between ">
@@ -52,7 +57,7 @@ const KanbanColumn = ({
             role="menuitem"
           >
             <svg
-              className="w-4.5 h-4.5 text-black"
+              className="w-4.5 h-4.5 text-black dark:text-white"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               width="24"

@@ -6,60 +6,99 @@ type ModalProps = {
   showUpdateColumn: boolean;
   setShowUpdateColumn: Dispatch<SetStateAction<boolean>>;
   board: Board | undefined;
+  col_id: number;
+  col_name: string;
+  getColumns: () => void;
 };
 
 const UpdateColumn_Modal = ({
   showUpdateColumn,
   setShowUpdateColumn,
   board,
+  col_id,
+  col_name,
+  getColumns,
 }: ModalProps) => {
   const [column_name, setColumnName] = useState("");
 
-  const handleClick = async () => {
-    // try {
-    //   if (column_name.length <= 2) {
-    //     toast.error(`Length Should be Greater Than 2`, {
-    //       position: "bottom-right",
-    //       autoClose: 3000,
-    //       hideProgressBar: false,
-    //       closeOnClick: true,
-    //       pauseOnHover: true,
-    //       draggable: true,
-    //       progress: undefined,
-    //       theme: "light",
-    //     });
-    //   } else {
-    //     const res = await fetch(`/api/kanban_board`, {
-    //       method: "PUT",
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //       },
-    //       body: JSON.stringify({
-    //         id: board?.id,
-    //         name: column_name,
-    //       }),
-    //     });
-    //     if (!res.ok) {
-    //       throw new Error("Something Went Wrong");
-    //     }
-    //     // const res_data = await res.json();
-    //     toast.success(`Board Updated Succesfully`, {
-    //       position: "bottom-right",
-    //       autoClose: 3000,
-    //       hideProgressBar: false,
-    //       closeOnClick: true,
-    //       pauseOnHover: true,
-    //       draggable: true,
-    //       progress: undefined,
-    //       theme: "light",
-    //     });
-    //     setShowUpdateColumn(!showUpdateColumn);
-    //     getBoards();
-    //     setBoard({ ...board, name: column_name });
-    //   }
-    // } catch (error) {
-    //   console.log("Error >>", error);
-    // }
+  const updateColumn = async () => {
+    try {
+      if (column_name.length <= 2) {
+        toast.error(`Length Should be Greater Than 2`, {
+          position: "bottom-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      } else {
+        const res = await fetch(`/api/kanban_column`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            board_id: board?.id,
+            id: col_id,
+            name: column_name,
+          }),
+        });
+        if (!res.ok) {
+          throw new Error("Something Went Wrong");
+        }
+        const res_data = await res.json();
+        toast.success(`Column ${res_data.name} Updated Succesfully`, {
+          position: "bottom-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+        setShowUpdateColumn(!showUpdateColumn);
+        getColumns();
+      }
+    } catch (error) {
+      console.log("Error >>", error);
+    }
+  };
+
+  const deleteColumn = async () => {
+    try {
+      const res = await fetch(`/api/kanban_column`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          board_id: board?.id,
+          id: col_id,
+        }),
+      });
+      if (!res.ok) {
+        throw new Error("Something Went Wrong");
+      }
+      // const res_data = await res.json();
+      toast.success(`Column ${col_name} Deleted`, {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      setShowUpdateColumn(!showUpdateColumn);
+      getColumns();
+    } catch (error) {
+      console.log("Error >>", error);
+    }
   };
 
   return (
@@ -68,7 +107,13 @@ const UpdateColumn_Modal = ({
         <>
           <div
             className="fixed z-50  outline-none focus:outline-none "
-            // style={modalStyle}
+            style={{
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              position: "fixed", // Ensure the modal is positioned relative to the viewport
+              zIndex: 50, // Ensure the modal is on top of other content
+            }}
           >
             <div className="relative w-auto my-6 mx-auto max-w-3xl">
               {/*content*/}
@@ -88,7 +133,7 @@ const UpdateColumn_Modal = ({
                     id="column_name"
                     name="column_name"
                     type="text"
-                    placeholder={column_name}
+                    placeholder={col_name}
                     onChange={(event) => {
                       setColumnName(event.target.value);
                     }}
@@ -96,12 +141,18 @@ const UpdateColumn_Modal = ({
                   />
                 </div>
                 {/*footer*/}
-                <div className="flex items-center justify-around pt-4 rounded-b">
+                <div className="flex items-center justify-evenly pt-4 rounded-b">
                   <button
-                    onClick={handleClick}
+                    onClick={updateColumn}
                     className="cursor-pointer rounded-lg border border-primary bg-primary py-2 px-6 text-white transition hover:bg-opacity-90 disabled:bg-strokedark disabled:border-strokedark"
                   >
                     Update
+                  </button>
+                  <button
+                    onClick={deleteColumn}
+                    className="cursor-pointer mx-1 rounded-lg border border-rose-700 bg-rose-800 py-2 px-6 text-white transition hover:bg-opacity-90 disabled:bg-strokedark disabled:border-strokedark"
+                  >
+                    Delete
                   </button>
                   <button
                     onClick={() => {

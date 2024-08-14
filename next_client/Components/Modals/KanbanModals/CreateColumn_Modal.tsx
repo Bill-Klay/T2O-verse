@@ -84,7 +84,7 @@ const CreateColumn_Modal = ({
               <div className="py-4 px-8 rounded-md border border-stroke shadow-default relative flex flex-col w-full bg-white outline-none focus:outline-none">
                 {/*header*/}
                 <h2 className="mb-5 text-title-md2 font-semibold text-black dark:text-white">
-                  Create Kanban Board
+                  Create Kanban Column
                 </h2>
                 <div className="flex flex-col items-start">
                   <label

@@ -69,7 +69,7 @@ const Profile = () => {
                 </h4>
                 {auth.roles?.map((role: string) => (
                   <p
-                    className="inline-block text-black font-semibold "
+                    className="inline-block text-black dark:text-white font-semibold "
                     key={role}
                   >
                     {role}

@@ -5,12 +5,14 @@ type ModalProps = {
   showModal: boolean;
   modalStyle: object;
   setShowModal: Dispatch<SetStateAction<boolean>>;
+  getBoards: () => void;
 };
 
 const CreateKanban_Modal = ({
   showModal,
   modalStyle,
   setShowModal,
+  getBoards,
 }: ModalProps) => {
   const [kanban_name, setKanbanName] = useState("");
 
@@ -54,6 +56,7 @@ const CreateKanban_Modal = ({
           theme: "light",
         });
         setShowModal(!showModal);
+        getBoards();
       }
     } catch (error) {
       console.log("Error >>", error);

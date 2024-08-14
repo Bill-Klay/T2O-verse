@@ -36,7 +36,7 @@ const TaskBar = ({
             role="menuitem"
           >
             <svg
-              className="w-4.5 h-4.5 text-black"
+              className="w-4.5 h-4.5 text-black dark:text-white"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               width="24"

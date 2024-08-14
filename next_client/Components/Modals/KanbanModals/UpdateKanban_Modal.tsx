@@ -21,7 +21,7 @@ const UpdateKanban_Modal = ({
 }: ModalProps) => {
   const [kanban_name, setKanbanName] = useState("");
 
-  const handleClick = async () => {
+  const updateBoard = async () => {
     try {
       if (kanban_name.length <= 2) {
         toast.error(`Length Should be Greater Than 2`, {
@@ -70,6 +70,62 @@ const UpdateKanban_Modal = ({
     }
   };
 
+  const deleteBoard = async () => {
+    try {
+      const res = await fetch(`/api/kanban_board`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: board?.id,
+        }),
+      });
+
+      if (!res.ok) {
+        // Check for specific response status codes if needed
+        if (res.status === 403) {
+          throw new Error(
+            "Forbidden: You do not have permission to delete this board."
+          );
+        }
+        throw new Error("Something Went Wrong");
+      }
+
+      // Uncomment this if you need to parse the response data
+      // const res_data = await res.json();
+
+      toast.success(`Board Deleted ${res.status}`, {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+
+      setShowUpdateKanban(!showUpdateKanban);
+      getBoards();
+      setBoard(null);
+    } catch (error: any) {
+      console.error("Error >>", error.message);
+
+      // Optionally, show an error toast
+      toast.error(`Failed to delete board: ${error.message}`, {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    }
+  };
+
   return (
     <>
       {showUpdateKanban ? (
@@ -106,10 +162,16 @@ const UpdateKanban_Modal = ({
                 {/*footer*/}
                 <div className="flex items-center justify-around pt-4 rounded-b">
                   <button
-                    onClick={handleClick}
+                    onClick={updateBoard}
                     className="cursor-pointer rounded-lg border border-primary bg-primary py-2 px-6 text-white transition hover:bg-opacity-90 disabled:bg-strokedark disabled:border-strokedark"
                   >
                     Update
+                  </button>
+                  <button
+                    onClick={deleteBoard}
+                    className="cursor-pointer rounded-lg border border-rose-700 bg-rose-800 mx-1 py-2 px-6 text-white transition hover:bg-opacity-90 disabled:bg-strokedark disabled:border-strokedark"
+                  >
+                    Delete
                   </button>
                   <button
                     onClick={() => {
