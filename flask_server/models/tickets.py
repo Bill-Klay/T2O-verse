@@ -4,14 +4,15 @@ from datetime import datetime
 class Board(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    columns = db.relationship('Column', backref='board', lazy=True)
+    columns = db.relationship('Column', backref='board', lazy=True, cascade="all, delete-orphan")
 
 class Column(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     position = db.Column(db.Integer, nullable=False)
     board_id = db.Column(db.Integer, db.ForeignKey('board.id'), nullable=False)
-    tickets = db.relationship('Ticket', backref='column', lazy=True)
+    tickets = db.relationship('Ticket', backref='column', lazy=True, cascade="all, delete-orphan")
+    board = db.relationship('Board', backref=db.backref('columns', lazy=True))
 
 class Ticket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
