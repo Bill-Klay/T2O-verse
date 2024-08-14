@@ -38,7 +38,16 @@ def current_user_details():
 @login_required
 def update_profile():
     data = request.get_json()
-    user = current_user
+    
+    # Extract user ID from the request
+    user_id = data.get('user_id')
+    
+    # Fetch the user based on the provided user ID
+    user = User.query.filter_by(id=user_id).first()
+    
+    # Check if the user exists
+    if not user:
+        return jsonify({"error": "User not found."}), 404
     
     # Extract updated fields from the request
     first_name = data.get('first_name')
@@ -53,7 +62,7 @@ def update_profile():
 
     # Check if email or username is already taken by another user
     existing_user_email = User.query.filter(User.email == email, User.id != user.id).first()
-    existing_username = User.query.filter(User.username == username, User.id != user.id).first()  # New check for username uniqueness
+    existing_username = User.query.filter(User.username == username, User.id != user.id).first()  # Ensure uniqueness
     if existing_user_email:
         return jsonify({"error": "Email already in use."}), 400
     if existing_username:
@@ -63,7 +72,7 @@ def update_profile():
     user.first_name = first_name
     user.last_name = last_name
     user.email = email
-    user.username = username  # New addition for updating username
+    user.username = username
 
     # Update password if provided
     if password:
@@ -72,3 +81,19 @@ def update_profile():
     db.session.commit()
 
     return jsonify({"success": True, "message": "Profile updated successfully."}), 200
+
+@home_bp.route('/all_user_profiles', methods=['GET'])
+@login_required
+def all_user_profiles():
+    if not current_user.has_role('Admin'):
+        return jsonify({'error': 'Unauthorized access'}), 403
+    # Query the database for all users
+    users = User.query.all()
+    
+    # Serialize user data
+    user_data_list = []
+    for user in users:
+        user_data_list.append(user.user_to_dict())
+    
+    # Return serialized user data as JSON
+    return jsonify(success=True, message=user_data_list), 200
