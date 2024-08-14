@@ -70,3 +70,53 @@ def get_all_user_details():
     users = User.query.all()
     user_details = [{"id": user.id, "first_name": user.first_name, "last_name": user.last_name, "username": user.username, "email": user.email} for user in users]
     return jsonify({'users': user_details}), 200
+
+@admin_bp.route('/delete_permission', methods=['DELETE'])
+@login_required
+def delete_permission():
+    data = request.json
+    try:
+        permission_id = data.get('permission_id')
+        if not permission_id:
+            raise ValueError("Permission ID must be provided")
+
+        permission = Permission.query.filter_by(id=permission_id).first()
+        if not permission:
+            raise ValueError("Permission not found")
+
+        # Remove permission from all roles
+        for role in Role.query.all():
+            if permission in role.permissions:
+                role.permissions.remove(permission)
+
+        db.session.delete(permission)
+        db.session.commit()
+        return jsonify({'message': 'Permission deleted successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 400
+
+@admin_bp.route('/delete_role', methods=['DELETE'])
+@login_required
+def delete_role():
+    data = request.json
+    try:
+        role_id = data.get('role_id')
+        if not role_id:
+            raise ValueError("Role ID must be provided")
+
+        role = Role.query.get(role_id)
+        if not role:
+            raise ValueError("Role not found")
+
+        # Remove role from all users
+        for user in User.query.all():
+            if role in user.roles:
+                user.roles.remove(role)
+
+        db.session.delete(role)
+        db.session.commit()
+        return jsonify({'message': 'Role deleted successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 400
