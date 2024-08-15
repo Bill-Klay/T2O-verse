@@ -12,7 +12,10 @@ def index():
     return jsonify(message="Hello Friend!")
 
 @home_bp.route('/logs', methods=['GET'])
+@login_required
 def get_logs():
+    if not current_user.has_role('Admin'):
+        return jsonify({'error': 'Unauthorized access'}), 403
     page = request.args.get('page', 1, type=int)
     per_page = min(request.args.get('per_page', 10, type=int), 100)  # Limit max items per page
     # Calculate offsets for pagination
