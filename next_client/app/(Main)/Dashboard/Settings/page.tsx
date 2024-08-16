@@ -83,27 +83,30 @@ const SettingsPage = () => {
   });
 
   return (
-    <>
-      <UserDataCmp user_data={userData} />
-      <div className="w-5/6 mx-auto px-4 pb-6 text-center lg:pb-8 xl:pb-11.5">
-        <button
-          className="w-[45%] mb-4 rounded-lg border border-primary bg-primary p-2
-        text-white transition hover:bg-opacity-90"
-          onClick={() => setType(!type)}
-        >
-          {type ? "Switch To Roles" : "Switch to Profile"}
-        </button>
-        {type ? (
+    <div
+      className={`${
+        userData?.roles.includes("Admin")
+          ? "md:flex lg:flex xl:flex justify-between"
+          : "w-full"
+      }`}
+    >
+      <div className="overflow-hidden rounded-md border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+        <div className="w-full mx-auto px-5 pb-6 text-center">
           <UserCmp
             Formik={profileFormik}
             userData={userData}
             setCnfPassword={setCnfPassword}
           />
-        ) : (
-          <RoleCmp />
-        )}
+        </div>
       </div>
-    </>
+      {userData?.roles.includes("Admin") ? (
+        <div>
+          <div className="w-full mx-auto text-center border-stroke bg-white rounded-md border shadow-default dark:border-strokedark dark:bg-boxdark">
+            <RoleCmp />
+          </div>
+        </div>
+      ) : null}
+    </div>
   );
 };
 

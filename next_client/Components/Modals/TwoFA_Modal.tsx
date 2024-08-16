@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 
 type ModalProps = {
   showModal: boolean;
-  modalStyle: object;
+  // modalStyle: object;
   uri: string;
   token: string;
   setShowModal: Dispatch<SetStateAction<boolean>>;
@@ -16,7 +16,7 @@ type ModalProps = {
 
 const TwoFA_Modal = ({
   showModal,
-  modalStyle,
+  // modalStyle,
   uri,
   token,
   setShowModal,
@@ -29,7 +29,13 @@ const TwoFA_Modal = ({
         <>
           <div
             className="fixed z-50 outline-none focus:outline-none "
-            style={modalStyle}
+            style={{
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              position: "fixed", // Ensure the modal is positioned relative to the viewport
+              zIndex: 50, // Ensure the modal is on top of other content
+            }}
           >
             <div className="relative w-auto my-6 mx-auto max-w-3xl  ">
               {/*content*/}

@@ -11,7 +11,7 @@ const Profile = () => {
   const [showModal, setShowModal] = useState(false);
   const { auth, setAuth }: any = useAuth();
   const profileRef = useRef<HTMLDivElement>(null);
-  const [modalStyle, setModalStyle] = useState({});
+  // const [modalStyle, setModalStyle] = useState({});
   const [uri, setURI] = useState("");
   const [token, setToken] = useState("");
 
@@ -19,16 +19,16 @@ const Profile = () => {
     setShowModal(!showModal);
   };
 
-  useEffect(() => {
-    if (showModal && profileRef.current) {
-      const rect = profileRef.current.getBoundingClientRect();
-      setModalStyle({
-        top: rect.top + window.scrollY + rect.height / 2,
-        left: rect.left + window.scrollX + rect.width / 2,
-        transform: "translate(-50%, 20%)",
-      });
-    }
-  }, [showModal]);
+  // useEffect(() => {
+  //   if (showModal && profileRef.current) {
+  //     const rect = profileRef.current.getBoundingClientRect();
+  //     setModalStyle({
+  //       top: rect.top + window.scrollY + rect.height / 2,
+  //       left: rect.left + window.scrollX + rect.width / 2,
+  //       transform: "translate(-50%, 20%)",
+  //     });
+  //   }
+  // }, [showModal]);
 
   return (
     <>
@@ -36,7 +36,7 @@ const Profile = () => {
       <TwoFA_Modal
         showModal={showModal}
         setShowModal={setShowModal}
-        modalStyle={modalStyle}
+        // modalStyle={modalStyle}
         uri={uri}
         token={token}
         setToken={setToken}
@@ -47,7 +47,7 @@ const Profile = () => {
 
         <div className="overflow-hidden rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
           <Image
-            src={"/images/cover/cover-01.png"}
+            src={"/images/cover/cover-01.jpg"}
             alt="profile cover"
             className="h-full w-full rounded-tl-sm rounded-tr-sm object-cover object-center"
             width={970}

@@ -225,16 +225,18 @@ const Kanban = () => {
           <option key={0} value="">
             None
           </option>
-          {boardsList.map((board) => (
-            <option
-              key={board.id}
-              value={board.id}
-              data-id={board.id}
-              data-name={board.name}
-            >
-              {board.name}
-            </option>
-          ))}
+          {!!boardsList
+            ? boardsList?.map((board) => (
+                <option
+                  key={board.id}
+                  value={board.id}
+                  data-id={board.id}
+                  data-name={board.name}
+                >
+                  {board.name}
+                </option>
+              ))
+            : null}
         </select>
         {!!board && board?.name !== "" ? (
           <>

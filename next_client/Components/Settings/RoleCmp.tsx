@@ -177,10 +177,10 @@ const RoleCmp = () => {
 
   return (
     <>
-      <div className="p-2">
+      <div className="py-3 px-10 flex flex-col justify-center items-center">
         <label
           htmlFor="action"
-          className="mb-2.5 font-medium text-black dark:text-white "
+          className="mb-2 font-medium text-black dark:text-white "
         >
           Select Action:{" "}
         </label>
@@ -198,7 +198,9 @@ const RoleCmp = () => {
           <option value="assign_role">Assign Role</option>
         </select>
       </div>
-      <hr className="my-8" />
+      <div className="mx-auto mb-2 w-11/12">
+        <hr />
+      </div>
       {(() => {
         switch (action) {
           case "create_role":
@@ -206,7 +208,7 @@ const RoleCmp = () => {
               <div className=" flex flex-col items-center">
                 <label
                   htmlFor="create_role"
-                  className="mb-2.5 font-medium text-black dark:text-white"
+                  className="mb-2 font-medium text-black dark:text-white"
                 >
                   Create Role:{" "}
                 </label>
@@ -218,7 +220,7 @@ const RoleCmp = () => {
                   onChange={(event) => {
                     setRole(event.target.value);
                   }}
-                  className="w-1/2 rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  className="w-55 rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
                 />
                 <button
                   onClick={createRole}
@@ -234,7 +236,7 @@ const RoleCmp = () => {
               <div className=" flex flex-col items-center">
                 <label
                   htmlFor="create_permission"
-                  className="mb-2.5 font-medium text-black dark:text-white"
+                  className="mb-2 font-medium text-black dark:text-white"
                 >
                   Create Permission:{" "}
                 </label>
@@ -262,7 +264,7 @@ const RoleCmp = () => {
               <div className=" flex flex-col items-center">
                 <label
                   htmlFor="role"
-                  className="mb-2.5 font-medium text-black dark:text-white"
+                  className="mb-2 font-medium text-black dark:text-white"
                 >
                   Select Role:{" "}
                 </label>
@@ -274,6 +276,9 @@ const RoleCmp = () => {
                   }}
                   className="w-1/2 rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
                 >
+                  <option key={0} value="">
+                    Select Role
+                  </option>
                   {existingRoles?.map((role) => (
                     <option key={role.id} value={role.name}>
                       {role.name}
@@ -283,7 +288,7 @@ const RoleCmp = () => {
 
                 <label
                   htmlFor="assign_permission"
-                  className="my-2.5 font-medium text-black dark:text-white"
+                  className="my-2 font-medium text-black dark:text-white"
                 >
                   Assign Permission:{" "}
                 </label>
@@ -319,7 +324,7 @@ const RoleCmp = () => {
               <div className=" flex flex-col items-center">
                 <label
                   htmlFor="select_user"
-                  className="mb-2.5 font-medium text-black dark:text-white"
+                  className="mb-2 font-medium text-black dark:text-white"
                 >
                   Select User:{" "}
                 </label>
@@ -331,6 +336,9 @@ const RoleCmp = () => {
                   }}
                   className="w-1/2 rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
                 >
+                  <option key={0} value="">
+                    Select User
+                  </option>
                   {listedUsers?.map((user) => (
                     <option key={user.id} value={user.id}>
                       {user.id} {user.first_name}
@@ -339,7 +347,7 @@ const RoleCmp = () => {
                 </select>
                 <label
                   htmlFor="assign_role"
-                  className="my-2.5 font-medium text-black dark:text-white"
+                  className="my-2 font-medium text-black dark:text-white"
                 >
                   Assign Role:{" "}
                 </label>
@@ -351,6 +359,9 @@ const RoleCmp = () => {
                   }}
                   className="w-1/2 rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
                 >
+                  <option key={0} value="">
+                    Select Role
+                  </option>
                   {existingRoles?.map((role) => (
                     <option key={role.id} value={role.id}>
                       {role.name}

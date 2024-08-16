@@ -5,27 +5,16 @@ const UserDataCmp = (user_data: any) => {
   const userData = user_data.user_data;
   return (
     <>
-      <Image
-        src={"/images/cover/cover-01.png"}
-        alt="profile cover"
-        className="h-full w-full rounded-tl-sm rounded-tr-sm object-cover object-center"
-        width={970}
-        height={260}
-        style={{
-          width: "auto",
-          height: "auto",
-        }}
-      />
       {/* {JSON.stringify(userData, null, 4)} */}
-      <div className="px-4 pb-3 text-center lg:pb-5 xl:pb-5">
-        <div className="mt-8 grid grid-cols-2">
+      <div className="pb-3 text-center lg:pb-5 xl:pb-5">
+        <div className="mt-8 grid grid-cols-3">
           <h3 className="mb-1.5 text-lg font-semibold text-meta-5 dark:text-meta-5">
             <span className="font-semibold text-black dark:text-white">
               Name:
             </span>
             {" " + userData?.first_name} {userData?.last_name}
           </h3>
-          <h3 className="mb-1.5 text-lg font-semibold text-black dark:text-white">
+          <h3 className="mb-1.5 col-span-2 text-lg font-semibold text-black dark:text-white">
             <span className="font-semibold text-black dark:text-white">
               Email:
             </span>
@@ -37,7 +26,7 @@ const UserDataCmp = (user_data: any) => {
             </span>
             {" " + userData?.username}
           </h3>
-          <h3 className="mt-2 mb-1.5 text-lg font-semibold text-black dark:text-white space-x-2">
+          <h3 className="col-span-2 mt-2 mb-1.5 text-lg font-semibold text-black dark:text-white space-x-2">
             <span className="font-semibold text-black dark:text-white">
               Roles:
             </span>
