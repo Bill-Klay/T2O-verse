@@ -13,7 +13,7 @@ const LogTablePage = () => {
   const logsPerPage = 10;
 
   const endOffset = logOffset + logsPerPage;
-  const currentLogs = logs.slice(logOffset, endOffset);
+  const currentLogs = logs?.slice(logOffset, endOffset);
   // const pageCount = Math.ceil(logs.length / logsPerPage);
 
   const handlePageClick = async (event: any) => {

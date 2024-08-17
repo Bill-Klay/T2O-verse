@@ -4,6 +4,6 @@ export type UserData = {
   last_name: string;
   email: string;
   username: string;
-  roles: [];
+  roles: string[];
   twofa_enabled: boolean;
 };

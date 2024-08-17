@@ -1,16 +1,47 @@
 import { UserData } from "@/types/UserData";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import UserDataCmp from "./UserDataCmp";
+import useProfileFormik from "@/hooks/useProfileFormik";
 
 type Props = {
-  Formik: any;
-  userData: UserData | undefined;
+  // Formik: any;
+  userData: UserData;
+  setUserData: Dispatch<SetStateAction<UserData | undefined>>;
+  cnf_password: string;
   setCnfPassword: Dispatch<SetStateAction<string>>;
 };
 
-const UserCmp = ({ Formik, userData, setCnfPassword }: Props) => {
+const UserCmp = ({
+  userData,
+  cnf_password,
+  setCnfPassword,
+  setUserData,
+}: Props) => {
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  const Formik = useProfileFormik(userData, cnf_password, setUserData);
+
+  useEffect(() => {
+    console.log(userData?.roles.includes("Admin"));
+    if (userData?.roles.includes("Admin")) {
+      setIsAdmin(true);
+    } else {
+      setIsAdmin(false);
+    }
+  }, []);
+
   return (
     <>
+      {isAdmin ? (
+        <select>
+          <option key={1} value={"User1"}>
+            User 1
+          </option>
+          <option key={2} value={"User2"}>
+            User 2
+          </option>
+        </select>
+      ) : null}
       <UserDataCmp user_data={userData} />
       <form onSubmit={Formik.handleSubmit} noValidate>
         <div className="grid grid-cols-2 gap-4">
@@ -25,7 +56,8 @@ const UserCmp = ({ Formik, userData, setCnfPassword }: Props) => {
               id="first_name"
               name="first_name"
               type="text"
-              placeholder={userData?.first_name}
+              // placeholder={userData?.first_name}
+              value={Formik.values.first_name}
               onChange={Formik.handleChange}
               className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
             />
@@ -46,7 +78,8 @@ const UserCmp = ({ Formik, userData, setCnfPassword }: Props) => {
               id="last_name"
               name="last_name"
               type="text"
-              placeholder={userData?.last_name}
+              // placeholder={userData?.last_name}
+              value={Formik.values.last_name}
               onChange={Formik.handleChange}
               className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
             />
@@ -68,7 +101,8 @@ const UserCmp = ({ Formik, userData, setCnfPassword }: Props) => {
             id="email"
             name="email"
             type="email"
-            placeholder={userData?.email}
+            // placeholder={userData?.email}
+            value={Formik.values.email}
             onChange={Formik.handleChange}
             className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
           />
@@ -89,7 +123,8 @@ const UserCmp = ({ Formik, userData, setCnfPassword }: Props) => {
             id="username"
             name="username"
             type="text"
-            placeholder={userData?.username}
+            // placeholder={userData?.username}
+            value={Formik.values.username}
             onChange={Formik.handleChange}
             className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
           />

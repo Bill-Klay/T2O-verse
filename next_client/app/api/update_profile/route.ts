@@ -24,6 +24,7 @@ export async function POST(req: NextRequest) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
+            user_id: data.user_id,
             first_name: data.first_name,
             last_name: data.last_name,
             email: data.email,
@@ -45,6 +46,7 @@ export async function POST(req: NextRequest) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          user_id: data.user_id,
           first_name: data.first_name,
           last_name: data.last_name,
           email: data.email,
@@ -52,6 +54,7 @@ export async function POST(req: NextRequest) {
         }),
       });
 
+      console.log(res.status);
       const res_data = await res.json();
       return Response.json(res_data);
     }
