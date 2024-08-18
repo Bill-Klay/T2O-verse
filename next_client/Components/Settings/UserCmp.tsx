@@ -4,20 +4,14 @@ import UserDataCmp from "./UserDataCmp";
 import useProfileFormik from "@/hooks/useProfileFormik";
 
 type Props = {
-  // Formik: any;
   userData: UserData;
   setUserData: Dispatch<SetStateAction<UserData | undefined>>;
-  cnf_password: string;
-  setCnfPassword: Dispatch<SetStateAction<string>>;
 };
 
-const UserCmp = ({
-  userData,
-  cnf_password,
-  setCnfPassword,
-  setUserData,
-}: Props) => {
+const UserCmp = ({ userData, setUserData }: Props) => {
   const [isAdmin, setIsAdmin] = useState(false);
+  const [cnf_password, setCnfPassword] = useState("");
+  const [user, setUser] = useState<UserData>(userData);
 
   const Formik = useProfileFormik(userData, cnf_password, setUserData);
 
@@ -33,7 +27,7 @@ const UserCmp = ({
   return (
     <>
       {isAdmin ? (
-        <select>
+        <select className="w-1/2 mt-5 rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary">
           <option key={1} value={"User1"}>
             User 1
           </option>

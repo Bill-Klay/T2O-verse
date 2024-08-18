@@ -1,12 +1,13 @@
 import { base_url } from "@/lib/Constants";
 import { Permission, Role, User } from "@/types/RoleTypes";
+import { runSuccessToast } from "@/utils/toast";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { CreateRole } from "./RoleActionCmp/CreateRole";
+import { CreatePermission } from "./RoleActionCmp/CreatePermission";
 
 const RoleCmp = () => {
   const [action, setAction] = useState("create_role");
-  const [role, setRole] = useState("");
-  const [permission, setPermission] = useState("");
   const [existingRoles, setExistingRoles] = useState<Role[]>([]);
   const [existingPermissions, setExistingPermissions] = useState<Permission[]>(
     []
@@ -45,66 +46,6 @@ const RoleCmp = () => {
     }
   };
 
-  const createRole = async () => {
-    try {
-      const res = await fetch(`/api/create_role`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          role,
-        }),
-      });
-
-      const res_data = await res.json();
-      toast.success(`${res_data.message}`, {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-    } catch (error) {
-      console.log("Error >>", error);
-    }
-  };
-
-  const createPermission = async () => {
-    // Can be Better
-    try {
-      const res = await fetch(`/api/create_permission`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          permission,
-        }),
-      });
-
-      const resStatus = res.status;
-      console.log("Res Status >>", resStatus);
-      const res_data = await res.json();
-
-      toast.success(`${res_data.message}`, {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-    } catch (error) {
-      console.log("Error >>", error);
-    }
-  };
-
   const assignPermission = async () => {
     try {
       const res = await fetch(`/api/assign_permission`, {
@@ -121,17 +62,7 @@ const RoleCmp = () => {
       const resStatus = res.status;
       console.log("Res Status >>", resStatus);
       const res_data = await res.json();
-
-      toast.success(`${res_data.message}`, {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+      runSuccessToast(res_data.message);
     } catch (error) {
       console.log("Error >>", error);
     }
@@ -155,17 +86,7 @@ const RoleCmp = () => {
       const resStatus = res.status;
       console.log("Res Status >>", resStatus);
       const res_data = await res.json();
-
-      toast.success(`${res_data.message}`, {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+      runSuccessToast(res_data.message);
     } catch (error) {
       console.log("Error >>", error);
     }
@@ -204,61 +125,9 @@ const RoleCmp = () => {
       {(() => {
         switch (action) {
           case "create_role":
-            return (
-              <div className=" flex flex-col items-center">
-                <label
-                  htmlFor="create_role"
-                  className="mb-2 font-medium text-black dark:text-white"
-                >
-                  Create Role:{" "}
-                </label>
-                <input
-                  id="create_role"
-                  name="create_role"
-                  type="text"
-                  placeholder="Admin..."
-                  onChange={(event) => {
-                    setRole(event.target.value);
-                  }}
-                  className="w-55 rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                />
-                <button
-                  onClick={createRole}
-                  className="w-[45%] my-4 rounded-lg border border-primary bg-primary p-1
-        text-white transition hover:bg-opacity-90"
-                >
-                  Create Role
-                </button>
-              </div>
-            );
+            return <CreateRole />;
           case "create_permission":
-            return (
-              <div className=" flex flex-col items-center">
-                <label
-                  htmlFor="create_permission"
-                  className="mb-2 font-medium text-black dark:text-white"
-                >
-                  Create Permission:{" "}
-                </label>
-                <input
-                  id="create_permission"
-                  name="create_permission"
-                  type="text"
-                  placeholder="Edit"
-                  onChange={(event) => {
-                    setPermission(event.target.value);
-                  }}
-                  className="w-1/2 rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                />
-                <button
-                  onClick={createPermission}
-                  className="w-[45%] my-4 rounded-lg border border-primary bg-primary p-1
-        text-white transition hover:bg-opacity-90"
-                >
-                  Create Permission
-                </button>
-              </div>
-            );
+            return <CreatePermission />;
           case "assign_permission":
             return (
               <div className=" flex flex-col items-center">
