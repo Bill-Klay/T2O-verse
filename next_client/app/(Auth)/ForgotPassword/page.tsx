@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { base_url } from "@/lib/Constants";
-import { toast } from "react-toastify";
+import { runErrorToast, runSuccessToast } from "@/utils/toast";
 
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState("");
@@ -28,16 +28,7 @@ const ForgotPasswordPage = () => {
 
       const resData = await res.json();
       if (resData.success) {
-        toast.success(`${resData.message}`, {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        runSuccessToast(resData.message);
       }
     } catch (error: any) {
       console.log("Error: ", error);
@@ -45,16 +36,7 @@ const ForgotPasswordPage = () => {
       if (error.message) {
         errorMessage = error.message;
       }
-      toast.error(`${errorMessage}`, {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+      runErrorToast(errorMessage);
     }
   };
 

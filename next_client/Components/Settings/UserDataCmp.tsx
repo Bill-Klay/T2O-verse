@@ -1,6 +1,3 @@
-import { UserData } from "@/types/UserData";
-import Image from "next/image";
-
 const UserDataCmp = (user_data: any) => {
   const userData = user_data.user_data;
   return (

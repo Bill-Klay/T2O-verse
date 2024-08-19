@@ -1,6 +1,6 @@
 import { Board } from "@/types/KanbanTypes";
+import { runErrorToast, runSuccessToast } from "@/utils/toast";
 import { Dispatch, SetStateAction, useState } from "react";
-import { toast } from "react-toastify";
 
 type ModalProps = {
   showUpdateColumn: boolean;
@@ -24,16 +24,7 @@ const UpdateColumn_Modal = ({
   const updateColumn = async () => {
     try {
       if (column_name.length <= 2) {
-        toast.error(`Length Should be Greater Than 2`, {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        runErrorToast("Length Should be Greater Than 2");
       } else {
         const res = await fetch(`/api/kanban_column`, {
           method: "PUT",
@@ -46,20 +37,13 @@ const UpdateColumn_Modal = ({
             name: column_name,
           }),
         });
+
         if (!res.ok) {
           throw new Error("Something Went Wrong");
         }
+
         const res_data = await res.json();
-        toast.success(`Column ${res_data.name} Updated Succesfully`, {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        runSuccessToast(`Column ${res_data.name} Updated Succesfully`);
         setShowUpdateColumn(!showUpdateColumn);
         getColumns();
       }
@@ -80,20 +64,12 @@ const UpdateColumn_Modal = ({
           id: col_id,
         }),
       });
+
       if (!res.ok) {
         throw new Error("Something Went Wrong");
       }
-      // const res_data = await res.json();
-      toast.success(`Column ${col_name} Deleted`, {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+
+      runSuccessToast(`Column ${col_name} Deleted`);
       setShowUpdateColumn(!showUpdateColumn);
       getColumns();
     } catch (error) {

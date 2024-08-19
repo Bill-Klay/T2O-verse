@@ -9,20 +9,9 @@ type Props = {
 };
 
 const UserCmp = ({ userData, setUserData }: Props) => {
-  const [isAdmin, setIsAdmin] = useState(false);
   const [cnf_password, setCnfPassword] = useState("");
-  const [user, setUser] = useState<UserData>(userData);
 
   const Formik = useProfileFormik(userData, cnf_password, setUserData);
-
-  useEffect(() => {
-    console.log(userData?.roles.includes("Admin"));
-    if (userData?.roles.includes("Admin")) {
-      setIsAdmin(true);
-    } else {
-      setIsAdmin(false);
-    }
-  }, []);
 
   return (
     <>

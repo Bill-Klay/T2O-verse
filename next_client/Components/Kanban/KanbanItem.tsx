@@ -1,11 +1,11 @@
 "use client";
 
-import { Board, Column, ColumnWithTickets, Ticket } from "@/types/KanbanTypes";
+import { Board, Column, Ticket } from "@/types/KanbanTypes";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { useState } from "react";
-import { toast } from "react-toastify";
 import UpdateTicket_Modal from "../Modals/KanbanModals/UpdateTicket_Modal";
+import { runSuccessToast } from "@/utils/toast";
 
 interface Props {
   col_id: number;
@@ -55,17 +55,7 @@ const KanbanItem = ({
         throw new Error(`${res.headers}`);
       }
 
-      toast.success(`Deleted Succesfully`, {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-
+      runSuccessToast("Deleted Successfully");
       getColumns(board);
     } catch (error) {
       console.log("Error >>", error);

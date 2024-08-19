@@ -1,12 +1,10 @@
 import { UserData } from "@/types/UserData";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useState } from "react";
 import UserDataCmp from "./UserDataCmp";
-import useProfileFormik from "@/hooks/useProfileFormik";
 import AdminUserCmp from "./AdminUserCmp";
 
 type Props = {
   usersList: [UserData];
-  // setUserData: Dispatch<SetStateAction<UserData | undefined>>;
 };
 
 const AdminCmp = ({ usersList }: Props) => {

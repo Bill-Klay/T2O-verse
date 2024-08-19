@@ -1,6 +1,5 @@
 import { Board } from "@/types/KanbanTypes";
 import { Dispatch, SetStateAction } from "react";
-import UpdateKanban_Modal from "../Modals/KanbanModals/UpdateKanban_Modal";
 
 interface Props {
   board: Board;

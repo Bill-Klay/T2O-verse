@@ -3,11 +3,7 @@ import { AuthProvider } from "@/config/context/AuthProvider";
 import { ReactNode } from "react";
 
 const DashboardLayout = ({ children }: { children: ReactNode }) => {
-  return (
-    <AuthProvider>
-      <DefaultLayout>{children}</DefaultLayout>
-    </AuthProvider>
-  );
+  return <DefaultLayout>{children}</DefaultLayout>;
 };
 
 export default DashboardLayout;

@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import { AuthProvider } from "@/config/context/AuthProvider";
+import ToastProvider from "@/Providers/ToastProvider";
+
 import "@/css/satoshi.css";
 import "@/css/style.css";
 
@@ -15,7 +18,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body suppressHydrationWarning={true}>
-        <div className="dark:bg-boxdark-2 dark:text-bodydark">{children}</div>
+        <div className="dark:bg-boxdark-2 dark:text-bodydark">
+          <AuthProvider>
+            <ToastProvider>{children}</ToastProvider>
+          </AuthProvider>
+        </div>
       </body>
     </html>
   );

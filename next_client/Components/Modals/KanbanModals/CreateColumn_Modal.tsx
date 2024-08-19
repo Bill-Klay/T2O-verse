@@ -1,6 +1,6 @@
 import { Board } from "@/types/KanbanTypes";
+import { runErrorToast, runSuccessToast } from "@/utils/toast";
 import { Dispatch, SetStateAction, useState } from "react";
-import { toast } from "react-toastify";
 
 type ModalProps = {
   showColumnModal: boolean;
@@ -23,16 +23,7 @@ const CreateColumn_Modal = ({
   const handleClick = async () => {
     try {
       if (columnName.length <= 2) {
-        toast.error(`Length Should be Greater Than 2`, {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        runErrorToast("Length Should be Greater Than 2");
       } else {
         if (!!board?.id) {
           const res = await fetch(`/api/kanban_column`, {
@@ -52,16 +43,7 @@ const CreateColumn_Modal = ({
           }
 
           const res_data = await res.json();
-          toast.success(`Column ${res_data.id} Created Succesfully`, {
-            position: "bottom-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
+          runSuccessToast(`Column ${res_data.id} Created Succesfully`);
           getColumns(board);
           setShowColumnModal(!showColumnModal);
         }

@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/hooks/useAuth";
 import { base_url } from "@/lib/Constants";
+import { runErrorToast, runSuccessToast } from "@/utils/toast";
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -57,32 +56,14 @@ const DropdownUser = () => {
       localStorage.removeItem("auth");
       const data = await res.json();
       console.log("RESPONSE...", JSON.stringify(data, null, 4));
-      toast.success(`${data.message}`, {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+      runSuccessToast(data.message);
       router.push(`/`);
     } catch (error: any) {
       let errorMessage = "An error Occured";
       if (error.message) {
         errorMessage = error.message;
       }
-      toast.error(`${errorMessage}`, {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+      runErrorToast(errorMessage);
     }
   };
 

@@ -2,13 +2,7 @@
 
 import { Board } from "@/types/KanbanTypes";
 import { useDroppable } from "@dnd-kit/core";
-import {
-  Dispatch,
-  PropsWithChildren,
-  ReactNode,
-  SetStateAction,
-  useState,
-} from "react";
+import { PropsWithChildren, useState } from "react";
 import UpdateColumn_Modal from "../Modals/KanbanModals/UpdateColumn_Modal";
 
 interface Props {

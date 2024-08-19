@@ -8,12 +8,11 @@ import CreateColumn_Modal from "@/Components/Modals/KanbanModals/CreateColumn_Mo
 import CreateKanban_Modal from "@/Components/Modals/KanbanModals/CreateKanban_Modal";
 import CreateTicket_Modal from "@/Components/Modals/KanbanModals/CreateTicket_Modal";
 import UpdateKanban_Modal from "@/Components/Modals/KanbanModals/UpdateKanban_Modal";
-import UpdateTicket_Modal from "@/Components/Modals/KanbanModals/UpdateTicket_Modal";
 import { base_url } from "@/lib/Constants";
 import { Board, Column, ColumnWithTickets } from "@/types/KanbanTypes";
+import { runErrorToast, runSuccessToast } from "@/utils/toast";
 import { DragEndEvent } from "@dnd-kit/core";
 import { useEffect, useState, useRef, ChangeEvent } from "react";
-import { toast } from "react-toastify";
 
 const Kanban = () => {
   const [boardsList, setBoardsList] = useState<Board[]>([]);
@@ -80,18 +79,10 @@ const Kanban = () => {
       if (!res.ok) {
         throw new Error("Failed to update task position");
       }
-      toast.success(`Updated successfully`, {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+      runSuccessToast("Updated Successfully");
     } catch (error) {
       console.log("Error updating task position >>", error);
+      runErrorToast("Error Updating");
     }
   }
 

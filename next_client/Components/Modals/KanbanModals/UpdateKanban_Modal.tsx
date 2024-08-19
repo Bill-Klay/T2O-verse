@@ -1,6 +1,6 @@
 import { Board } from "@/types/KanbanTypes";
+import { runErrorToast, runSuccessToast } from "@/utils/toast";
 import { Dispatch, SetStateAction, useState } from "react";
-import { toast } from "react-toastify";
 
 type ModalProps = {
   showUpdateKanban: boolean;
@@ -24,16 +24,7 @@ const UpdateKanban_Modal = ({
   const updateBoard = async () => {
     try {
       if (kanban_name.length <= 2) {
-        toast.error(`Length Should be Greater Than 2`, {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        runErrorToast(`Length Should be Greater Than 2`);
       } else {
         const res = await fetch(`/api/kanban_board`, {
           method: "PUT",
@@ -51,16 +42,7 @@ const UpdateKanban_Modal = ({
         }
 
         // const res_data = await res.json();
-        toast.success(`Board Updated Succesfully`, {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        runSuccessToast("Board Updated Successfully");
         setShowUpdateKanban(!showUpdateKanban);
         getBoards();
         setBoard({ ...board, name: kanban_name });
@@ -94,18 +76,7 @@ const UpdateKanban_Modal = ({
 
       // Uncomment this if you need to parse the response data
       // const res_data = await res.json();
-
-      toast.success(`Board Deleted ${res.status}`, {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-
+      runSuccessToast(`Board Deleted ${res.status}`);
       setShowUpdateKanban(!showUpdateKanban);
       getBoards();
       setBoard(null);
@@ -113,16 +84,7 @@ const UpdateKanban_Modal = ({
       console.error("Error >>", error.message);
 
       // Optionally, show an error toast
-      toast.error(`Failed to delete board: ${error.message}`, {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+      runErrorToast(`Failed to delete board: ${error.message}`);
     }
   };
 

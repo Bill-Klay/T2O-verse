@@ -1,7 +1,6 @@
 import { Board, Column, Ticket } from "@/types/KanbanTypes";
-import { title } from "process";
+import { runErrorToast, runSuccessToast } from "@/utils/toast";
 import { Dispatch, SetStateAction, useState } from "react";
-import { toast } from "react-toastify";
 
 type ModalProps = {
   showUpdateTicket: boolean;
@@ -29,16 +28,7 @@ const UpdateTicket_Modal = ({
   const handleClick = async () => {
     try {
       if (ticketTitle.length <= 2) {
-        toast.error(`Title should be greater than 2 characters`, {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        runErrorToast("Title should be greater than 2 characters");
       } else {
         if (!!board?.id && !!ticketColumnId) {
           const res = await fetch(`/api/kanban_ticket`, {
@@ -61,17 +51,7 @@ const UpdateTicket_Modal = ({
             throw new Error("Something went wrong");
           }
 
-          const res_data = await res.json();
-          toast.success(`Ticket Updated successfully`, {
-            position: "bottom-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
+          runSuccessToast("Ticket Updated successfully");
           getColumns(board);
           setShowUpdateTicket(!showUpdateTicket);
         }

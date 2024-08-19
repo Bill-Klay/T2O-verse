@@ -1,5 +1,5 @@
+import { runErrorToast, runSuccessToast } from "@/utils/toast";
 import { Dispatch, SetStateAction, useState } from "react";
-import { toast } from "react-toastify";
 
 type ModalProps = {
   showModal: boolean;
@@ -19,16 +19,7 @@ const CreateKanban_Modal = ({
   const handleClick = async () => {
     try {
       if (kanban_name.length <= 2) {
-        toast.error(`Length Should be Greater Than 2`, {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        runErrorToast("Length Should be Greater Than 2");
       } else {
         const res = await fetch(`/api/kanban_board`, {
           method: "POST",
@@ -44,16 +35,7 @@ const CreateKanban_Modal = ({
           throw new Error("Something Went Wrong");
         }
 
-        toast.success(`Board Created Succesfully`, {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        runSuccessToast("Board Created Succesfully");
 
         const res_data = await res.json();
         const response = await fetch(`/api/kanban_column`, {
@@ -73,16 +55,7 @@ const CreateKanban_Modal = ({
         }
 
         const col_res_data = await response.json();
-        toast.success(`Column Created Succesfully`, {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        runSuccessToast("Column Created Successfully");
         setShowModal(!showModal);
         getBoards();
       }

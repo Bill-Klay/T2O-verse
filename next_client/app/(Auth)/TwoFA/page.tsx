@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import OTPInput from "react-otp-input";
 import { base_url } from "@/lib/Constants";
-import { toast } from "react-toastify";
+import { runErrorToast, runSuccessToast } from "@/utils/toast";
 
 const TwoFA = () => {
   const [token, setToken] = useState("");
@@ -37,32 +37,14 @@ const TwoFA = () => {
       console.log("DATA:...", JSON.stringify(data, null, 4));
       const user = data.user;
       setAuth(user);
-      toast.success(`${data.message}`, {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+      runSuccessToast(data.message);
       router.push(`/Dashboard/Profile`);
     } catch (error: any) {
       let errorMessage = "An error Occured";
       if (error.message) {
         errorMessage = error.message;
       }
-      toast.error(`${errorMessage}`, {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+      runErrorToast(errorMessage);
     }
   };
 
