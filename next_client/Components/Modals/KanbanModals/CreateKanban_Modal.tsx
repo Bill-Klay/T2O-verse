@@ -44,8 +44,36 @@ const CreateKanban_Modal = ({
           throw new Error("Something Went Wrong");
         }
 
-        const res_data = await res.json();
         toast.success(`Board Created Succesfully`, {
+          position: "bottom-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+
+        const res_data = await res.json();
+        const response = await fetch(`/api/kanban_column`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            board_id: res_data.id,
+            name: `To Do's`,
+            position: 1,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Something Went Wrong");
+        }
+
+        const col_res_data = await response.json();
+        toast.success(`Column Created Succesfully`, {
           position: "bottom-right",
           autoClose: 3000,
           hideProgressBar: false,

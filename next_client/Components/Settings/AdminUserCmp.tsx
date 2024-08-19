@@ -1,32 +1,24 @@
-import { UserData } from "@/types/UserData";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import UserDataCmp from "./UserDataCmp";
 import useProfileFormik from "@/hooks/useProfileFormik";
+import { UserData } from "@/types/UserData";
+import { Dispatch, SetStateAction, useState } from "react";
 
 type Props = {
-  userData: UserData;
-  setUserData: Dispatch<SetStateAction<UserData | undefined>>;
+  user: UserData;
+  setUser: Dispatch<SetStateAction<UserData | undefined>>;
 };
 
-const UserCmp = ({ userData, setUserData }: Props) => {
-  const [isAdmin, setIsAdmin] = useState(false);
+const AdminUserCmp = ({ user, setUser }: Props) => {
   const [cnf_password, setCnfPassword] = useState("");
-  const [user, setUser] = useState<UserData>(userData);
 
-  const Formik = useProfileFormik(userData, cnf_password, setUserData);
-
-  useEffect(() => {
-    console.log(userData?.roles.includes("Admin"));
-    if (userData?.roles.includes("Admin")) {
-      setIsAdmin(true);
-    } else {
-      setIsAdmin(false);
-    }
-  }, []);
+  const Formik = useProfileFormik(
+    user as UserData,
+    cnf_password,
+    setUser as Dispatch<SetStateAction<UserData | undefined>>,
+    true
+  );
 
   return (
     <>
-      <UserDataCmp user_data={userData} />
       <form onSubmit={Formik.handleSubmit} noValidate>
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col items-start">
@@ -40,7 +32,7 @@ const UserCmp = ({ userData, setUserData }: Props) => {
               id="first_name"
               name="first_name"
               type="text"
-              // placeholder={userData?.first_name}
+              // placeholder={usersList?.first_name}
               value={Formik.values.first_name}
               onChange={Formik.handleChange}
               className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
@@ -62,7 +54,7 @@ const UserCmp = ({ userData, setUserData }: Props) => {
               id="last_name"
               name="last_name"
               type="text"
-              // placeholder={userData?.last_name}
+              // placeholder={usersList?.last_name}
               value={Formik.values.last_name}
               onChange={Formik.handleChange}
               className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
@@ -85,7 +77,7 @@ const UserCmp = ({ userData, setUserData }: Props) => {
             id="email"
             name="email"
             type="email"
-            // placeholder={userData?.email}
+            // placeholder={usersList?.email}
             value={Formik.values.email}
             onChange={Formik.handleChange}
             className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
@@ -107,7 +99,7 @@ const UserCmp = ({ userData, setUserData }: Props) => {
             id="username"
             name="username"
             type="text"
-            // placeholder={userData?.username}
+            // placeholder={usersList?.username}
             value={Formik.values.username}
             onChange={Formik.handleChange}
             className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
@@ -171,4 +163,4 @@ const UserCmp = ({ userData, setUserData }: Props) => {
   );
 };
 
-export default UserCmp;
+export default AdminUserCmp;

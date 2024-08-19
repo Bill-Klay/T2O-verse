@@ -4,9 +4,9 @@ import { ReactNode } from "react";
 
 const DashboardLayout = ({ children }: { children: ReactNode }) => {
   return (
-    <DefaultLayout>
-      <AuthProvider>{children}</AuthProvider>
-    </DefaultLayout>
+    <AuthProvider>
+      <DefaultLayout>{children}</DefaultLayout>
+    </AuthProvider>
   );
 };
 

@@ -2,14 +2,15 @@ import { UserData } from "@/types/UserData";
 import { useFormik } from "formik";
 import { profileUpdateValidation } from "@/utils/FormValidation";
 
-import { fetchCurrentUser } from "@/handlers/Settings/handlers";
+import { fetchAllUsers, fetchCurrentUser } from "@/handlers/Settings/handlers";
 import { runSuccessToast } from "@/utils/toast";
 import { Dispatch, SetStateAction } from "react";
 
 const useProfileFormik = (
   user_data: UserData,
   cnf_password: string,
-  setUserData: Dispatch<SetStateAction<UserData | undefined>>
+  setUserData: Dispatch<SetStateAction<UserData | undefined>>,
+  flag?: boolean
 ) => {
   const profileFormik = useFormik({
     initialValues: {
@@ -19,6 +20,7 @@ const useProfileFormik = (
       username: user_data.username,
       password: "",
     },
+    enableReinitialize: true,
     validationSchema: profileUpdateValidation,
     onSubmit: async (values) => {
       console.log(JSON.stringify(values, null, 4));
@@ -47,8 +49,17 @@ const useProfileFormik = (
           const status = await res.json();
           runSuccessToast(status.message);
           console.log("Hello");
-          const data = await fetchCurrentUser();
-          setUserData(data);
+          if (flag) {
+            const usersData = await fetchAllUsers();
+            const user = usersData.find(
+              (user: UserData) => user.id === Number(user_data.id)
+            );
+            console.log("Hello >>", user);
+            setUserData(user);
+          } else {
+            const data = await fetchCurrentUser();
+            setUserData(data);
+          }
         }
       } catch (error) {
         console.log("Error >>", error);

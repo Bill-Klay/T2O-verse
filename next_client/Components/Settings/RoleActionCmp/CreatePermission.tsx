@@ -20,13 +20,13 @@ export const CreatePermission = () => {
         onChange={(event) => {
           setPermission(event.target.value);
         }}
-        className="w-1/2 rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
+        className="w-55 rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
       />
       <button
         onClick={() => {
           createPermission(permission);
         }}
-        className="w-[45%] my-4 rounded-lg border border-primary bg-primary p-1
+        className="w-45 my-4 rounded-lg border border-primary bg-primary p-1
         text-white transition hover:bg-opacity-90"
       >
         Create Permission
