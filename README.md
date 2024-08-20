@@ -19,6 +19,7 @@ A Front-End designed for the Flask Role Management System. The application allow
 ### Pre-Requisites
 
 > [NodeJs](https://nodejs.org/en)
+>
 > [Git](https://git-scm.com/)
 
 ### Installation
@@ -44,7 +45,9 @@ A Front-End designed for the Flask Role Management System. The application allow
 4. Add Server Url For API Calls:
 
    > Create a **lib** folder in **next-client** folder.
+   >
    > In the **lib** folder create a file **Constants.ts**
+   >
    > In the file created add: export const base_url = "url_of_server"
 
 5. Run Application:
