@@ -1,4 +1,7 @@
-import { Board, Column, Ticket } from "@/types/KanbanTypes";
+import { getColumnsNTickets } from "@/handlers/Kanban/handlers";
+import { useKanbanCtx } from "@/hooks/useKanbanCtx";
+import { ContextTypes } from "@/types/KanbanCtxTypes";
+import { Board, Column, ColumnWithTickets, Ticket } from "@/types/KanbanTypes";
 import { runErrorToast, runSuccessToast } from "@/utils/toast";
 import { Dispatch, SetStateAction, useState } from "react";
 
@@ -7,8 +10,6 @@ type ModalProps = {
   setShowUpdateTicket: Dispatch<SetStateAction<boolean>>;
   board: Board | undefined;
   ticket: Ticket;
-  getColumns: (board: Board) => void;
-  columnsList: Column[];
 };
 
 const UpdateTicket_Modal = ({
@@ -16,14 +17,15 @@ const UpdateTicket_Modal = ({
   setShowUpdateTicket,
   board,
   ticket,
-  getColumns,
-  columnsList,
 }: ModalProps) => {
   const [ticketTitle, setTicketTitle] = useState(ticket.title);
   const [ticketDescription, setTicketDescription] = useState(
     ticket.description
   );
   const [ticketColumnId, setTicketColumnId] = useState(ticket.position);
+
+  const { columnsNTicketsList, setColumnsNTicketsList } =
+    useKanbanCtx() as ContextTypes;
 
   const handleClick = async () => {
     try {
@@ -52,7 +54,8 @@ const UpdateTicket_Modal = ({
           }
 
           runSuccessToast("Ticket Updated successfully");
-          getColumns(board);
+          const column_and_tickets = await getColumnsNTickets(board);
+          setColumnsNTicketsList(column_and_tickets as ColumnWithTickets[]);
           setShowUpdateTicket(!showUpdateTicket);
         }
       }
@@ -134,7 +137,7 @@ const UpdateTicket_Modal = ({
                     className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
                   >
                     <option value={ticket.position}>Select Column</option>
-                    {columnsList.map((column) => (
+                    {columnsNTicketsList.map((column) => (
                       <option key={column.id} value={column.id}>
                         {column.name}
                       </option>

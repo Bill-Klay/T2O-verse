@@ -1,3 +1,6 @@
+import { getBoards } from "@/handlers/Kanban/handlers";
+import { useKanbanCtx } from "@/hooks/useKanbanCtx";
+import { ContextTypes } from "@/types/KanbanCtxTypes";
 import { runErrorToast, runSuccessToast } from "@/utils/toast";
 import { Dispatch, SetStateAction, useState } from "react";
 
@@ -5,18 +8,18 @@ type ModalProps = {
   showModal: boolean;
   modalStyle: object;
   setShowModal: Dispatch<SetStateAction<boolean>>;
-  getBoards: () => void;
 };
 
 const CreateKanban_Modal = ({
   showModal,
   modalStyle,
   setShowModal,
-  getBoards,
 }: ModalProps) => {
   const [kanban_name, setKanbanName] = useState("");
 
-  const handleClick = async () => {
+  const { setBoardsList } = useKanbanCtx() as ContextTypes;
+
+  const createBoard = async () => {
     try {
       if (kanban_name.length <= 2) {
         runErrorToast("Length Should be Greater Than 2");
@@ -57,7 +60,8 @@ const CreateKanban_Modal = ({
         const col_res_data = await response.json();
         runSuccessToast("Column Created Successfully");
         setShowModal(!showModal);
-        getBoards();
+        const boards = await getBoards();
+        setBoardsList(boards);
       }
     } catch (error) {
       console.log("Error >>", error);
@@ -99,7 +103,7 @@ const CreateKanban_Modal = ({
                 {/*footer*/}
                 <div className="flex items-center justify-around pt-4 rounded-b">
                   <button
-                    onClick={handleClick}
+                    onClick={createBoard}
                     className="cursor-pointer rounded-lg border border-primary bg-primary py-2 px-6 text-white transition hover:bg-opacity-90 disabled:bg-strokedark disabled:border-strokedark"
                   >
                     Create

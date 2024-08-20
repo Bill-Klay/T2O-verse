@@ -1,3 +1,6 @@
+import { getBoards } from "@/handlers/Kanban/handlers";
+import { useKanbanCtx } from "@/hooks/useKanbanCtx";
+import { ContextTypes } from "@/types/KanbanCtxTypes";
 import { Board } from "@/types/KanbanTypes";
 import { runErrorToast, runSuccessToast } from "@/utils/toast";
 import { Dispatch, SetStateAction, useState } from "react";
@@ -8,7 +11,6 @@ type ModalProps = {
   setShowUpdateKanban: Dispatch<SetStateAction<boolean>>;
   board: Board | undefined;
   setBoard: Dispatch<SetStateAction<any>>;
-  getBoards: () => void;
 };
 
 const UpdateKanban_Modal = ({
@@ -17,9 +19,10 @@ const UpdateKanban_Modal = ({
   setShowUpdateKanban,
   board,
   setBoard,
-  getBoards,
 }: ModalProps) => {
   const [kanban_name, setKanbanName] = useState("");
+
+  const { setBoardsList } = useKanbanCtx() as ContextTypes;
 
   const updateBoard = async () => {
     try {
@@ -44,7 +47,8 @@ const UpdateKanban_Modal = ({
         // const res_data = await res.json();
         runSuccessToast("Board Updated Successfully");
         setShowUpdateKanban(!showUpdateKanban);
-        getBoards();
+        const boards = await getBoards();
+        setBoardsList(boards);
         setBoard({ ...board, name: kanban_name });
       }
     } catch (error) {
@@ -78,7 +82,8 @@ const UpdateKanban_Modal = ({
       // const res_data = await res.json();
       runSuccessToast(`Board Deleted ${res.status}`);
       setShowUpdateKanban(!showUpdateKanban);
-      getBoards();
+      const boards = await getBoards();
+      setBoardsList(boards);
       setBoard(null);
     } catch (error: any) {
       console.error("Error >>", error.message);

@@ -8,8 +8,8 @@ import UpdateColumn_Modal from "../Modals/KanbanModals/UpdateColumn_Modal";
 interface Props {
   col_id: number;
   col_name: string;
-  getColumns: () => void;
-  board: Board | undefined;
+  // getColumns: () => void;
+  board: Board;
 }
 
 const KanbanColumn = ({
@@ -17,8 +17,8 @@ const KanbanColumn = ({
   col_name,
   col_id,
   board,
-  getColumns,
-}: PropsWithChildren<Props>) => {
+}: // getColumns,
+PropsWithChildren<Props>) => {
   const [showUpdateColumn, setShowUpdateColumn] = useState(false);
   const { isOver, setNodeRef } = useDroppable({
     id: col_id,
@@ -32,7 +32,6 @@ const KanbanColumn = ({
         board={board}
         col_id={col_id}
         col_name={col_name}
-        getColumns={getColumns}
       />
       <div ref={setNodeRef} className="flex flex-col items-start">
         <div className="w-full flex justify-between ">

@@ -8,15 +8,15 @@ import CreateColumn_Modal from "@/Components/Modals/KanbanModals/CreateColumn_Mo
 import CreateKanban_Modal from "@/Components/Modals/KanbanModals/CreateKanban_Modal";
 import CreateTicket_Modal from "@/Components/Modals/KanbanModals/CreateTicket_Modal";
 import UpdateKanban_Modal from "@/Components/Modals/KanbanModals/UpdateKanban_Modal";
-import { base_url } from "@/lib/Constants";
-import { Board, Column, ColumnWithTickets } from "@/types/KanbanTypes";
+import { getBoards, getColumnsNTickets } from "@/handlers/Kanban/handlers";
+import { useKanbanCtx } from "@/hooks/useKanbanCtx";
+import { ContextTypes } from "@/types/KanbanCtxTypes";
+import { Board, ColumnWithTickets } from "@/types/KanbanTypes";
 import { runErrorToast, runSuccessToast } from "@/utils/toast";
 import { DragEndEvent } from "@dnd-kit/core";
 import { useEffect, useState, useRef, ChangeEvent } from "react";
 
 const Kanban = () => {
-  const [boardsList, setBoardsList] = useState<Board[]>([]);
-  const [columnsList, setColumnsList] = useState<ColumnWithTickets[]>([]);
   const [board, setBoard] = useState<Board>();
   const [showModal, setShowModal] = useState(false);
   const [showUpdateKanban, setShowUpdateKanban] = useState(false);
@@ -25,12 +25,19 @@ const Kanban = () => {
   const boardRef = useRef<HTMLDivElement>(null);
   const [modalStyle, setModalStyle] = useState({});
 
+  const {
+    boardsList,
+    setBoardsList,
+    columnsNTicketsList,
+    setColumnsNTicketsList,
+  } = useKanbanCtx() as ContextTypes;
+
   async function handleDragEnd(event: DragEndEvent) {
     const new_col_id = event.over?.id as number;
     const task_id = event.active?.id as number;
 
     // Find the moved ticket
-    const movedTicket = columnsList
+    const movedTicket = columnsNTicketsList
       .flatMap((col) => col.tickets)
       .find((ticket) => ticket.id === task_id);
 
@@ -44,7 +51,7 @@ const Kanban = () => {
     // Update the ticket's position
     const updatedTicket = { ...movedTicket, position: new_col_id };
 
-    const updatedColumnsList = columnsList.map((column) => {
+    const updatedColumnsList = columnsNTicketsList.map((column) => {
       if (column.id === old_position) {
         // Remove the task from the old column
         return {
@@ -62,7 +69,7 @@ const Kanban = () => {
       }
     });
     console.log("Updated LIST >>>", updatedColumnsList);
-    setColumnsList(updatedColumnsList);
+    setColumnsNTicketsList(updatedColumnsList);
 
     try {
       const res = await fetch(`/api/kanban_ticket`, {
@@ -85,55 +92,6 @@ const Kanban = () => {
       runErrorToast("Error Updating");
     }
   }
-
-  const getBoards = async () => {
-    try {
-      const res = await fetch(`${base_url}/boards`, {
-        method: "GET",
-        credentials: "include",
-      });
-
-      const boards = await res.json();
-      console.log("Boards >>", boards);
-      setBoardsList(boards);
-    } catch (error) {
-      console.log("Error >>", error);
-    }
-  };
-
-  const getColumnsNTickets = async () => {
-    try {
-      // Fetch columns
-      const res = await fetch(`${base_url}//boards/${board?.id}/columns`, {
-        method: "GET",
-        credentials: "include",
-      });
-
-      const columns = await res.json();
-      console.log("Columns >>", columns);
-
-      // Fetch tickets for each column
-      const columnsWithTickets = await Promise.all(
-        columns.map(async (column: Column) => {
-          const ticketsRes = await fetch(
-            `${base_url}//columns/${column.id}/tickets`,
-            {
-              method: "GET",
-              credentials: "include",
-            }
-          );
-          const tickets = await ticketsRes.json();
-          console.log("Tickets >>", tickets + column.id);
-          return { ...column, tickets };
-        })
-      );
-
-      console.log("Columns with tickets >>", columnsWithTickets);
-      setColumnsList(columnsWithTickets);
-    } catch (error) {
-      console.log("Error >>", error);
-    }
-  };
 
   const handleBoardChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const selectedIndex = event.target.selectedIndex;
@@ -160,20 +118,20 @@ const Kanban = () => {
   }, [showModal, showColumnModal, showTicketModal, showUpdateKanban]);
 
   useEffect(() => {
-    getBoards();
+    (async () => {
+      const boards = await getBoards();
+      setBoardsList(boards);
+    })();
   }, []);
 
   useEffect(() => {
     if (!!board && board?.name !== "") {
-      getColumnsNTickets();
+      (async () => {
+        const columns_and_tickets = await getColumnsNTickets(board);
+        setColumnsNTicketsList(columns_and_tickets as ColumnWithTickets[]);
+      })();
     }
   }, [board]);
-
-  // useEffect(() => {
-  //   if (!!columnsList) {
-  //     getTickets();
-  //   }
-  // }, [columnsList]);
 
   return (
     <>
@@ -181,7 +139,7 @@ const Kanban = () => {
         showModal={showModal}
         modalStyle={modalStyle}
         setShowModal={setShowModal}
-        getBoards={getBoards}
+        // getBoards={getBoards}
       />
       <UpdateKanban_Modal
         board={board}
@@ -189,22 +147,22 @@ const Kanban = () => {
         showUpdateKanban={showUpdateKanban}
         setShowUpdateKanban={setShowUpdateKanban}
         modalStyle={modalStyle}
-        getBoards={getBoards}
+        // getBoards={getBoards}
       />
       <CreateColumn_Modal
         showColumnModal={showColumnModal}
         modalStyle={modalStyle}
         setShowColumnModal={setShowColumnModal}
         board={board}
-        getColumns={getColumnsNTickets}
+        // getColumns={getColumnsNTickets}
       />
       <CreateTicket_Modal
         showTicketModal={showTicketModal}
         modalStyle={modalStyle}
         setShowTicketModal={setShowTicketModal}
         board={board}
-        getColumns={getColumnsNTickets}
-        columnsList={columnsList}
+        // getColumns={getColumnsNTickets}
+        // columnsNTicketsList={columnsNTicketsList}
       />
       <div ref={boardRef}>
         <select
@@ -239,12 +197,11 @@ const Kanban = () => {
               setShowUpdateKanban={setShowUpdateKanban}
             />
             <KanbanContainer onDragEnd={handleDragEnd}>
-              {columnsList.map((column) => (
+              {columnsNTicketsList.map((column) => (
                 <KanbanColumn
                   key={column.id}
                   col_id={column.id}
                   col_name={column.name}
-                  getColumns={getColumnsNTickets}
                   board={board}
                 >
                   {column.tickets.map((item) => (
@@ -253,8 +210,8 @@ const Kanban = () => {
                       col_id={column.id}
                       ticket={item}
                       board={board}
-                      getColumns={getColumnsNTickets}
-                      columnsList={columnsList}
+                      // getColumns={getColumnsNTickets}
+                      // columnsNTicketsList={columnsNTicketsList}
                     />
                   ))}
                 </KanbanColumn>

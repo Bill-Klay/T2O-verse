@@ -1,14 +1,17 @@
-import { Board } from "@/types/KanbanTypes";
+import { getColumnsNTickets } from "@/handlers/Kanban/handlers";
+import { useKanbanCtx } from "@/hooks/useKanbanCtx";
+import { ContextTypes } from "@/types/KanbanCtxTypes";
+import { Board, ColumnWithTickets } from "@/types/KanbanTypes";
 import { runErrorToast, runSuccessToast } from "@/utils/toast";
 import { Dispatch, SetStateAction, useState } from "react";
 
 type ModalProps = {
   showUpdateColumn: boolean;
   setShowUpdateColumn: Dispatch<SetStateAction<boolean>>;
-  board: Board | undefined;
+  board: Board;
   col_id: number;
   col_name: string;
-  getColumns: () => void;
+  // getColumns: () => void;
 };
 
 const UpdateColumn_Modal = ({
@@ -17,9 +20,11 @@ const UpdateColumn_Modal = ({
   board,
   col_id,
   col_name,
-  getColumns,
-}: ModalProps) => {
+}: // getColumns,
+ModalProps) => {
   const [column_name, setColumnName] = useState("");
+
+  const { setColumnsNTicketsList } = useKanbanCtx() as ContextTypes;
 
   const updateColumn = async () => {
     try {
@@ -45,7 +50,8 @@ const UpdateColumn_Modal = ({
         const res_data = await res.json();
         runSuccessToast(`Column ${res_data.name} Updated Succesfully`);
         setShowUpdateColumn(!showUpdateColumn);
-        getColumns();
+        const column_and_tickets = await getColumnsNTickets(board);
+        setColumnsNTicketsList(column_and_tickets as ColumnWithTickets[]);
       }
     } catch (error) {
       console.log("Error >>", error);
@@ -71,7 +77,8 @@ const UpdateColumn_Modal = ({
 
       runSuccessToast(`Column ${col_name} Deleted`);
       setShowUpdateColumn(!showUpdateColumn);
-      getColumns();
+      const column_and_tickets = await getColumnsNTickets(board);
+      setColumnsNTicketsList(column_and_tickets as ColumnWithTickets[]);
     } catch (error) {
       console.log("Error >>", error);
     }

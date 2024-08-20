@@ -1,4 +1,7 @@
-import { Board } from "@/types/KanbanTypes";
+import { getColumnsNTickets } from "@/handlers/Kanban/handlers";
+import { useKanbanCtx } from "@/hooks/useKanbanCtx";
+import { ContextTypes } from "@/types/KanbanCtxTypes";
+import { Board, ColumnWithTickets } from "@/types/KanbanTypes";
 import { runErrorToast, runSuccessToast } from "@/utils/toast";
 import { Dispatch, SetStateAction, useState } from "react";
 
@@ -7,7 +10,7 @@ type ModalProps = {
   modalStyle: object;
   setShowColumnModal: Dispatch<SetStateAction<boolean>>;
   board: Board | undefined;
-  getColumns: (board: Board) => void;
+  // getColumns: (board: Board) => void;
 };
 
 const CreateColumn_Modal = ({
@@ -15,10 +18,12 @@ const CreateColumn_Modal = ({
   modalStyle,
   setShowColumnModal,
   board,
-  getColumns,
-}: ModalProps) => {
+}: // getColumns,
+ModalProps) => {
   const [columnName, setColumnName] = useState("");
   const [columnPosition, setColumnPosition] = useState("");
+
+  const { setColumnsNTicketsList } = useKanbanCtx() as ContextTypes;
 
   const handleClick = async () => {
     try {
@@ -44,7 +49,8 @@ const CreateColumn_Modal = ({
 
           const res_data = await res.json();
           runSuccessToast(`Column ${res_data.id} Created Succesfully`);
-          getColumns(board);
+          const columns_and_tickets = await getColumnsNTickets(board);
+          setColumnsNTicketsList(columns_and_tickets as ColumnWithTickets[]);
           setShowColumnModal(!showColumnModal);
         }
       }

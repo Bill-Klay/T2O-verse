@@ -1,37 +1,29 @@
 "use client";
 
-import { Board, Column, Ticket } from "@/types/KanbanTypes";
+import { Board, Column, ColumnWithTickets, Ticket } from "@/types/KanbanTypes";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { useState } from "react";
 import UpdateTicket_Modal from "../Modals/KanbanModals/UpdateTicket_Modal";
 import { runSuccessToast } from "@/utils/toast";
+import { useKanbanCtx } from "@/hooks/useKanbanCtx";
+import { ContextTypes } from "@/types/KanbanCtxTypes";
+import { getColumnsNTickets } from "@/handlers/Kanban/handlers";
 
 interface Props {
   col_id: number;
   ticket: Ticket;
   board: Board;
-  getColumns: (board: Board) => void;
-  columnsList: Column[];
 }
 
-const KanbanItem = ({
-  col_id,
-  ticket,
-  board,
-  getColumns,
-  columnsList,
-}: Props) => {
+const KanbanItem = ({ col_id, ticket, board }: Props) => {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: ticket.id,
   });
-  const style = {
-    // Outputs `translate3d(x, y, 0)`
-    transform: CSS.Translate.toString(transform),
-  };
-
   const [isOpen, setIsOpen] = useState(false);
   const [showUpdateTicket, setShowUpdateTicket] = useState(false);
+
+  const { setColumnsNTicketsList } = useKanbanCtx() as ContextTypes;
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -56,7 +48,8 @@ const KanbanItem = ({
       }
 
       runSuccessToast("Deleted Successfully");
-      getColumns(board);
+      const column_and_tickets = await getColumnsNTickets(board);
+      setColumnsNTicketsList(column_and_tickets as ColumnWithTickets[]);
     } catch (error) {
       console.log("Error >>", error);
     }
@@ -69,14 +62,12 @@ const KanbanItem = ({
         setShowUpdateTicket={setShowUpdateTicket}
         board={board}
         ticket={ticket}
-        getColumns={getColumns}
-        columnsList={columnsList}
       />
       <div
         ref={setNodeRef}
         {...listeners}
         {...attributes}
-        style={style}
+        style={{ transform: CSS.Translate.toString(transform) }}
         className="my-2 w-full bg-white shadow-md rounded-lg p-4 relative"
       >
         <div className="flex justify-between items-center mb-2">
