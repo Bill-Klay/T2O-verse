@@ -18,7 +18,8 @@ A Front-End designed for the Flask Role Management System. The application allow
 
 ### Pre-Requisites
 
-> [NodeJs](https://nodejs.org/en) > [Git](https://git-scm.com/)
+> [NodeJs](https://nodejs.org/en)
+> [Git](https://git-scm.com/)
 
 ### Installation
 
