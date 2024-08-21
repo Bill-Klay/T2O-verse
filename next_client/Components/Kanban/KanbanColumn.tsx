@@ -1,27 +1,20 @@
 "use client";
 
-import { Board } from "@/types/KanbanTypes";
+import { Board, ColumnWithTickets } from "@/types/KanbanTypes";
 import { useDroppable } from "@dnd-kit/core";
-import { PropsWithChildren, useState } from "react";
+import { useState } from "react";
 import UpdateColumn_Modal from "../Modals/KanbanModals/UpdateColumn_Modal";
+import KanbanItem from "./KanbanItem";
 
 interface Props {
-  col_id: number;
-  col_name: string;
-  // getColumns: () => void;
+  column: ColumnWithTickets;
   board: Board;
 }
 
-const KanbanColumn = ({
-  children,
-  col_name,
-  col_id,
-  board,
-}: // getColumns,
-PropsWithChildren<Props>) => {
+const KanbanColumn = ({ board, column }: Props) => {
   const [showUpdateColumn, setShowUpdateColumn] = useState(false);
-  const { isOver, setNodeRef } = useDroppable({
-    id: col_id,
+  const { setNodeRef } = useDroppable({
+    id: column.id,
   });
 
   return (
@@ -30,13 +23,12 @@ PropsWithChildren<Props>) => {
         showUpdateColumn={showUpdateColumn}
         setShowUpdateColumn={setShowUpdateColumn}
         board={board}
-        col_id={col_id}
-        col_name={col_name}
+        column={column}
       />
-      <div ref={setNodeRef} className="flex flex-col items-start">
+      <div ref={setNodeRef} className="flex flex-col items-start min-h-[55vh]">
         <div className="w-full flex justify-between ">
           <h2 className="text-title-md mb-2 font-semibold text-black dark:text-white">
-            {col_name}
+            {column.name}
           </h2>
           <button
             type="submit"
@@ -68,7 +60,14 @@ PropsWithChildren<Props>) => {
             </svg>
           </button>
         </div>
-        {children}
+        {column.tickets.map((item) => (
+          <KanbanItem
+            key={item.id}
+            col_id={column.id}
+            ticket={item}
+            board={board}
+          />
+        ))}
       </div>
     </>
   );

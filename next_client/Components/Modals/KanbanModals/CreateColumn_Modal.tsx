@@ -1,25 +1,21 @@
 import { getColumnsNTickets } from "@/handlers/Kanban/handlers";
 import { useKanbanCtx } from "@/hooks/useKanbanCtx";
 import { ContextTypes } from "@/types/KanbanCtxTypes";
-import { Board, ColumnWithTickets } from "@/types/KanbanTypes";
+import { Board, ColumnWithTickets, ModalStatusType } from "@/types/KanbanTypes";
 import { runErrorToast, runSuccessToast } from "@/utils/toast";
 import { Dispatch, SetStateAction, useState } from "react";
 
 type ModalProps = {
-  showColumnModal: boolean;
-  modalStyle: object;
-  setShowColumnModal: Dispatch<SetStateAction<boolean>>;
+  modalStatus: ModalStatusType;
+  setModalStatus: Dispatch<SetStateAction<ModalStatusType>>;
   board: Board | undefined;
-  // getColumns: (board: Board) => void;
 };
 
 const CreateColumn_Modal = ({
-  showColumnModal,
-  modalStyle,
-  setShowColumnModal,
+  modalStatus,
+  setModalStatus,
   board,
-}: // getColumns,
-ModalProps) => {
+}: ModalProps) => {
   const [columnName, setColumnName] = useState("");
   const [columnPosition, setColumnPosition] = useState("");
 
@@ -51,7 +47,7 @@ ModalProps) => {
           runSuccessToast(`Column ${res_data.id} Created Succesfully`);
           const columns_and_tickets = await getColumnsNTickets(board);
           setColumnsNTicketsList(columns_and_tickets as ColumnWithTickets[]);
-          setShowColumnModal(!showColumnModal);
+          setModalStatus({ ...modalStatus, createColumnModal: false });
         }
       }
     } catch (error) {
@@ -61,11 +57,17 @@ ModalProps) => {
 
   return (
     <>
-      {showColumnModal ? (
+      {modalStatus.createColumnModal ? (
         <>
           <div
             className="fixed z-50  outline-none focus:outline-none "
-            style={modalStyle}
+            style={{
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              position: "fixed",
+              zIndex: 50,
+            }}
           >
             <div className="relative w-auto my-6 mx-auto max-w-3xl">
               {/*content*/}
@@ -118,7 +120,10 @@ ModalProps) => {
                   </button>
                   <button
                     onClick={() => {
-                      setShowColumnModal(false);
+                      setModalStatus({
+                        ...modalStatus,
+                        createColumnModal: false,
+                      });
                     }}
                     className="cursor-pointer rounded-lg border border-rose-700 py-2 px-6 text-rose-700 transition hover:bg-opacity-90 disabled:bg-strokedark disabled:border-strokedark"
                   >

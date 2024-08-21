@@ -1,7 +1,7 @@
 import { getColumnsNTickets } from "@/handlers/Kanban/handlers";
 import { useKanbanCtx } from "@/hooks/useKanbanCtx";
 import { ContextTypes } from "@/types/KanbanCtxTypes";
-import { Board, ColumnWithTickets } from "@/types/KanbanTypes";
+import { Board, Column, ColumnWithTickets } from "@/types/KanbanTypes";
 import { runErrorToast, runSuccessToast } from "@/utils/toast";
 import { Dispatch, SetStateAction, useState } from "react";
 
@@ -9,20 +9,16 @@ type ModalProps = {
   showUpdateColumn: boolean;
   setShowUpdateColumn: Dispatch<SetStateAction<boolean>>;
   board: Board;
-  col_id: number;
-  col_name: string;
-  // getColumns: () => void;
+  column: ColumnWithTickets;
 };
 
 const UpdateColumn_Modal = ({
   showUpdateColumn,
   setShowUpdateColumn,
   board,
-  col_id,
-  col_name,
-}: // getColumns,
-ModalProps) => {
-  const [column_name, setColumnName] = useState("");
+  column,
+}: ModalProps) => {
+  const [column_name, setColumnName] = useState(column.name);
 
   const { setColumnsNTicketsList } = useKanbanCtx() as ContextTypes;
 
@@ -38,7 +34,7 @@ ModalProps) => {
           },
           body: JSON.stringify({
             board_id: board?.id,
-            id: col_id,
+            id: column.id,
             name: column_name,
           }),
         });
@@ -67,7 +63,7 @@ ModalProps) => {
         },
         body: JSON.stringify({
           board_id: board?.id,
-          id: col_id,
+          id: column.id,
         }),
       });
 
@@ -75,7 +71,7 @@ ModalProps) => {
         throw new Error("Something Went Wrong");
       }
 
-      runSuccessToast(`Column ${col_name} Deleted`);
+      runSuccessToast(`Column ${column.name} Deleted`);
       setShowUpdateColumn(!showUpdateColumn);
       const column_and_tickets = await getColumnsNTickets(board);
       setColumnsNTicketsList(column_and_tickets as ColumnWithTickets[]);
@@ -116,7 +112,8 @@ ModalProps) => {
                     id="column_name"
                     name="column_name"
                     type="text"
-                    placeholder={col_name}
+                    // placeholder={col_name}
+                    value={column_name}
                     onChange={(event) => {
                       setColumnName(event.target.value);
                     }}

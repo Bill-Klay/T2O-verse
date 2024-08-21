@@ -19,3 +19,10 @@ export type Ticket = {
 export type ColumnWithTickets = Column & {
   tickets: Ticket[];
 };
+
+export type ModalStatusType = {
+  createKanbanModal: boolean;
+  updateKanbanModal: boolean;
+  createColumnModal: boolean;
+  createTicketModal: boolean;
+};

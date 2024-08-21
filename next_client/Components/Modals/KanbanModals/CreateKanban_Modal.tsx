@@ -1,20 +1,16 @@
 import { getBoards } from "@/handlers/Kanban/handlers";
 import { useKanbanCtx } from "@/hooks/useKanbanCtx";
 import { ContextTypes } from "@/types/KanbanCtxTypes";
+import { ModalStatusType } from "@/types/KanbanTypes";
 import { runErrorToast, runSuccessToast } from "@/utils/toast";
 import { Dispatch, SetStateAction, useState } from "react";
 
 type ModalProps = {
-  showModal: boolean;
-  modalStyle: object;
-  setShowModal: Dispatch<SetStateAction<boolean>>;
+  modalStatus: ModalStatusType;
+  setModalStatus: Dispatch<SetStateAction<ModalStatusType>>;
 };
 
-const CreateKanban_Modal = ({
-  showModal,
-  modalStyle,
-  setShowModal,
-}: ModalProps) => {
+const CreateKanban_Modal = ({ modalStatus, setModalStatus }: ModalProps) => {
   const [kanban_name, setKanbanName] = useState("");
 
   const { setBoardsList } = useKanbanCtx() as ContextTypes;
@@ -59,7 +55,7 @@ const CreateKanban_Modal = ({
 
         const col_res_data = await response.json();
         runSuccessToast("Column Created Successfully");
-        setShowModal(!showModal);
+        setModalStatus({ ...modalStatus, createKanbanModal: false });
         const boards = await getBoards();
         setBoardsList(boards);
       }
@@ -70,11 +66,17 @@ const CreateKanban_Modal = ({
 
   return (
     <>
-      {showModal ? (
+      {modalStatus.createKanbanModal ? (
         <>
           <div
             className="fixed z-50  outline-none focus:outline-none "
-            style={modalStyle}
+            style={{
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              position: "fixed",
+              zIndex: 50,
+            }}
           >
             <div className="relative w-auto my-6 mx-auto max-w-3xl">
               {/*content*/}
@@ -110,7 +112,10 @@ const CreateKanban_Modal = ({
                   </button>
                   <button
                     onClick={() => {
-                      setShowModal(false);
+                      setModalStatus({
+                        ...modalStatus,
+                        createKanbanModal: false,
+                      });
                     }}
                     className="cursor-pointer rounded-lg border border-rose-700 py-2 px-6 text-rose-700 transition hover:bg-opacity-90 disabled:bg-strokedark disabled:border-strokedark"
                   >

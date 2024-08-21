@@ -1,22 +1,20 @@
 import { getBoards } from "@/handlers/Kanban/handlers";
 import { useKanbanCtx } from "@/hooks/useKanbanCtx";
 import { ContextTypes } from "@/types/KanbanCtxTypes";
-import { Board } from "@/types/KanbanTypes";
+import { Board, ModalStatusType } from "@/types/KanbanTypes";
 import { runErrorToast, runSuccessToast } from "@/utils/toast";
 import { Dispatch, SetStateAction, useState } from "react";
 
 type ModalProps = {
-  showUpdateKanban: boolean;
-  modalStyle: object;
-  setShowUpdateKanban: Dispatch<SetStateAction<boolean>>;
+  modalStatus: ModalStatusType;
+  setModalStatus: Dispatch<SetStateAction<ModalStatusType>>;
   board: Board | undefined;
   setBoard: Dispatch<SetStateAction<any>>;
 };
 
 const UpdateKanban_Modal = ({
-  showUpdateKanban,
-  modalStyle,
-  setShowUpdateKanban,
+  modalStatus,
+  setModalStatus,
   board,
   setBoard,
 }: ModalProps) => {
@@ -46,7 +44,7 @@ const UpdateKanban_Modal = ({
 
         // const res_data = await res.json();
         runSuccessToast("Board Updated Successfully");
-        setShowUpdateKanban(!showUpdateKanban);
+        setModalStatus({ ...modalStatus, updateKanbanModal: false });
         const boards = await getBoards();
         setBoardsList(boards);
         setBoard({ ...board, name: kanban_name });
@@ -81,7 +79,10 @@ const UpdateKanban_Modal = ({
       // Uncomment this if you need to parse the response data
       // const res_data = await res.json();
       runSuccessToast(`Board Deleted ${res.status}`);
-      setShowUpdateKanban(!showUpdateKanban);
+      setModalStatus({
+        ...modalStatus,
+        updateKanbanModal: false,
+      });
       const boards = await getBoards();
       setBoardsList(boards);
       setBoard(null);
@@ -95,11 +96,17 @@ const UpdateKanban_Modal = ({
 
   return (
     <>
-      {showUpdateKanban ? (
+      {modalStatus.updateKanbanModal ? (
         <>
           <div
             className="fixed z-50  outline-none focus:outline-none "
-            style={modalStyle}
+            style={{
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              position: "fixed",
+              zIndex: 50,
+            }}
           >
             <div className="relative w-auto my-6 mx-auto max-w-3xl">
               {/*content*/}
@@ -142,7 +149,10 @@ const UpdateKanban_Modal = ({
                   </button>
                   <button
                     onClick={() => {
-                      setShowUpdateKanban(false);
+                      setModalStatus({
+                        ...modalStatus,
+                        updateKanbanModal: false,
+                      });
                     }}
                     className="cursor-pointer rounded-lg border border-rose-700 py-2 px-6 text-rose-700 transition hover:bg-opacity-90 disabled:bg-strokedark disabled:border-strokedark"
                   >

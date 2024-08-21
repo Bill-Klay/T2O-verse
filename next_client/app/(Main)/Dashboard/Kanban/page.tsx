@@ -2,7 +2,6 @@
 
 import KanbanColumn from "@/Components/Kanban/KanbanColumn";
 import KanbanContainer from "@/Components/Kanban/KanbanContainer";
-import KanbanItem from "@/Components/Kanban/KanbanItem";
 import TaskBar from "@/Components/Kanban/TaskBar";
 import CreateColumn_Modal from "@/Components/Modals/KanbanModals/CreateColumn_Modal";
 import CreateKanban_Modal from "@/Components/Modals/KanbanModals/CreateKanban_Modal";
@@ -11,19 +10,20 @@ import UpdateKanban_Modal from "@/Components/Modals/KanbanModals/UpdateKanban_Mo
 import { getBoards, getColumnsNTickets } from "@/handlers/Kanban/handlers";
 import { useKanbanCtx } from "@/hooks/useKanbanCtx";
 import { ContextTypes } from "@/types/KanbanCtxTypes";
-import { Board, ColumnWithTickets } from "@/types/KanbanTypes";
+import { Board, ColumnWithTickets, ModalStatusType } from "@/types/KanbanTypes";
+import { handleBoardChange } from "@/utils/changeBoard";
 import { runErrorToast, runSuccessToast } from "@/utils/toast";
 import { DragEndEvent } from "@dnd-kit/core";
-import { useEffect, useState, useRef, ChangeEvent } from "react";
+import { useEffect, useState } from "react";
 
 const Kanban = () => {
   const [board, setBoard] = useState<Board>();
-  const [showModal, setShowModal] = useState(false);
-  const [showUpdateKanban, setShowUpdateKanban] = useState(false);
-  const [showColumnModal, setShowColumnModal] = useState(false);
-  const [showTicketModal, setShowTicketModal] = useState(false);
-  const boardRef = useRef<HTMLDivElement>(null);
-  const [modalStyle, setModalStyle] = useState({});
+  const [modalStatus, setModalStatus] = useState<ModalStatusType>({
+    createKanbanModal: false,
+    updateKanbanModal: false,
+    createColumnModal: false,
+    createTicketModal: false,
+  });
 
   const {
     boardsList,
@@ -82,6 +82,7 @@ const Kanban = () => {
           old_column_id: movedTicket.position,
         }),
       });
+      console.log("Updated Ticket: ", updatedTicket);
 
       if (!res.ok) {
         throw new Error("Failed to update task position");
@@ -92,30 +93,6 @@ const Kanban = () => {
       runErrorToast("Error Updating");
     }
   }
-
-  const handleBoardChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    const selectedIndex = event.target.selectedIndex;
-    const selectedOption = event.target.options[selectedIndex];
-    const id = Number(selectedOption.getAttribute("data-id"));
-    const name = selectedOption.getAttribute("data-name") || "";
-    setBoard({ id, name });
-  };
-
-  useEffect(() => {
-    if (
-      (showModal && boardRef.current) ||
-      (showColumnModal && boardRef.current) ||
-      (showTicketModal && boardRef.current) ||
-      (showUpdateKanban && boardRef.current)
-    ) {
-      const rect = boardRef.current.getBoundingClientRect();
-      setModalStyle({
-        top: rect.top + window.scrollY + rect.height / 2,
-        left: rect.left + window.scrollX + rect.width / 2,
-        transform: "translate(-50%, -50%)",
-      });
-    }
-  }, [showModal, showColumnModal, showTicketModal, showUpdateKanban]);
 
   useEffect(() => {
     (async () => {
@@ -136,39 +113,32 @@ const Kanban = () => {
   return (
     <>
       <CreateKanban_Modal
-        showModal={showModal}
-        modalStyle={modalStyle}
-        setShowModal={setShowModal}
-        // getBoards={getBoards}
+        modalStatus={modalStatus}
+        setModalStatus={setModalStatus}
       />
       <UpdateKanban_Modal
         board={board}
         setBoard={setBoard}
-        showUpdateKanban={showUpdateKanban}
-        setShowUpdateKanban={setShowUpdateKanban}
-        modalStyle={modalStyle}
-        // getBoards={getBoards}
+        modalStatus={modalStatus}
+        setModalStatus={setModalStatus}
       />
       <CreateColumn_Modal
-        showColumnModal={showColumnModal}
-        modalStyle={modalStyle}
-        setShowColumnModal={setShowColumnModal}
+        modalStatus={modalStatus}
+        setModalStatus={setModalStatus}
         board={board}
-        // getColumns={getColumnsNTickets}
       />
       <CreateTicket_Modal
-        showTicketModal={showTicketModal}
-        modalStyle={modalStyle}
-        setShowTicketModal={setShowTicketModal}
+        modalStatus={modalStatus}
+        setModalStatus={setModalStatus}
         board={board}
-        // getColumns={getColumnsNTickets}
-        // columnsNTicketsList={columnsNTicketsList}
       />
-      <div ref={boardRef}>
+      <div>
         <select
           id="kanban_name"
           name="kanban_name"
-          onChange={handleBoardChange}
+          onChange={(event) => {
+            handleBoardChange(event, setBoard);
+          }}
           className="w-55 my-3 rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
         >
           <option key={0} value="">
@@ -191,34 +161,16 @@ const Kanban = () => {
           <>
             <TaskBar
               board={board}
-              showTicketModal={showTicketModal}
-              setShowTicketModal={setShowTicketModal}
-              showUpdateKanban={showUpdateKanban}
-              setShowUpdateKanban={setShowUpdateKanban}
+              modalStatus={modalStatus}
+              setModalStatus={setModalStatus}
             />
             <KanbanContainer onDragEnd={handleDragEnd}>
               {columnsNTicketsList.map((column) => (
-                <KanbanColumn
-                  key={column.id}
-                  col_id={column.id}
-                  col_name={column.name}
-                  board={board}
-                >
-                  {column.tickets.map((item) => (
-                    <KanbanItem
-                      key={item.id}
-                      col_id={column.id}
-                      ticket={item}
-                      board={board}
-                      // getColumns={getColumnsNTickets}
-                      // columnsNTicketsList={columnsNTicketsList}
-                    />
-                  ))}
-                </KanbanColumn>
+                <KanbanColumn key={column.id} column={column} board={board} />
               ))}
               <button
                 onClick={() => {
-                  setShowColumnModal(!showColumnModal);
+                  setModalStatus({ ...modalStatus, createColumnModal: true });
                 }}
                 className="w-fit h-10 rounded-md border border-gray bg-slate-500 px-3 py-2
         text-white transition hover:bg-opacity-90 flex"
@@ -247,9 +199,9 @@ const Kanban = () => {
       </div>
       <button
         onClick={() => {
-          setShowModal(!showModal);
+          setModalStatus({ ...modalStatus, createKanbanModal: true });
         }}
-        className="absolute right-2 bottom-2 w-fit rounded-md border border-primary bg-primary px-4 py-2
+        className="fixed right-5 bottom-2 w-fit rounded-md border border-primary bg-primary px-4 py-2
         text-white transition hover:bg-opacity-90 flex"
       >
         <svg

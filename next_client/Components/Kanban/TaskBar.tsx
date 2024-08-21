@@ -1,21 +1,13 @@
-import { Board } from "@/types/KanbanTypes";
+import { Board, ModalStatusType } from "@/types/KanbanTypes";
 import { Dispatch, SetStateAction } from "react";
 
 interface Props {
   board: Board;
-  showTicketModal: boolean;
-  setShowTicketModal: Dispatch<SetStateAction<boolean>>;
-  showUpdateKanban: boolean;
-  setShowUpdateKanban: Dispatch<SetStateAction<boolean>>;
+  modalStatus: ModalStatusType;
+  setModalStatus: Dispatch<SetStateAction<ModalStatusType>>;
 }
 
-const TaskBar = ({
-  board,
-  showTicketModal,
-  setShowTicketModal,
-  showUpdateKanban,
-  setShowUpdateKanban,
-}: Props) => {
+const TaskBar = ({ board, modalStatus, setModalStatus }: Props) => {
   return (
     <>
       <div className="overflow-hidden rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark flex justify-between items-center px-6 py-2">
@@ -26,7 +18,7 @@ const TaskBar = ({
           <button
             type="submit"
             onClick={() => {
-              setShowUpdateKanban(!showUpdateKanban);
+              setModalStatus({ ...modalStatus, updateKanbanModal: true });
             }}
             onPointerDown={(event) => {
               event.stopPropagation();
@@ -55,7 +47,7 @@ const TaskBar = ({
         </div>
         <button
           onClick={() => {
-            setShowTicketModal(!showTicketModal);
+            setModalStatus({ ...modalStatus, createTicketModal: true });
           }}
           className="w-fit rounded-sm border border-primary bg-primary px-4 py-2
         text-white transition hover:bg-opacity-90 flex"
