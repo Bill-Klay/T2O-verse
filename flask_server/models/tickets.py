@@ -12,7 +12,6 @@ class Column(db.Model):
     position = db.Column(db.Integer, nullable=False)
     board_id = db.Column(db.Integer, db.ForeignKey('board.id'), nullable=False)
     tickets = db.relationship('Ticket', backref='column', lazy=True, cascade="all, delete-orphan")
-    board = db.relationship('Board', backref=db.backref('columns', lazy=True))
 
 class Ticket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
