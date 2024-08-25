@@ -52,5 +52,81 @@ export FLASK_DEBUG=1
 # Important commands to work with
 sqlite3 default.db .tables
 sqlite3 default.db "SELECT * FROM user"
-flask db migrate
+flask db migrate -m
 flask db upgrade
+
+# Stripe Prices
+curl -X POST http://localhost:5000/create-price -H "Content-Type: application/json" -d '{
+    "unit_amount": "10.99",
+    "currency": "usd",
+    "product_id": "prod_QjABV5KA8Sz57S",
+    "active": true,
+    "billing_scheme": "per_unit",
+    "lookup_key": "standard_price",
+    "price_metadata": {"category": "books"},
+    "nickname": "Standard",
+    "transform_quantity": null,
+    "recurring": {"interval": "month"}
+}
+
+# Stripe Products
+curl -b login_cookies.txt -X POST http://localhost:5000/create-product -H "Content-Type: application/json" -d '{
+    "name": "New Product",
+    "description": "A new product description",
+    "active": true,
+    "attributes": ["size", "color"],
+    "images": ["http://example.com/image.png"],
+    "metadata": {"category": "books"},
+    "package_dimensions": {"weight": "2.0", "length": "10", "width": "15", "height": "1"},
+    "shippable": true,
+    "statement_descriptor": "NewProduct",
+    "unit_label": "piece",
+    "url": "http://example.com/product"
+}
+
+curl -X DELETE http://localhost:5000/delete-product -H "Content-Type: application/json" -d '{
+    "product_id": "prod_QjA0VYxc7soxWm"
+}
+
+curl -X POST http://localhost:5000/product -H "Content-Type: application/json" -d '{
+    "product_id": "prod_QjA0VYxc7soxWm"
+}
+
+curl -X POST http://localhost:5000/edit-product \
+-H "Content-Type: application/json" \
+-d '{
+    "product_id": "prod_Qj9tw4ItsLM0E6",
+    "name": "Updated Product",
+    "description": "Updated description",
+    "active": false,
+    "attributes": ["size", "color"],
+    "images": ["http://example.com/newimage.png"],
+    "metadata": {"category": "electronics"},
+    "package_dimensions": {"weight": "2.5", "length": "12", "width": "16", "height": "2"},                                                          "shippable": false,
+    "statement_descriptor": "UpdatedProduct",
+    "unit_label": "unit",
+    "url": "http://example.com/newproduct"
+}
+
+curl -X POST http://localhost:5000/edit-price -H "Content-Type: application/json" -d '{
+    "price_id": "price_1Pri8VG5M60MS35G6Fvob1Yg",
+    "unit_amount": "12.99",
+    "currency": "usd",
+    "active": true,
+    "billing_scheme": "per_unit",
+    "lookup_key": "premium_price",
+    "price_metadata": {"category": "premium books"},
+    "nickname": "Premium",
+    "transform_quantity": null,
+    "type": "recurring",
+    "interval": "month"
+}
+
+# Stripe subscriptions
+
+curl -X POST http://localhost:5000/create-subscription -H "Content-Type: application/json" -d '{
+    "user_id": "7",
+    "email": "bilal.khan2998@outlook.com",
+    "price_id": "price_1Pri8VG5M60MS35G6Fvob1Yg",
+    "trial_period_days": 14
+}
