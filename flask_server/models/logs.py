@@ -8,6 +8,7 @@ class LogEntry(db.Model):
     message = db.Column(db.Text)
     client_ip = db.Column(db.String(15))
     user_agent = db.Column(db.Text)
+    user_email = db.Column(db.String(120), db.ForeignKey('user.email'))
 
     def __repr__(self):
         return f'<LogEntry {self.id}>'
@@ -19,5 +20,6 @@ class LogEntry(db.Model):
             'log_level': self.log_level,
             'message': self.message,
             'client_ip': self.client_ip,
-            'user_agent': self.user_agent
+            'user_agent': self.user_agent,
+            'user_email': self.user_email
         }
