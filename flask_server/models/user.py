@@ -14,6 +14,7 @@ class User(db.Model):
     password_hash = db.Column(db.String(128))
     twofa_secret = db.Column(db.String(60), unique=True, nullable=True)  # Allow null for users without 2FA
     twofa_enabled = db.Column(db.Boolean, nullable=False, default=False)
+    stripe_customer_id = db.Column(db.String(60), nullable=True)
 
     # Many-to-many relationship with Role
     roles = db.relationship('Role', secondary='user_roles', backref=db.backref('users', lazy='dynamic'))
