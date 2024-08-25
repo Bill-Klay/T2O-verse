@@ -14,18 +14,23 @@ def index():
 @home_bp.route('/logs', methods=['GET'])
 @login_required
 def get_logs():
-    if not current_user.has_role('Admin'):
-        return jsonify({'error': 'Unauthorized access'}), 403
     page = request.args.get('page', 1, type=int)
     per_page = min(request.args.get('per_page', 10, type=int), 100)  # Limit max items per page
+
     # Calculate offsets for pagination
     offset = (page - 1) * per_page
 
-    # Query the database with offset and limit for pagination
-    paginated_logs = LogEntry.query.offset(offset).limit(per_page).all()
+    # Check if the user is an admin
+    if current_user.has_role('Admin'):
+        query = LogEntry.query
+    else:
+        query = LogEntry.query.filter_by(user_email=current_user.email)
 
-    # Optionally, calculate total pages if needed
-    total_items = LogEntry.query.count()
+    # Query the database with offset and limit for pagination
+    paginated_logs = query.offset(offset).limit(per_page).all()
+
+    # Calculate total items for pagination
+    total_items = query.count()
     total_pages = (total_items - 1) // per_page + 1
 
     logs_data = [log.to_dict() for log in paginated_logs]
