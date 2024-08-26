@@ -3,7 +3,7 @@
 import { Board, Column, ColumnWithTickets, Ticket } from "@/types/KanbanTypes";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import UpdateTicket_Modal from "../Modals/KanbanModals/UpdateTicket_Modal";
 import { runSuccessToast } from "@/utils/toast";
 import { useKanbanCtx } from "@/hooks/useKanbanCtx";
@@ -22,6 +22,7 @@ const KanbanItem = ({ col_id, ticket, board }: Props) => {
   });
   const [isOpen, setIsOpen] = useState(false);
   const [showUpdateTicket, setShowUpdateTicket] = useState(false);
+  const optionsRef = useRef<any>(null);
 
   const { setColumnsNTicketsList } = useKanbanCtx() as ContextTypes;
 
@@ -54,6 +55,25 @@ const KanbanItem = ({ col_id, ticket, board }: Props) => {
       console.log("Error >>", error);
     }
   };
+
+  useEffect(() => {
+    const clickHandler = ({ target }: MouseEvent) => {
+      if (!optionsRef.current) return;
+      if (!isOpen || optionsRef.current.contains(target)) return;
+      setIsOpen(false);
+    };
+    document.addEventListener("click", clickHandler);
+    return () => document.removeEventListener("click", clickHandler);
+  });
+
+  useEffect(() => {
+    const keyHandler = ({ keyCode }: KeyboardEvent) => {
+      if (!isOpen || keyCode !== 27) return;
+      setIsOpen(false);
+    };
+    document.addEventListener("keydown", keyHandler);
+    return () => document.removeEventListener("keydown", keyHandler);
+  });
 
   return (
     <>
@@ -103,6 +123,7 @@ const KanbanItem = ({ col_id, ticket, board }: Props) => {
           <div
             className="absolute right-0 top-12 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
             role="menu"
+            ref={optionsRef}
             aria-orientation="vertical"
             aria-labelledby="menu-button"
           >
