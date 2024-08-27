@@ -1,6 +1,6 @@
 "use client";
 
-import { Board, Column, ColumnWithTickets, Ticket } from "@/types/KanbanTypes";
+import { Board, ColumnWithTickets, Ticket } from "@/types/KanbanTypes";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { useEffect, useRef, useState } from "react";
@@ -9,6 +9,7 @@ import { runSuccessToast } from "@/utils/toast";
 import { useKanbanCtx } from "@/hooks/useKanbanCtx";
 import { ContextTypes } from "@/types/KanbanCtxTypes";
 import { getColumnsNTickets } from "@/handlers/Kanban/handlers";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Props {
   col_id: number;
@@ -17,8 +18,11 @@ interface Props {
 }
 
 const KanbanItem = ({ col_id, ticket, board }: Props) => {
+  const { auth }: any = useAuth();
+  const flag: boolean = auth.roles?.includes("Admin") ? false : true;
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: ticket.id,
+    disabled: flag,
   });
   const [isOpen, setIsOpen] = useState(false);
   const [showUpdateTicket, setShowUpdateTicket] = useState(false);
@@ -92,30 +96,32 @@ const KanbanItem = ({ col_id, ticket, board }: Props) => {
       >
         <div className="flex justify-between items-center mb-2">
           <h2 className="text-lg font-semibold text-black">{ticket.title}</h2>
-          <button
-            onClick={toggleDropdown}
-            onPointerDown={(event) => {
-              event.stopPropagation();
-            }}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            <svg
-              className="w-6 h-6 text-gray-800 dark:text-black"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              fill="none"
-              viewBox="0 0 24 24"
+          {auth.roles?.includes("Admin") && (
+            <button
+              onClick={toggleDropdown}
+              onPointerDown={(event) => {
+                event.stopPropagation();
+              }}
+              className="text-gray-500 hover:text-gray-700"
             >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeWidth="2"
-                d="M6 12h.01m6 0h.01m5.99 0h.01"
-              />
-            </svg>
-          </button>
+              <svg
+                className="w-6 h-6 text-gray-800 dark:text-black"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeWidth="2"
+                  d="M6 12h.01m6 0h.01m5.99 0h.01"
+                />
+              </svg>
+            </button>
+          )}
         </div>
         <p className="text-black">{ticket.description}</p>
 

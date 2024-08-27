@@ -1,4 +1,5 @@
 import { getColumnsNTickets } from "@/handlers/Kanban/handlers";
+import { useAuth } from "@/hooks/useAuth";
 import { useKanbanCtx } from "@/hooks/useKanbanCtx";
 import { ContextTypes } from "@/types/KanbanCtxTypes";
 import { Board, ColumnWithTickets, ModalStatusType } from "@/types/KanbanTypes";
@@ -20,6 +21,7 @@ const CreateTicket_Modal = ({
   const [ticketDescription, setTicketDescription] = useState("");
   const [ticketColumnId, setTicketColumnId] = useState("");
 
+  const { auth }: any = useAuth();
   const { columnsNTicketsList, setColumnsNTicketsList } =
     useKanbanCtx() as ContextTypes;
 
@@ -128,11 +130,20 @@ const CreateTicket_Modal = ({
                     className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
                   >
                     <option value="">Select a column</option>
-                    {columnsNTicketsList.map((column) => (
-                      <option key={column.id} value={column.id}>
-                        {column.name}
-                      </option>
-                    ))}
+                    {auth.roles?.includes("Admin")
+                      ? columnsNTicketsList.map((column) => (
+                          <option key={column.id} value={column.id}>
+                            {column.name}
+                          </option>
+                        ))
+                      : columnsNTicketsList.map((column) => {
+                          if (column.name === "To Do's")
+                            return (
+                              <option key={column.id} value={column.id}>
+                                {column.name}
+                              </option>
+                            );
+                        })}
                   </select>
                 </div>
                 {/*footer*/}

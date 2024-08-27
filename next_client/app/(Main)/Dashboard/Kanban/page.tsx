@@ -1,5 +1,6 @@
 "use client";
 
+import PlusSVG from "@/Assets/SVGs/PlusSVG";
 import KanbanColumn from "@/Components/Kanban/KanbanColumn";
 import KanbanContainer from "@/Components/Kanban/KanbanContainer";
 import TaskBar from "@/Components/Kanban/TaskBar";
@@ -8,6 +9,7 @@ import CreateKanban_Modal from "@/Components/Modals/KanbanModals/CreateKanban_Mo
 import CreateTicket_Modal from "@/Components/Modals/KanbanModals/CreateTicket_Modal";
 import UpdateKanban_Modal from "@/Components/Modals/KanbanModals/UpdateKanban_Modal";
 import { getBoards, getColumnsNTickets } from "@/handlers/Kanban/handlers";
+import { useAuth } from "@/hooks/useAuth";
 import { useKanbanCtx } from "@/hooks/useKanbanCtx";
 import { ContextTypes } from "@/types/KanbanCtxTypes";
 import { Board, ColumnWithTickets, ModalStatusType } from "@/types/KanbanTypes";
@@ -24,6 +26,8 @@ const Kanban = () => {
     createColumnModal: false,
     createTicketModal: false,
   });
+
+  const { auth }: any = useAuth();
 
   const {
     boardsList,
@@ -168,60 +172,32 @@ const Kanban = () => {
               {columnsNTicketsList.map((column) => (
                 <KanbanColumn key={column.id} column={column} board={board} />
               ))}
-              <button
-                onClick={() => {
-                  setModalStatus({ ...modalStatus, createColumnModal: true });
-                }}
-                className="w-fit h-10 rounded-md border border-gray bg-slate-500 px-3 py-2
+              {auth.roles?.includes("Admin") && (
+                <button
+                  onClick={() => {
+                    setModalStatus({ ...modalStatus, createColumnModal: true });
+                  }}
+                  className="w-fit h-10 rounded-md border border-gray bg-slate-500 px-3 py-2
         text-white transition hover:bg-opacity-90 flex"
-              >
-                <svg
-                  className="w-6 h-6 text-gray-800 dark:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="0 0 24 24"
                 >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M5 12h14m-7 7V5"
-                  />
-                </svg>
-              </button>
+                  <PlusSVG />
+                </button>
+              )}
             </KanbanContainer>
           </>
         ) : null}
       </div>
-      <button
-        onClick={() => {
-          setModalStatus({ ...modalStatus, createKanbanModal: true });
-        }}
-        className="fixed right-5 bottom-2 w-fit rounded-md border border-primary bg-primary px-4 py-2
+      {auth.roles?.includes("Admin") && (
+        <button
+          onClick={() => {
+            setModalStatus({ ...modalStatus, createKanbanModal: true });
+          }}
+          className="fixed right-5 bottom-2 w-fit rounded-md border border-primary bg-primary px-4 py-2
         text-white transition hover:bg-opacity-90 flex"
-      >
-        <svg
-          className="w-6 h-6 text-gray-800 dark:text-white"
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          fill="none"
-          viewBox="0 0 24 24"
         >
-          <path
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M5 12h14m-7 7V5"
-          />
-        </svg>
-      </button>
+          <PlusSVG />
+        </button>
+      )}
     </>
   );
 };
