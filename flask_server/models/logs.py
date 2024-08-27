@@ -4,14 +4,15 @@ from flask_login import current_user
 from.user import User
 
 class LogEntry(db.Model):
+    __tablename__ = 'log_entry'
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     log_level = db.Column(db.String(10))
     message = db.Column(db.Text)
     client_ip = db.Column(db.String(15))
     user_agent = db.Column(db.Text)
-    user_email = db.Column(db.String(60), db.ForeignKey('user.email', name='fk_user_email', ondelete='CASCADE'))
-    
+    user_email = db.Column(db.String(60))
+
     def __repr__(self):
         return f'<LogEntry {self.id}>'
 
@@ -25,7 +26,3 @@ class LogEntry(db.Model):
             'user_agent': self.user_agent,
             'user_email': self.user_email
         }
-
-    @property
-    def user_email(self):
-        return current_user.email if current_user.is_authenticated else None

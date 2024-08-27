@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import event
 from flask_migrate import Migrate
 from flask_mail import Mail
-from flask_login import LoginManager, login_required
+from flask_login import LoginManager, login_required, current_user
 from.config import get_logging_config
 from flask_wtf.csrf import validate_csrf
 from flask_socketio import SocketIO
@@ -79,9 +79,13 @@ def create_app():
             client_ip = get_client_ip(request)
             user_agent = request.headers.get('User-Agent', 'Unknown')
             log_message = f"Before Request: {request.method} {request.url} - Client IP: {client_ip} - User Agent: {user_agent}"
+            if current_user.is_authenticated:
+                user_email = current_user.email
+            else:
+                user_email = None
 
             # Insert log entry into the database
-            new_log_entry = LogEntry(log_level='INFO', message=log_message, client_ip=client_ip, user_agent=user_agent)
+            new_log_entry = LogEntry(log_level='INFO', message=log_message, client_ip=client_ip, user_agent=user_agent, user_email=user_email)
             db.session.add(new_log_entry)
             db.session.commit()
 
@@ -93,7 +97,11 @@ def create_app():
             client_ip = get_client_ip(request)
             user_agent = request.headers.get('User-Agent', 'Unknown')
             log_message = f"After Request: {request.method} {request.url} - Client IP: {client_ip} - User Agent: {user_agent}"
-            new_log_entry = LogEntry(log_level='INFO', message=log_message, client_ip=client_ip, user_agent=user_agent)
+            if current_user.is_authenticated:
+                user_email = current_user.email
+            else:
+                user_email = None
+            new_log_entry = LogEntry(log_level='INFO', message=log_message, client_ip=client_ip, user_agent=user_agent, user_email=user_email)
             db.session.add(new_log_entry)
             db.session.commit()
             app.logger.info(log_message)
@@ -105,7 +113,11 @@ def create_app():
             client_ip = get_client_ip(request)
             user_agent = request.headers.get('User-Agent', 'Unknown')
             log_message = f'Unhandled error: {e} - Request: {request.method} {request.url} - Client IP: {client_ip} - User Agent: {user_agent}'
-            new_log_entry = LogEntry(log_level='INFO', message=log_message, client_ip=client_ip, user_agent=user_agent)
+            if current_user.is_authenticated:
+                user_email = current_user.email
+            else:
+                user_email = None
+            new_log_entry = LogEntry(log_level='INFO', message=log_message, client_ip=client_ip, user_agent=user_agent, user_email=user_email)
             db.session.add(new_log_entry)
             db.session.commit()
             app.logger.error(f'Unhandled error: {e} - Request: {request.method} {request.url} - Client IP: {client_ip} - User Agent: {user_agent}', exc_info=e)
