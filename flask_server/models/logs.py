@@ -1,6 +1,7 @@
 from datetime import datetime
 from flask_server import db
 from flask_login import current_user
+from.user import User
 
 class LogEntry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -9,8 +10,8 @@ class LogEntry(db.Model):
     message = db.Column(db.Text)
     client_ip = db.Column(db.String(15))
     user_agent = db.Column(db.Text)
+    user_email = db.Column(db.String(60), db.ForeignKey('user.email', name='fk_user_email', ondelete='CASCADE'))
     
-
     def __repr__(self):
         return f'<LogEntry {self.id}>'
 
