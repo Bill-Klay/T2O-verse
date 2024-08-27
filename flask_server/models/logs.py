@@ -1,5 +1,6 @@
 from datetime import datetime
 from flask_server import db
+from flask_login import current_user
 
 class LogEntry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -8,7 +9,7 @@ class LogEntry(db.Model):
     message = db.Column(db.Text)
     client_ip = db.Column(db.String(15))
     user_agent = db.Column(db.Text)
-    user_email = db.Column(db.String(120), db.ForeignKey('user.email', name='fk_user_email'))
+    
 
     def __repr__(self):
         return f'<LogEntry {self.id}>'
@@ -23,3 +24,7 @@ class LogEntry(db.Model):
             'user_agent': self.user_agent,
             'user_email': self.user_email
         }
+
+    @property
+    def user_email(self):
+        return current_user.email if current_user.is_authenticated else None
