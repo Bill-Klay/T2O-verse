@@ -6,24 +6,28 @@ import UserCmp from "@/Components/Settings/UserCmp";
 import RoleCmp from "@/Components/Settings/RoleCmp";
 import { fetchAllUsers, fetchCurrentUser } from "@/handlers/Settings/handlers";
 import AdminCmp from "@/Components/Settings/AdminCmp";
+import { useAuth } from "@/hooks/useAuth";
 
 const SettingsPage = () => {
   const [userData, setUserData] = useState<UserData>();
   const [usersList, setUsersList] = useState([]);
   const [type, setType] = useState(false);
 
+  const { auth }: any = useAuth();
+
   useEffect(() => {
     (async () => {
       const data = await fetchCurrentUser();
       setUserData(data);
 
-      const usersData = await fetchAllUsers();
-      console.log(userData);
-      const filteredData = usersData.filter(
-        (user: UserData) => user.id !== data?.id
-      );
-      console.log("Filtered: ", filteredData);
-      setUsersList(filteredData);
+      if (auth.roles?.includes("Admin")) {
+        const usersData = await fetchAllUsers();
+        const filteredData = usersData.filter(
+          (user: UserData) => user.id !== data?.id
+        );
+        console.log("Filtered: ", filteredData);
+        setUsersList(filteredData);
+      }
     })();
   }, []);
 
