@@ -40,7 +40,7 @@ const LogTablePage = () => {
   }, []);
   return (
     <>
-      <Logs currentLogs={currentLogs} />
+      {currentLogs.length > 0 && <Logs currentLogs={currentLogs} />}
       <Pagination handlePageClick={handlePageClick} total_pages={totalPages} />
     </>
   );
