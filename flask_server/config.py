@@ -38,10 +38,13 @@ def get_logging_config(env):
     return configs.get(env, configs['development'])  # Default to 'development' if env is not found
 
 # Add more configurations as needed
-SECRET_KEY = 'your_secret_key'
-PASSWORD_RESET_SALT = 'unique_salt_for_password_reset'
-STRIPE_PUBLIC_KEY = 'stripe_public_key_from_env'
-STRIPE_PRIVATE_KEY = 'stripe_private_key_from_env'
+# Get the value of an environment variable
+# Provide a default value if the variable isn't set
+
+SECRET_KEY = os.getenv('SECRET_KEY', 'your_secret_key')
+PASSWORD_RESET_SALT = os.getenv('PASSWORD_RESET_SALT', 'unique_salt_for_password_reset')
+STRIPE_PUBLIC_KEY = os.getenv('STRIPE_PUBLIC_KEY', 'stripe_public_key_from_env')
+STRIPE_PRIVATE_KEY = os.getenv('STRIPE_PRIVATE_KEY', 'stripe_private_key_from_env')
 SESSION_COOKIE_SECURE = False
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
@@ -50,10 +53,10 @@ PERMANENT_SESSION_LIFETIME = timedelta(days=1)
 SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///default.db')
 SQLALCHEMY_ECHO = False
 ENV = os.getenv('FLASK_ENV', 'development').lower()
-MAIL_SERVER = 'sandbox.smtp.mailtrap.io'
-MAIL_PORT = 2525
-MAIL_USERNAME = 'acf7606c86c045'
-MAIL_PASSWORD = 'a94237314a7a25'
+MAIL_SERVER = os.getenv('MAIL_SERVER', 'sandbox.smtp.mailtrap.io')
+MAIL_PORT = os.getenv('MAIL_PORT', 2525)
+MAIL_USERNAME = os.getenv('MAIL_USERNAME', 'acf7606c86c045')
+MAIL_PASSWORD = os.getenv('MAIL_PASSWORD', 'a94237314a7a25')
 MAIL_USE_TLS = True
 MAIL_USE_SSL = False
 CSRF_EXEMPT_ENDPOINTS = [
