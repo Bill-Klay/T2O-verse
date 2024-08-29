@@ -14,7 +14,7 @@ class Role(db.Model):
 class Permission(db.Model):
     __tablename__ = 'permissions'
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(50), unique=True)
+    name = db.Column(db.String(50))
     role_id = db.Column(db.Integer(), ForeignKey('roles.id', name='fk_permissions_role'))
 
     # Relationship to role
