@@ -52,6 +52,11 @@ A comprehensive Flask application designed for managing user roles and permissio
 
 ##### The deploy script takes care of the following steps for you. Please adjust the environment variables prior to execution
 
+```
+chmod +x deploy
+./deploy
+```
+
 4. Set up environment variables:
    - `FLASK_APP`: Path to your Flask application entry file.
    - `FLASK_ENV`: Set to `development` for development mode.
