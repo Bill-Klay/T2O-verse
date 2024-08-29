@@ -9,7 +9,7 @@ user_role_bp = Blueprint('user_role', __name__)
 @user_role_bp.route('/assign_role_to_user', methods=['POST'])
 @login_required
 def assign_role_to_user():
-    if not current_user.has_role('Admin'):
+    if not current_user.has_role('Admin') or not current_user.has_role('Super Admin'):
         return jsonify({'error': 'Unauthorized access'}), 403
 
     data = request.json
