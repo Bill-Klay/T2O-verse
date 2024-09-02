@@ -59,6 +59,7 @@ MAIL_USERNAME = os.getenv('MAIL_USERNAME', 'acf7606c86c045')
 MAIL_PASSWORD = os.getenv('MAIL_PASSWORD', 'a94237314a7a25')
 MAIL_USE_TLS = True
 MAIL_USE_SSL = False
+EMAIL_SENDER = 'noreply@yourdomain.com'
 CSRF_EXEMPT_ENDPOINTS = [
     'auth.logout',
     'auth.signup',

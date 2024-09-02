@@ -1,6 +1,7 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.ext.hybrid import hybrid_property
 from.roles import Role, Permission
+from datetime import datetime
 from flask_server import db
 import pyotp
 
@@ -12,9 +13,11 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
-    twofa_secret = db.Column(db.String(60), unique=True, nullable=True)  # Allow null for users without 2FA
+    twofa_secret = db.Column(db.String(60), unique=True, nullable=True)
     twofa_enabled = db.Column(db.Boolean, nullable=False, default=False)
     stripe_customer_id = db.Column(db.String(60), nullable=True)
+    verified = db.Column(db.Boolean, nullable=False, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Many-to-many relationship with Role
     roles = db.relationship('Role', secondary='user_roles', backref=db.backref('users', lazy='dynamic'))

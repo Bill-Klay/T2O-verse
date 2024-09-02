@@ -4,7 +4,7 @@ from flask_server import db, mail
 from flask_mail import Message
 from flask_login import login_user, logout_user,login_required, current_user
 from flask_wtf.csrf import generate_csrf
-from itsdangerous import TimedSerializer
+from itsdangerous import TimedSerializer, SignatureExpired
 import pyotp
 import re
 
@@ -46,14 +46,32 @@ def signup():
     db.session.add(user)
     db.session.commit()
 
+    # Email verification
+    serializer = TimedSerializer(current_app.config['SECRET_KEY'])
+    token = serializer.dumps(email, salt=current_app.config['PASSWORD_RESET_SALT'])
+    verify_url = url_for('auth.verify_email', token=token, _external=True)
+
     # Send welcome email
-    msg = Message("Welcome to Our Service!",
-                  sender="your_email@example.com",
-                  recipients=[email])
-    msg.body = f"Hello {first_name},\n\nThank you for signing up with our service. We are excited to have you on board!"
+    msg = Message("Welcome to Our Service!", sender=current_app.config['EMAIL_SENDER'], recipients=[email])
+    msg.body = f"Hello {first_name},\n\nThank you for signing up with our service. We are excited to have you on board! \
+        Please click the following link to verify your email: {verify_url}"
     mail.send(msg)
 
-    return jsonify(success=True, message='Account created successfully'), 201
+    return jsonify(success=True, message='Please check your email to verify your account'), 201
+
+@auth_bp.route('/verify_email/<token>', methods=['GET'])
+def verify_email(token):
+    try:
+        serializer = TimedSerializer(current_app.config['SECRET_KEY'])
+        email = serializer.loads(token, salt=current_app.config['PASSWORD_RESET_SALT'], max_age=3600)
+    except SignatureExpired:
+        return jsonify(success=False, message='The verification link is expired'), 400
+
+    user = User.query.filter_by(email=email).first_or_404()
+    user.verified = True
+    db.session.commit()
+
+    return jsonify(success=True, message='Your account has been verified')
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -65,6 +83,8 @@ def login():
         user = User.query.filter((User.username == username_or_email) | (User.email == username_or_email)).first()
         
         if user and user.verify_password(password):
+            if not user.verified:
+                return jsonify(success=False, message='Please verify your email address before logging in'), 401
             if user.twofa_enabled:
                 if token is None or not user.verify_totp(token):
                     # Optionally send OTP via email
@@ -140,7 +160,7 @@ def forgot_password():
     serializer = TimedSerializer(current_app.config['SECRET_KEY'])
     token = serializer.dumps(email, salt=current_app.config['PASSWORD_RESET_SALT'])
     reset_url = url_for('auth.reset_password', token=token, _external=True)
-    msg = Message('Password Reset Requested', sender='noreply@yourdomain.com', recipients=[email])
+    msg = Message('Password Reset Requested', sender=current_app.config['EMAIL_SENDER'], recipients=[email])
     msg.body = f'''To reset your password, visit the following link:
     {reset_url}
     If you did not make this request then simply ignore this email and no changes will be made.
