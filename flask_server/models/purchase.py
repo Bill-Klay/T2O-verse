@@ -101,7 +101,7 @@ class StripeSubscription(db.Model):
     __tablename__ = 'stripe_subscriptions'
     id = db.Column(db.Integer, primary_key=True)  # Auto-incrementing integer ID
     subscription_id = db.Column(db.String(255), nullable=False, unique=True)  # Stripe subscription ID
-    user_id = db.Column(db.String(32), db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     price_id = db.Column(db.String(255), db.ForeignKey('stripe_prices.price_id'), nullable=False)
     status = db.Column(db.String(50), nullable=False)
     previous_status = db.Column(db.String(50), nullable=True)  # Add this line
@@ -124,3 +124,16 @@ class StripeSubscription(db.Model):
             'trial_end': self.trial_end.isoformat() if self.trial_end else None,  # Include trial end in the dict
             'created_at': self.created_at.isoformat()
         }
+
+class Order(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    product_id = db.Column(db.String(120), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False, default=1)
+    price = db.Column(db.Float, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref=db.backref('orders', lazy=True))
+
+    def __repr__(self):
+        return f'<Order {self.id} by User {self.user_id}>'

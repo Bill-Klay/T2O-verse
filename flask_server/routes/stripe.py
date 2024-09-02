@@ -681,3 +681,82 @@ def get_user_email_subscriptions():
     except Exception as e:
         current_app.logger.error("Error fetching subscriptions for user with email %s: %s", email, str(e))
         return jsonify({'error': str(e)}), 400
+
+# Checkout session
+@stripe_bp.route('/create-checkout-session', methods=['POST'])
+def create_checkout_session():
+    """
+    Route to create a Stripe checkout session.
+    """
+    data = request.json
+    price_id = data.get('price_id')
+    user_id = session.get('user_id')
+    quantity = data.get('quantity', 1)
+    mode = data.get('mode', 'payment')
+
+    user = User.query.filter_by(user_id=user_id).first()
+
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    if not user.stripe_customer_id:
+        try:
+            customer = stripe.Customer.create(email=user.email)
+            user.stripe_customer_id = customer['id']
+            db.session.commit()
+        except Exception as e:
+            current_app.logger.error(f"Error creating Stripe customer: {str(e)}")
+            return jsonify({'error': str(e)}), 400
+    
+    # Check if user is already subscribed to the selected plan
+    if mode == "subscription":
+        current_subscription = StripeSubscription.query.filter_by(user_id=user_id).first()
+        if current_subscription and current_subscription.price_id == price_id:
+            current_app.logger.error(f"User is already subscribed to this plan: {price_id}")
+            return jsonify({'error': 'You are already subscribed to this plan'}), 400
+
+    try:
+        checkout_session = stripe.checkout.Session.create(
+            customer=user.stripe_customer_id,
+            payment_method_types=['card'],
+            line_items=[
+                {
+                    'price': price_id,
+                    'quantity': quantity,
+                },
+            ],
+            mode=mode,
+            success_url=url_for('checkout_success', _external=True) + '?session_id={CHECKOUT_SESSION_ID}',
+            cancel_url=url_for('checkout_cancel', _external=True),
+            metadata={
+                'user_id': user_id,
+                'product_id': price_id,
+                'quantity': quantity
+            }
+        )
+        return jsonify({'checkout_url': checkout_session.url}), 200
+    except Exception as e:
+        current_app.logger.error(f"Error creating checkout session: {str(e)}")
+        return jsonify({'error': str(e)}), 400
+
+# Checkout success and failure
+@stripe_bp.route('/checkout-success')
+def checkout_success():
+    session_id = request.args.get('session_id')
+    if session_id:
+        session = stripe.checkout.Session.retrieve(session_id)
+        user_id = session.metadata.user_id  # Ensure you pass user_id in metadata when creating the session
+        product_id = session.metadata.product_id  # Pass product_id in metadata
+        quantity = session.metadata.quantity  # Pass quantity in metadata
+        price = session.amount_total / 100  # Convert from cents to dollars
+
+        # Create and save the order
+        order = Order(user_id=user_id, product_id=product_id, quantity=quantity, price=price)
+        db.session.add(order)
+        db.session.commit()
+        return jsonify({'message': 'Success! Your payment was received.', 'session': session})
+    return 'No session ID found in the request', 400
+
+@stripe_bp.route('/checkout-cancel')
+def checkout_cancel():
+    return 'Payment cancelled.', 200
