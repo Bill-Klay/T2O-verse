@@ -5,4 +5,5 @@ export type LOGS = {
   message: string;
   client_ip: string;
   user_agent: string;
+  user_email: string;
 };

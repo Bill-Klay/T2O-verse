@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { useFormik } from "formik";
 import { loginFormValidation } from "@/utils/FormValidation";
-import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
 import { base_url } from "@/lib/Constants";
+import { runErrorToast, runSuccessToast } from "@/utils/toast";
 
 const LoginPage = () => {
   const [type, setType] = useState("password");
@@ -65,32 +65,14 @@ const LoginPage = () => {
         console.log("DATA:...", JSON.stringify(data, null, 4));
         const user = data.user;
         setAuth(user);
-        toast.success(`${data.message}`, {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        runSuccessToast(data.message);
         router.push(`/Dashboard/Profile`);
       } catch (error: any) {
         let errorMessage = "An error Occured";
         if (error.message) {
           errorMessage = error.message;
         }
-        toast.error(`${errorMessage}`, {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        runErrorToast(errorMessage);
       }
     },
   });

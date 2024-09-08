@@ -6,8 +6,8 @@ import Image from "next/image";
 import { useState } from "react";
 import { passwordValidation } from "@/utils/FormValidation";
 import { usePathname } from "next/navigation";
-import { toast } from "react-toastify";
 import { base_url } from "@/lib/Constants";
+import { runErrorToast, runSuccessToast } from "@/utils/toast";
 
 const ResetPasswordPage = () => {
   const [type, setType] = useState("password");
@@ -77,27 +77,9 @@ const ResetPasswordPage = () => {
             }),
           });
           const data = await res.json();
-          toast.success(`${data.message}`, {
-            position: "bottom-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
+          runSuccessToast(data.message);
         } else {
-          toast.error(`Passwords Do Not Match`, {
-            position: "bottom-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
+          runErrorToast("Passwords Do Not Match");
         }
       } catch (error) {
         console.log(error);

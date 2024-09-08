@@ -1,15 +1,15 @@
-import { Board, Column, Ticket } from "@/types/KanbanTypes";
-import { title } from "process";
+import { getColumnsNTickets } from "@/handlers/Kanban/handlers";
+import { useKanbanCtx } from "@/hooks/useKanbanCtx";
+import { ContextTypes } from "@/types/KanbanCtxTypes";
+import { Board, Column, ColumnWithTickets, Ticket } from "@/types/KanbanTypes";
+import { runErrorToast, runSuccessToast } from "@/utils/toast";
 import { Dispatch, SetStateAction, useState } from "react";
-import { toast } from "react-toastify";
 
 type ModalProps = {
   showUpdateTicket: boolean;
   setShowUpdateTicket: Dispatch<SetStateAction<boolean>>;
   board: Board | undefined;
   ticket: Ticket;
-  getColumns: (board: Board) => void;
-  columnsList: Column[];
 };
 
 const UpdateTicket_Modal = ({
@@ -17,8 +17,6 @@ const UpdateTicket_Modal = ({
   setShowUpdateTicket,
   board,
   ticket,
-  getColumns,
-  columnsList,
 }: ModalProps) => {
   const [ticketTitle, setTicketTitle] = useState(ticket.title);
   const [ticketDescription, setTicketDescription] = useState(
@@ -26,19 +24,13 @@ const UpdateTicket_Modal = ({
   );
   const [ticketColumnId, setTicketColumnId] = useState(ticket.position);
 
+  const { columnsNTicketsList, setColumnsNTicketsList } =
+    useKanbanCtx() as ContextTypes;
+
   const handleClick = async () => {
     try {
       if (ticketTitle.length <= 2) {
-        toast.error(`Title should be greater than 2 characters`, {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        runErrorToast("Title should be greater than 2 characters");
       } else {
         if (!!board?.id && !!ticketColumnId) {
           const res = await fetch(`/api/kanban_ticket`, {
@@ -61,18 +53,9 @@ const UpdateTicket_Modal = ({
             throw new Error("Something went wrong");
           }
 
-          const res_data = await res.json();
-          toast.success(`Ticket Updated successfully`, {
-            position: "bottom-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
-          getColumns(board);
+          runSuccessToast("Ticket Updated successfully");
+          const column_and_tickets = await getColumnsNTickets(board);
+          setColumnsNTicketsList(column_and_tickets as ColumnWithTickets[]);
           setShowUpdateTicket(!showUpdateTicket);
         }
       }
@@ -154,7 +137,7 @@ const UpdateTicket_Modal = ({
                     className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
                   >
                     <option value={ticket.position}>Select Column</option>
-                    {columnsList.map((column) => (
+                    {columnsNTicketsList.map((column) => (
                       <option key={column.id} value={column.id}>
                         {column.name}
                       </option>

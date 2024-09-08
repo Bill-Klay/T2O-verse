@@ -9,33 +9,12 @@ type Props = {
 };
 
 const UserCmp = ({ userData, setUserData }: Props) => {
-  const [isAdmin, setIsAdmin] = useState(false);
   const [cnf_password, setCnfPassword] = useState("");
-  const [user, setUser] = useState<UserData>(userData);
 
   const Formik = useProfileFormik(userData, cnf_password, setUserData);
 
-  useEffect(() => {
-    console.log(userData?.roles.includes("Admin"));
-    if (userData?.roles.includes("Admin")) {
-      setIsAdmin(true);
-    } else {
-      setIsAdmin(false);
-    }
-  }, []);
-
   return (
     <>
-      {isAdmin ? (
-        <select className="w-1/2 mt-5 rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary">
-          <option key={1} value={"User1"}>
-            User 1
-          </option>
-          <option key={2} value={"User2"}>
-            User 2
-          </option>
-        </select>
-      ) : null}
       <UserDataCmp user_data={userData} />
       <form onSubmit={Formik.handleSubmit} noValidate>
         <div className="grid grid-cols-2 gap-4">

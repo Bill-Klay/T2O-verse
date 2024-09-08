@@ -1,34 +1,24 @@
+import { getBoards } from "@/handlers/Kanban/handlers";
+import { useKanbanCtx } from "@/hooks/useKanbanCtx";
+import { ContextTypes } from "@/types/KanbanCtxTypes";
+import { ModalStatusType } from "@/types/KanbanTypes";
+import { runErrorToast, runSuccessToast } from "@/utils/toast";
 import { Dispatch, SetStateAction, useState } from "react";
-import { toast } from "react-toastify";
 
 type ModalProps = {
-  showModal: boolean;
-  modalStyle: object;
-  setShowModal: Dispatch<SetStateAction<boolean>>;
-  getBoards: () => void;
+  modalStatus: ModalStatusType;
+  setModalStatus: Dispatch<SetStateAction<ModalStatusType>>;
 };
 
-const CreateKanban_Modal = ({
-  showModal,
-  modalStyle,
-  setShowModal,
-  getBoards,
-}: ModalProps) => {
+const CreateKanban_Modal = ({ modalStatus, setModalStatus }: ModalProps) => {
   const [kanban_name, setKanbanName] = useState("");
 
-  const handleClick = async () => {
+  const { setBoardsList } = useKanbanCtx() as ContextTypes;
+
+  const createBoard = async () => {
     try {
       if (kanban_name.length <= 2) {
-        toast.error(`Length Should be Greater Than 2`, {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        runErrorToast("Length Should be Greater Than 2");
       } else {
         const res = await fetch(`/api/kanban_board`, {
           method: "POST",
@@ -44,19 +34,30 @@ const CreateKanban_Modal = ({
           throw new Error("Something Went Wrong");
         }
 
+        runSuccessToast("Board Created Succesfully");
+
         const res_data = await res.json();
-        toast.success(`Board Created Succesfully`, {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
+        const response = await fetch(`/api/kanban_column`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            board_id: res_data.id,
+            name: `To Do's`,
+            position: 1,
+          }),
         });
-        setShowModal(!showModal);
-        getBoards();
+
+        if (!response.ok) {
+          throw new Error("Something Went Wrong");
+        }
+
+        const col_res_data = await response.json();
+        runSuccessToast("Column Created Successfully");
+        setModalStatus({ ...modalStatus, createKanbanModal: false });
+        const boards = await getBoards();
+        setBoardsList(boards);
       }
     } catch (error) {
       console.log("Error >>", error);
@@ -65,11 +66,17 @@ const CreateKanban_Modal = ({
 
   return (
     <>
-      {showModal ? (
+      {modalStatus.createKanbanModal ? (
         <>
           <div
             className="fixed z-50  outline-none focus:outline-none "
-            style={modalStyle}
+            style={{
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              position: "fixed",
+              zIndex: 50,
+            }}
           >
             <div className="relative w-auto my-6 mx-auto max-w-3xl">
               {/*content*/}
@@ -98,14 +105,17 @@ const CreateKanban_Modal = ({
                 {/*footer*/}
                 <div className="flex items-center justify-around pt-4 rounded-b">
                   <button
-                    onClick={handleClick}
+                    onClick={createBoard}
                     className="cursor-pointer rounded-lg border border-primary bg-primary py-2 px-6 text-white transition hover:bg-opacity-90 disabled:bg-strokedark disabled:border-strokedark"
                   >
                     Create
                   </button>
                   <button
                     onClick={() => {
-                      setShowModal(false);
+                      setModalStatus({
+                        ...modalStatus,
+                        createKanbanModal: false,
+                      });
                     }}
                     className="cursor-pointer rounded-lg border border-rose-700 py-2 px-6 text-rose-700 transition hover:bg-opacity-90 disabled:bg-strokedark disabled:border-strokedark"
                   >

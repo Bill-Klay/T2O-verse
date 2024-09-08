@@ -1,39 +1,31 @@
-import { Board } from "@/types/KanbanTypes";
+import { getColumnsNTickets } from "@/handlers/Kanban/handlers";
+import { useKanbanCtx } from "@/hooks/useKanbanCtx";
+import { ContextTypes } from "@/types/KanbanCtxTypes";
+import { Board, Column, ColumnWithTickets } from "@/types/KanbanTypes";
+import { runErrorToast, runSuccessToast } from "@/utils/toast";
 import { Dispatch, SetStateAction, useState } from "react";
-import { toast } from "react-toastify";
 
 type ModalProps = {
   showUpdateColumn: boolean;
   setShowUpdateColumn: Dispatch<SetStateAction<boolean>>;
-  board: Board | undefined;
-  col_id: number;
-  col_name: string;
-  getColumns: () => void;
+  board: Board;
+  column: ColumnWithTickets;
 };
 
 const UpdateColumn_Modal = ({
   showUpdateColumn,
   setShowUpdateColumn,
   board,
-  col_id,
-  col_name,
-  getColumns,
+  column,
 }: ModalProps) => {
-  const [column_name, setColumnName] = useState("");
+  const [column_name, setColumnName] = useState(column.name);
+
+  const { setColumnsNTicketsList } = useKanbanCtx() as ContextTypes;
 
   const updateColumn = async () => {
     try {
       if (column_name.length <= 2) {
-        toast.error(`Length Should be Greater Than 2`, {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        runErrorToast("Length Should be Greater Than 2");
       } else {
         const res = await fetch(`/api/kanban_column`, {
           method: "PUT",
@@ -42,26 +34,20 @@ const UpdateColumn_Modal = ({
           },
           body: JSON.stringify({
             board_id: board?.id,
-            id: col_id,
+            id: column.id,
             name: column_name,
           }),
         });
+
         if (!res.ok) {
           throw new Error("Something Went Wrong");
         }
+
         const res_data = await res.json();
-        toast.success(`Column ${res_data.name} Updated Succesfully`, {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        runSuccessToast(`Column ${res_data.name} Updated Succesfully`);
         setShowUpdateColumn(!showUpdateColumn);
-        getColumns();
+        const column_and_tickets = await getColumnsNTickets(board);
+        setColumnsNTicketsList(column_and_tickets as ColumnWithTickets[]);
       }
     } catch (error) {
       console.log("Error >>", error);
@@ -77,25 +63,18 @@ const UpdateColumn_Modal = ({
         },
         body: JSON.stringify({
           board_id: board?.id,
-          id: col_id,
+          id: column.id,
         }),
       });
+
       if (!res.ok) {
         throw new Error("Something Went Wrong");
       }
-      // const res_data = await res.json();
-      toast.success(`Column ${col_name} Deleted`, {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+
+      runSuccessToast(`Column ${column.name} Deleted`);
       setShowUpdateColumn(!showUpdateColumn);
-      getColumns();
+      const column_and_tickets = await getColumnsNTickets(board);
+      setColumnsNTicketsList(column_and_tickets as ColumnWithTickets[]);
     } catch (error) {
       console.log("Error >>", error);
     }
@@ -133,7 +112,8 @@ const UpdateColumn_Modal = ({
                     id="column_name"
                     name="column_name"
                     type="text"
-                    placeholder={col_name}
+                    // placeholder={col_name}
+                    value={column_name}
                     onChange={(event) => {
                       setColumnName(event.target.value);
                     }}

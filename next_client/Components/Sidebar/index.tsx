@@ -3,8 +3,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import SidebarLinkGroup from "./SidebarLinkGroup";
+import { useAuth } from "@/hooks/useAuth";
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -16,6 +16,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
   const trigger = useRef<any>(null);
   const sidebar = useRef<any>(null);
+
+  const { auth }: any = useAuth();
 
   let storedSidebarExpanded = "true";
 
@@ -104,7 +106,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
       <div className="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear">
         {/* <!-- Sidebar Menu --> */}
-        <nav className="mt-5 px-4 py-4 lg:mt-9 lg:px-6">
+        <nav className="mt-5 px-2 py-4 lg:mt-9 lg:px-3">
           {/* <!-- Menu Group --> */}
           <div>
             <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">
@@ -263,6 +265,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               {/* <!-- Menu Item Profile --> */}
 
               {/* <!-- Menu Item Tables --> */}
+
               <li>
                 <Link
                   href="/Dashboard/Logs"

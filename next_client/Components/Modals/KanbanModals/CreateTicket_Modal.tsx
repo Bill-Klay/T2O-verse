@@ -1,41 +1,34 @@
-import { Board, Column } from "@/types/KanbanTypes";
+import { getColumnsNTickets } from "@/handlers/Kanban/handlers";
+import { useAuth } from "@/hooks/useAuth";
+import { useKanbanCtx } from "@/hooks/useKanbanCtx";
+import { ContextTypes } from "@/types/KanbanCtxTypes";
+import { Board, ColumnWithTickets, ModalStatusType } from "@/types/KanbanTypes";
+import { runErrorToast, runSuccessToast } from "@/utils/toast";
 import { Dispatch, SetStateAction, useState } from "react";
-import { toast } from "react-toastify";
 
 type ModalProps = {
-  showTicketModal: boolean;
-  modalStyle: object;
-  setShowTicketModal: Dispatch<SetStateAction<boolean>>;
+  modalStatus: ModalStatusType;
+  setModalStatus: Dispatch<SetStateAction<ModalStatusType>>;
   board: Board | undefined;
-  getColumns: (board: Board) => void;
-  columnsList: Column[];
 };
 
 const CreateTicket_Modal = ({
-  showTicketModal,
-  modalStyle,
-  setShowTicketModal,
+  modalStatus,
+  setModalStatus,
   board,
-  getColumns,
-  columnsList,
 }: ModalProps) => {
   const [ticketTitle, setTicketTitle] = useState("");
   const [ticketDescription, setTicketDescription] = useState("");
   const [ticketColumnId, setTicketColumnId] = useState("");
 
+  const { auth }: any = useAuth();
+  const { columnsNTicketsList, setColumnsNTicketsList } =
+    useKanbanCtx() as ContextTypes;
+
   const handleClick = async () => {
     try {
       if (ticketTitle.length <= 2) {
-        toast.error(`Title should be greater than 2 characters`, {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        runErrorToast("Title should be greater than 2 characters");
       } else {
         if (!!board?.id && ticketColumnId) {
           const res = await fetch(`/api/kanban_ticket`, {
@@ -55,18 +48,10 @@ const CreateTicket_Modal = ({
           }
 
           const res_data = await res.json();
-          toast.success(`Ticket ${res_data.id} created successfully`, {
-            position: "bottom-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
-          getColumns(board);
-          setShowTicketModal(!showTicketModal);
+          runSuccessToast(`Ticket ${res_data.id} created successfully`);
+          const columns_and_tickets = await getColumnsNTickets(board);
+          setColumnsNTicketsList(columns_and_tickets as ColumnWithTickets[]);
+          setModalStatus({ ...modalStatus, createTicketModal: false });
         }
       }
     } catch (error) {
@@ -76,11 +61,17 @@ const CreateTicket_Modal = ({
 
   return (
     <>
-      {showTicketModal ? (
+      {modalStatus.createTicketModal ? (
         <>
           <div
             className="fixed z-50 outline-none focus:outline-none"
-            style={modalStyle}
+            style={{
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              position: "fixed",
+              zIndex: 50,
+            }}
           >
             <div className="relative w-auto my-6 mx-auto max-w-3xl">
               {/*content*/}
@@ -139,11 +130,20 @@ const CreateTicket_Modal = ({
                     className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
                   >
                     <option value="">Select a column</option>
-                    {columnsList.map((column) => (
-                      <option key={column.id} value={column.id}>
-                        {column.name}
-                      </option>
-                    ))}
+                    {auth.roles?.includes("Admin")
+                      ? columnsNTicketsList.map((column) => (
+                          <option key={column.id} value={column.id}>
+                            {column.name}
+                          </option>
+                        ))
+                      : columnsNTicketsList.map((column) => {
+                          if (column.name === "To Do's")
+                            return (
+                              <option key={column.id} value={column.id}>
+                                {column.name}
+                              </option>
+                            );
+                        })}
                   </select>
                 </div>
                 {/*footer*/}
@@ -156,7 +156,10 @@ const CreateTicket_Modal = ({
                   </button>
                   <button
                     onClick={() => {
-                      setShowTicketModal(false);
+                      setModalStatus({
+                        ...modalStatus,
+                        createTicketModal: false,
+                      });
                     }}
                     className="cursor-pointer rounded-lg border border-rose-700 py-2 px-6 text-rose-700 transition hover:bg-opacity-90 disabled:bg-strokedark disabled:border-strokedark"
                   >

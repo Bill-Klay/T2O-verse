@@ -3,7 +3,7 @@ import QRCode from "react-qr-code";
 import OTPInput from "react-otp-input";
 import { setTwoFA } from "@/Actions/TwoFA_Actions";
 import { useAuth } from "@/hooks/useAuth";
-import { toast } from "react-toastify";
+import { runErrorToast, runSuccessToast } from "@/utils/toast";
 
 type ModalProps = {
   showModal: boolean;
@@ -89,27 +89,9 @@ const TwoFA_Modal = ({
                       onClick={async () => {
                         const res = await setTwoFA(false, token);
                         if (res.success) {
-                          toast.success(`${res.message}`, {
-                            position: "bottom-right",
-                            autoClose: 3000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            progress: undefined,
-                            theme: "light",
-                          });
+                          runSuccessToast(res.message);
                         } else if (!res.success) {
-                          toast.error(`${res.message}`, {
-                            position: "bottom-right",
-                            autoClose: 3000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            progress: undefined,
-                            theme: "light",
-                          });
+                          runErrorToast(res.message);
                         }
                         setAuth((prev: any) => ({
                           ...prev,
@@ -129,27 +111,9 @@ const TwoFA_Modal = ({
                         const res = await setTwoFA(true, token);
                         console.log("Res:....", res.status);
                         if (res.success) {
-                          toast.success(`${res.message}`, {
-                            position: "bottom-right",
-                            autoClose: 3000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            progress: undefined,
-                            theme: "light",
-                          });
+                          runSuccessToast(res.message);
                         } else if (!res.success) {
-                          toast.error(`${res.message}`, {
-                            position: "bottom-right",
-                            autoClose: 3000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            progress: undefined,
-                            theme: "light",
-                          });
+                          runErrorToast(res.message);
                         }
                         setAuth((prev: any) => ({
                           ...prev,

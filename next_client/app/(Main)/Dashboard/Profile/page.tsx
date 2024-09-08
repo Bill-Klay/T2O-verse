@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import Breadcrumb from "@/Components/Breadcrumbs/Breadcrumb";
 import { getURI } from "@/Actions/TwoFA_Actions";

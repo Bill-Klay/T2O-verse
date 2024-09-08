@@ -1,39 +1,31 @@
-import { Board } from "@/types/KanbanTypes";
+import { getBoards } from "@/handlers/Kanban/handlers";
+import { useKanbanCtx } from "@/hooks/useKanbanCtx";
+import { ContextTypes } from "@/types/KanbanCtxTypes";
+import { Board, ModalStatusType } from "@/types/KanbanTypes";
+import { runErrorToast, runSuccessToast } from "@/utils/toast";
 import { Dispatch, SetStateAction, useState } from "react";
-import { toast } from "react-toastify";
 
 type ModalProps = {
-  showUpdateKanban: boolean;
-  modalStyle: object;
-  setShowUpdateKanban: Dispatch<SetStateAction<boolean>>;
+  modalStatus: ModalStatusType;
+  setModalStatus: Dispatch<SetStateAction<ModalStatusType>>;
   board: Board | undefined;
   setBoard: Dispatch<SetStateAction<any>>;
-  getBoards: () => void;
 };
 
 const UpdateKanban_Modal = ({
-  showUpdateKanban,
-  modalStyle,
-  setShowUpdateKanban,
+  modalStatus,
+  setModalStatus,
   board,
   setBoard,
-  getBoards,
 }: ModalProps) => {
   const [kanban_name, setKanbanName] = useState("");
+
+  const { setBoardsList } = useKanbanCtx() as ContextTypes;
 
   const updateBoard = async () => {
     try {
       if (kanban_name.length <= 2) {
-        toast.error(`Length Should be Greater Than 2`, {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        runErrorToast(`Length Should be Greater Than 2`);
       } else {
         const res = await fetch(`/api/kanban_board`, {
           method: "PUT",
@@ -51,18 +43,10 @@ const UpdateKanban_Modal = ({
         }
 
         // const res_data = await res.json();
-        toast.success(`Board Updated Succesfully`, {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-        setShowUpdateKanban(!showUpdateKanban);
-        getBoards();
+        runSuccessToast("Board Updated Successfully");
+        setModalStatus({ ...modalStatus, updateKanbanModal: false });
+        const boards = await getBoards();
+        setBoardsList(boards);
         setBoard({ ...board, name: kanban_name });
       }
     } catch (error) {
@@ -94,45 +78,35 @@ const UpdateKanban_Modal = ({
 
       // Uncomment this if you need to parse the response data
       // const res_data = await res.json();
-
-      toast.success(`Board Deleted ${res.status}`, {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
+      runSuccessToast(`Board Deleted ${res.status}`);
+      setModalStatus({
+        ...modalStatus,
+        updateKanbanModal: false,
       });
-
-      setShowUpdateKanban(!showUpdateKanban);
-      getBoards();
+      const boards = await getBoards();
+      setBoardsList(boards);
       setBoard(null);
     } catch (error: any) {
       console.error("Error >>", error.message);
 
       // Optionally, show an error toast
-      toast.error(`Failed to delete board: ${error.message}`, {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+      runErrorToast(`Failed to delete board: ${error.message}`);
     }
   };
 
   return (
     <>
-      {showUpdateKanban ? (
+      {modalStatus.updateKanbanModal ? (
         <>
           <div
             className="fixed z-50  outline-none focus:outline-none "
-            style={modalStyle}
+            style={{
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              position: "fixed",
+              zIndex: 50,
+            }}
           >
             <div className="relative w-auto my-6 mx-auto max-w-3xl">
               {/*content*/}
@@ -175,7 +149,10 @@ const UpdateKanban_Modal = ({
                   </button>
                   <button
                     onClick={() => {
-                      setShowUpdateKanban(false);
+                      setModalStatus({
+                        ...modalStatus,
+                        updateKanbanModal: false,
+                      });
                     }}
                     className="cursor-pointer rounded-lg border border-rose-700 py-2 px-6 text-rose-700 transition hover:bg-opacity-90 disabled:bg-strokedark disabled:border-strokedark"
                   >

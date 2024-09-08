@@ -1,11 +1,7 @@
-import { UserData } from "@/types/UserData";
-import Image from "next/image";
-
 const UserDataCmp = (user_data: any) => {
   const userData = user_data.user_data;
   return (
     <>
-      {/* {JSON.stringify(userData, null, 4)} */}
       <div className="pb-3 text-center lg:pb-5 xl:pb-5">
         <div className="mt-8 grid grid-cols-3">
           <h3 className="mb-1.5 text-lg font-semibold text-meta-5 dark:text-meta-5">

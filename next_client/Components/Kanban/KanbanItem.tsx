@@ -1,37 +1,34 @@
 "use client";
 
-import { Board, Column, ColumnWithTickets, Ticket } from "@/types/KanbanTypes";
+import { Board, ColumnWithTickets, Ticket } from "@/types/KanbanTypes";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { useState } from "react";
-import { toast } from "react-toastify";
+import { useEffect, useRef, useState } from "react";
 import UpdateTicket_Modal from "../Modals/KanbanModals/UpdateTicket_Modal";
+import { runSuccessToast } from "@/utils/toast";
+import { useKanbanCtx } from "@/hooks/useKanbanCtx";
+import { ContextTypes } from "@/types/KanbanCtxTypes";
+import { getColumnsNTickets } from "@/handlers/Kanban/handlers";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Props {
   col_id: number;
   ticket: Ticket;
   board: Board;
-  getColumns: (board: Board) => void;
-  columnsList: Column[];
 }
 
-const KanbanItem = ({
-  col_id,
-  ticket,
-  board,
-  getColumns,
-  columnsList,
-}: Props) => {
+const KanbanItem = ({ col_id, ticket, board }: Props) => {
+  const { auth }: any = useAuth();
+  const flag: boolean = auth.roles?.includes("Admin") ? false : true;
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: ticket.id,
+    disabled: flag,
   });
-  const style = {
-    // Outputs `translate3d(x, y, 0)`
-    transform: CSS.Translate.toString(transform),
-  };
-
   const [isOpen, setIsOpen] = useState(false);
   const [showUpdateTicket, setShowUpdateTicket] = useState(false);
+  const optionsRef = useRef<any>(null);
+
+  const { setColumnsNTicketsList } = useKanbanCtx() as ContextTypes;
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -55,22 +52,32 @@ const KanbanItem = ({
         throw new Error(`${res.headers}`);
       }
 
-      toast.success(`Deleted Succesfully`, {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-
-      getColumns(board);
+      runSuccessToast("Deleted Successfully");
+      const column_and_tickets = await getColumnsNTickets(board);
+      setColumnsNTicketsList(column_and_tickets as ColumnWithTickets[]);
     } catch (error) {
       console.log("Error >>", error);
     }
   };
+
+  useEffect(() => {
+    const clickHandler = ({ target }: MouseEvent) => {
+      if (!optionsRef.current) return;
+      if (!isOpen || optionsRef.current.contains(target)) return;
+      setIsOpen(false);
+    };
+    document.addEventListener("click", clickHandler);
+    return () => document.removeEventListener("click", clickHandler);
+  });
+
+  useEffect(() => {
+    const keyHandler = ({ keyCode }: KeyboardEvent) => {
+      if (!isOpen || keyCode !== 27) return;
+      setIsOpen(false);
+    };
+    document.addEventListener("keydown", keyHandler);
+    return () => document.removeEventListener("keydown", keyHandler);
+  });
 
   return (
     <>
@@ -79,42 +86,42 @@ const KanbanItem = ({
         setShowUpdateTicket={setShowUpdateTicket}
         board={board}
         ticket={ticket}
-        getColumns={getColumns}
-        columnsList={columnsList}
       />
       <div
         ref={setNodeRef}
         {...listeners}
         {...attributes}
-        style={style}
+        style={{ transform: CSS.Translate.toString(transform) }}
         className="my-2 w-full bg-white shadow-md rounded-lg p-4 relative"
       >
         <div className="flex justify-between items-center mb-2">
           <h2 className="text-lg font-semibold text-black">{ticket.title}</h2>
-          <button
-            onClick={toggleDropdown}
-            onPointerDown={(event) => {
-              event.stopPropagation();
-            }}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            <svg
-              className="w-6 h-6 text-gray-800 dark:text-black"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              fill="none"
-              viewBox="0 0 24 24"
+          {auth.roles?.includes("Admin") && (
+            <button
+              onClick={toggleDropdown}
+              onPointerDown={(event) => {
+                event.stopPropagation();
+              }}
+              className="text-gray-500 hover:text-gray-700"
             >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeWidth="2"
-                d="M6 12h.01m6 0h.01m5.99 0h.01"
-              />
-            </svg>
-          </button>
+              <svg
+                className="w-6 h-6 text-gray-800 dark:text-black"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeWidth="2"
+                  d="M6 12h.01m6 0h.01m5.99 0h.01"
+                />
+              </svg>
+            </button>
+          )}
         </div>
         <p className="text-black">{ticket.description}</p>
 
@@ -122,6 +129,7 @@ const KanbanItem = ({
           <div
             className="absolute right-0 top-12 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
             role="menu"
+            ref={optionsRef}
             aria-orientation="vertical"
             aria-labelledby="menu-button"
           >

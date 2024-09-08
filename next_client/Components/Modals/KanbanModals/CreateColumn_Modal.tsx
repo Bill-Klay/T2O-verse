@@ -1,38 +1,30 @@
-import { Board } from "@/types/KanbanTypes";
+import { getColumnsNTickets } from "@/handlers/Kanban/handlers";
+import { useKanbanCtx } from "@/hooks/useKanbanCtx";
+import { ContextTypes } from "@/types/KanbanCtxTypes";
+import { Board, ColumnWithTickets, ModalStatusType } from "@/types/KanbanTypes";
+import { runErrorToast, runSuccessToast } from "@/utils/toast";
 import { Dispatch, SetStateAction, useState } from "react";
-import { toast } from "react-toastify";
 
 type ModalProps = {
-  showColumnModal: boolean;
-  modalStyle: object;
-  setShowColumnModal: Dispatch<SetStateAction<boolean>>;
+  modalStatus: ModalStatusType;
+  setModalStatus: Dispatch<SetStateAction<ModalStatusType>>;
   board: Board | undefined;
-  getColumns: (board: Board) => void;
 };
 
 const CreateColumn_Modal = ({
-  showColumnModal,
-  modalStyle,
-  setShowColumnModal,
+  modalStatus,
+  setModalStatus,
   board,
-  getColumns,
 }: ModalProps) => {
   const [columnName, setColumnName] = useState("");
   const [columnPosition, setColumnPosition] = useState("");
 
+  const { setColumnsNTicketsList } = useKanbanCtx() as ContextTypes;
+
   const handleClick = async () => {
     try {
       if (columnName.length <= 2) {
-        toast.error(`Length Should be Greater Than 2`, {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        runErrorToast("Length Should be Greater Than 2");
       } else {
         if (!!board?.id) {
           const res = await fetch(`/api/kanban_column`, {
@@ -52,18 +44,10 @@ const CreateColumn_Modal = ({
           }
 
           const res_data = await res.json();
-          toast.success(`Column ${res_data.id} Created Succesfully`, {
-            position: "bottom-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
-          getColumns(board);
-          setShowColumnModal(!showColumnModal);
+          runSuccessToast(`Column ${res_data.id} Created Succesfully`);
+          const columns_and_tickets = await getColumnsNTickets(board);
+          setColumnsNTicketsList(columns_and_tickets as ColumnWithTickets[]);
+          setModalStatus({ ...modalStatus, createColumnModal: false });
         }
       }
     } catch (error) {
@@ -73,11 +57,17 @@ const CreateColumn_Modal = ({
 
   return (
     <>
-      {showColumnModal ? (
+      {modalStatus.createColumnModal ? (
         <>
           <div
             className="fixed z-50  outline-none focus:outline-none "
-            style={modalStyle}
+            style={{
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              position: "fixed",
+              zIndex: 50,
+            }}
           >
             <div className="relative w-auto my-6 mx-auto max-w-3xl">
               {/*content*/}
@@ -130,7 +120,10 @@ const CreateColumn_Modal = ({
                   </button>
                   <button
                     onClick={() => {
-                      setShowColumnModal(false);
+                      setModalStatus({
+                        ...modalStatus,
+                        createColumnModal: false,
+                      });
                     }}
                     className="cursor-pointer rounded-lg border border-rose-700 py-2 px-6 text-rose-700 transition hover:bg-opacity-90 disabled:bg-strokedark disabled:border-strokedark"
                   >

@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { useFormik } from "formik";
 import { signupFormValidation } from "@/utils/FormValidation";
-import { toast } from "react-toastify";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { base_url } from "@/lib/Constants";
+import { runErrorToast, runSuccessToast } from "@/utils/toast";
 
 const SignupPage = () => {
   const [type, setType] = useState("password");
@@ -56,33 +56,14 @@ const SignupPage = () => {
         }
 
         const data = await res.json();
-
-        toast.success(`${data.message}`, {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        runSuccessToast(data.message);
         router.push("/");
       } catch (error: any) {
         let errorMessage = "An error Occured";
         if (error.message) {
           errorMessage = error.message;
         }
-        toast.error(`${errorMessage}`, {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        runErrorToast(errorMessage);
       }
     },
   });

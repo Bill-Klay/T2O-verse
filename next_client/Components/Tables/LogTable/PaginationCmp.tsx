@@ -1,6 +1,3 @@
-// "use client";
-
-import { ReactNode } from "react";
 import ReactPaginate from "react-paginate";
 
 type TableProps = {
