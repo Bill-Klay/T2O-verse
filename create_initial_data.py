@@ -50,10 +50,10 @@ def initialize_database():
                 super_admin_role.permissions.append(permission)
 
             # Create admin and super admin users
-            admin_user = User(first_name="admin", last_name="admin", username="admin", email="admin@example.com", password="SecureP@ssw0rd")  # Default password
+            admin_user = User(first_name="admin", last_name="admin", username="admin", email="admin@example.com", password="SecureP@ssw0rd", verified=True)  # Default password
             db.session.add(admin_user)
 
-            super_admin_user = User(first_name="super", last_name="admin", username="superadmin", email="superadmin@example.com", password="SecureP@ssw0rd")
+            super_admin_user = User(first_name="super", last_name="admin", username="superadmin", email="superadmin@example.com", password="SecureP@ssw0rd", verified=True)
             db.session.add(super_admin_user)
 
             # Create user and role association
