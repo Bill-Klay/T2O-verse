@@ -22,21 +22,10 @@ interface ProductData {
   url?: string;
 }
 
-const CreateProductForm: React.FC = () => {
-  const [formData, setFormData] = useState<ProductData>({
-    product_id: "",
-    name: "",
-    active: true,
-    attributes: [],
-    metadata: {},
-    package_dimensions: null,
-    shippable: false,
-    statement_descriptor: "None",
-    unit_label: "None",
-    url: "None",
-  });
+const EditProduct: React.FC = () => {
   const [products, setProducts] = useState<any[]>([]);
-  const [product, setProduct] = useState<any>();
+  const [product, setProduct] = useState<any>(null);
+  const [flag, setFlag] = useState(false);
 
   const getProducts = async () => {
     try {
@@ -54,7 +43,7 @@ const CreateProductForm: React.FC = () => {
 
   useEffect(() => {
     getProducts();
-  }, []);
+  }, [flag]);
 
   const selectProduct = (product_id: string) => {
     const [product] = products.filter(
@@ -76,6 +65,32 @@ const CreateProductForm: React.FC = () => {
     }));
   };
 
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(`/api/delete_product`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ product_id: product.product_id }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Product deleted successfully:", data);
+      runSuccessToast("Product Successfully Deleted.");
+
+      // Reset the form after deletion
+      setProduct(null);
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      runErrorToast("Error Deleting Product.");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -92,6 +107,7 @@ const CreateProductForm: React.FC = () => {
         const data = await response.json();
         console.log("Product edited successfully:", data);
         runSuccessToast("Product Successfully Edited.");
+        setFlag(!flag);
       } else {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -116,7 +132,7 @@ const CreateProductForm: React.FC = () => {
             }}
             className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
           >
-            <option key={0} value="">
+            <option key={0} value={undefined}>
               Select Product
             </option>
             {products.map((product, index) => (
@@ -125,9 +141,9 @@ const CreateProductForm: React.FC = () => {
               </option>
             ))}
           </select>
-          <span>{JSON.stringify(product, null, 4)}</span>
+          {/* <span>{JSON.stringify(product, null, 4)}</span> */}
         </div>
-        {product !== null ? (
+        {product !== null && product !== undefined ? (
           <>
             <div className="flex flex-col">
               <label
@@ -277,7 +293,14 @@ const CreateProductForm: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex justify-end">
+            <div className="flex justify-end space-x-1">
+              <button
+                type="button"
+                onClick={handleDelete}
+                className={`inline-flex justify-center rounded-md border border-transparent bg-meta-1 py-2 px-4 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-meta-1 focus:ring-offset-2`}
+              >
+                Delete Product
+              </button>
               <button
                 type="submit"
                 className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
@@ -286,10 +309,12 @@ const CreateProductForm: React.FC = () => {
               </button>
             </div>
           </>
-        ) : null}
+        ) : (
+          <></>
+        )}
       </div>
     </form>
   );
 };
 
-export default CreateProductForm;
+export default EditProduct;
