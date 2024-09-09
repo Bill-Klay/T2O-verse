@@ -1,126 +1,70 @@
 "use client";
 
-import React, { useState } from "react";
+import CreateProductForm from "@/Components/Stripe/CreateProductForm";
+import CreatePriceForm from "@/Components/Stripe/CreatePriceFrom";
+import { useState } from "react";
+import CreateSubscription from "@/Components/Stripe/CreateSubscription";
+import EditPrice from "@/Components/Stripe/EditPrice";
+import EditProduct from "@/Components/Stripe/EditProduct";
+import EditSubscription from "@/Components/Stripe/EditSubscription";
+import DeleteProduct from "@/Components/Stripe/DeleteProduct";
+import DeletePrice from "@/Components/Stripe/DeletePrice";
+import DeleteSubscription from "@/Components/Stripe/DeleteSubscription";
 
-// Stripe Page Component
 const StripePage = () => {
-  const [paymentMethod, setPaymentMethod] = useState("");
-  const [amount, setAmount] = useState("");
-  const [paymentStatus, setPaymentStatus] = useState("");
-  const [transactionId, setTransactionId] = useState("");
+  const [action, setAction] = useState("create_product");
 
-  const handlePaymentMethodChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setPaymentMethod(e.target.value);
-  };
-
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setAmount(e.target.value);
-  };
-
-  const handlePaymentStatusChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setPaymentStatus(e.target.value);
-  };
-
-  const handleTransactionIdChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setTransactionId(e.target.value);
-  };
-
-  const handlePaymentSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Implement your payment submission logic here
-    alert(`Payment Method: ${paymentMethod}\nAmount: ${amount}`);
-  };
-
-  const handleStatusSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Implement your payment status check logic here
-    alert(`Payment Status: ${paymentStatus}`);
-  };
-
-  const handleTransactionSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Implement your transaction ID search logic here
-    alert(`Transaction ID: ${transactionId}`);
+  const handleActionChange = (value: string) => {
+    setAction(value);
   };
 
   return (
-    <div style={{ padding: "20px", textAlign: "center" }}>
-      <h1>Stripe Payment Page</h1>
-
-      <div style={{ margin: "20px 0" }}>
-        <h2>Process Payment</h2>
-        <form onSubmit={handlePaymentSubmit}>
-          <div>
-            <label>
-              Payment Method:
-              <input
-                type="text"
-                value={paymentMethod}
-                onChange={handlePaymentMethodChange}
-                placeholder="e.g., Credit Card"
-                required
-              />
-            </label>
-          </div>
-          <div>
-            <label>
-              Amount:
-              <input
-                type="number"
-                value={amount}
-                onChange={handleAmountChange}
-                placeholder="e.g., 100.00"
-                required
-              />
-            </label>
-          </div>
-          <button type="submit">Submit Payment</button>
-        </form>
-      </div>
-
-      <div style={{ margin: "20px 0" }}>
-        <h2>Check Payment Status</h2>
-        <form onSubmit={handleStatusSubmit}>
-          <div>
-            <label>
-              Payment Status:
-              <input
-                type="text"
-                value={paymentStatus}
-                onChange={handlePaymentStatusChange}
-                placeholder="e.g., Completed"
-                required
-              />
-            </label>
-          </div>
-          <button type="submit">Check Status</button>
-        </form>
-      </div>
-
-      <div style={{ margin: "20px 0" }}>
-        <h2>Find Transaction</h2>
-        <form onSubmit={handleTransactionSubmit}>
-          <div>
-            <label>
-              Transaction ID:
-              <input
-                type="text"
-                value={transactionId}
-                onChange={handleTransactionIdChange}
-                placeholder="e.g., txn_12345"
-                required
-              />
-            </label>
-          </div>
-          <button type="submit">Find Transaction</button>
-        </form>
-      </div>
+    <div className="overflow-hidden rounded-md border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark p-3">
+      <select
+        id="action"
+        name="action"
+        value={action}
+        onChange={(event) => handleActionChange(event.target.value)}
+        className="rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
+      >
+        <option value="create_product">Create Product</option>
+        <option value="create_price">Create Price</option>
+        <option value="create_subscription">Create Subscription</option>
+        <option value="edit_product">Edit Product</option>
+        <option value="edit_price">Edit Price</option>
+        <option value="edit_subscription">Edit Subscription</option>
+        <option value="delete_product">Delete Product</option>
+        <option value="delete_price">Delete Price</option>
+        <option value="delete_subscription">Delete Subscription</option>
+      </select>
+      {(() => {
+        switch (action) {
+          case "create_product":
+            return <CreateProductForm />;
+          case "create_price":
+            return <CreatePriceForm />;
+          case "create_subscription":
+            return <CreateSubscription />;
+          case "edit_product":
+            return <EditProduct />;
+          case "edit_price":
+            return <EditPrice />;
+          case "edit_subscription":
+            return <EditSubscription />;
+          case "delete_product":
+            return <DeleteProduct />;
+          case "delete_price":
+            return <DeletePrice />;
+          case "delete_subscription":
+            return <DeleteSubscription />;
+          default:
+            return (
+              <div className="flex flex-col items-center">
+                <p>Refresh In Case You See This.</p>
+              </div>
+            );
+        }
+      })()}
     </div>
   );
 };
