@@ -1,5 +1,6 @@
 "use client";
 
+import { runErrorToast, runSuccessToast } from "@/utils/toast";
 import React, { SelectHTMLAttributes, useState } from "react";
 
 interface ProductData {
@@ -62,13 +63,13 @@ const CreateProductForm: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
         console.log("Product created successfully:", data);
-        alert("Product created successfully");
+        runSuccessToast("Product Successfully Created.");
       } else {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
     } catch (error) {
       console.error("Error creating product:", error);
-      alert("Error creating product");
+      runErrorToast("Error Creating Product.");
     }
     console.log("Submitting form:", formData);
   };

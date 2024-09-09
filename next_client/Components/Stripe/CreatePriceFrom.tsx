@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import { runErrorToast, runSuccessToast } from "@/utils/toast";
+import React, { useEffect, useState } from "react";
 
 interface RecurringData {
   interval: string;
@@ -25,7 +26,7 @@ interface PriceData {
   lookup_key?: string;
   price_metadata?: Record<string, string>;
   nickname?: string;
-  transform_quantity?: TransformQuantity;
+  transform_quantity?: null;
   recurring?: RecurringData;
   tiers?: null;
   tiers_mode?: null;
@@ -39,8 +40,26 @@ const CreatePriceForm: React.FC = () => {
     active: true,
   };
 
+  const [products, setProducts] = useState<any[]>([]);
   const [formData, setFormData] = useState<PriceData>(initialFormData);
-  const [isLoading, setIsLoading] = useState(false);
+
+  const getProducts = async () => {
+    try {
+      const res = await fetch("/api/get_product", {
+        method: "POST",
+      });
+
+      const data = await res.json();
+      console.log("Products >>", data);
+      setProducts(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getProducts();
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -71,7 +90,6 @@ const CreatePriceForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
 
     try {
       const response = await fetch("/api/create_price", {
@@ -85,16 +103,14 @@ const CreatePriceForm: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
         console.log("Price created successfully:", data);
-        alert("Price created successfully");
+        runSuccessToast("Price Successfully Created");
         setFormData(initialFormData);
       } else {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
     } catch (error) {
       console.error("Error creating price:", error);
-      alert("Error creating price");
-    } finally {
-      setIsLoading(false);
+      runErrorToast("Error Creating Price");
     }
   };
 
@@ -147,15 +163,23 @@ const CreatePriceForm: React.FC = () => {
             >
               Product ID:
             </label>
-            <input
+            <select
               id="product_id"
               name="product_id"
-              type="text"
               value={formData.product_id}
               onChange={handleChange}
               className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
               required
-            />
+            >
+              <option key={0} value="">
+                Select Product
+              </option>
+              {products.map((product, index) => (
+                <option key={index} value={product.product_id}>
+                  {product.product_id}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
@@ -236,7 +260,7 @@ const CreatePriceForm: React.FC = () => {
               <option value="year">Year</option>
             </select>
           </div>
-          <div className="flex flex-col w-1/2">
+          {/* <div className="flex flex-col w-1/2">
             <label
               htmlFor="transform_quantity"
               className="mb-2.5 font-medium text-black dark:text-white"
@@ -263,19 +287,16 @@ const CreatePriceForm: React.FC = () => {
                 className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
               />
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 
       <div className="flex justify-end">
         <button
           type="submit"
-          disabled={isLoading}
-          className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
-            isLoading ? "opacity-50 cursor-not-allowed" : ""
-          }`}
+          className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
         >
-          {isLoading ? "Creating..." : "Create Price"}
+          Create Price
         </button>
       </div>
     </form>
