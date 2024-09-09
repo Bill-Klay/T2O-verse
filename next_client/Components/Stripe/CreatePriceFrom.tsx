@@ -45,7 +45,7 @@ const CreatePriceForm: React.FC = () => {
 
   const getProducts = async () => {
     try {
-      const res = await fetch("/api/get_product", {
+      const res = await fetch("/api/get_products", {
         method: "POST",
       });
 
