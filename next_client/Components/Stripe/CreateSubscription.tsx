@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import { runErrorToast, runSuccessToast } from "@/utils/toast";
+import React, { useEffect, useState } from "react";
 
 interface SubscriptionData {
   user_id?: string;
@@ -14,6 +15,8 @@ const CreateSubscriptionForm: React.FC = () => {
     price_id: "",
     trial_period_days: 0,
   });
+  const [prices, setPrices] = useState<any>();
+  const [price, setPrice] = useState();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -28,7 +31,7 @@ const CreateSubscriptionForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch("/api/create-subscription", {
+      const response = await fetch("/api/create_subscription", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -39,7 +42,7 @@ const CreateSubscriptionForm: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
         console.log("Subscription created successfully:", data);
-        alert("Subscription created successfully");
+        runSuccessToast("Subscription created successfully");
         setFormData({
           price_id: "",
           trial_period_days: 0,
@@ -49,9 +52,31 @@ const CreateSubscriptionForm: React.FC = () => {
       }
     } catch (error) {
       console.error("Error creating subscription:", error);
-      alert("Error creating subscription");
+      runErrorToast("Error creating subscription");
     }
   };
+
+  const getPrices = async () => {
+    try {
+      const res = await fetch("/api/get_prices", {
+        method: "POST",
+      });
+
+      const data = await res.json();
+      setPrices(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const selectProduct = (price_id: string) => {
+    const [selectedPrice] = prices.filter((p: any) => p.price_id === price_id);
+    setPrice(selectedPrice.price_id);
+  };
+
+  useEffect(() => {
+    getPrices();
+  }, []);
 
   return (
     <form onSubmit={handleSubmit} className="max-w-md mx-auto my-6">
@@ -59,19 +84,24 @@ const CreateSubscriptionForm: React.FC = () => {
         <div className="flex flex-col">
           <label
             htmlFor="price_id"
-            className="mb-2.5 font-medium text-black dark:text-white"
+            className="mb-2 font-medium text-black dark:text-white"
           >
-            Price ID:
+            Select Price:
           </label>
-          <input
+          <select
             id="price_id"
             name="price_id"
-            type="text"
-            value={formData.price_id}
+            value={formData.price_id} // Bind the selected value to formData
             onChange={handleChange}
-            className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
-            required
-          />
+            className="w-full rounded-lg border border-strokedark bg-transparent py-2 pl-4 pr-10 text-black outline-none focus:border-primary dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+          >
+            <option value="">Select Price</option> {/* Default option */}
+            {prices?.map((p: any) => (
+              <option key={p.price_id} value={p.price_id}>
+                {p.price_id} - {p.price_name} {/* Display price name */}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="flex flex-col">
