@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   console.log(req_data);
 
   try {
-    const res = await fetch(`${base_url}/create-price`, {
+    const res = await fetch(`${base_url}/delete-price`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
         "X-CSRFToken": `${CSRFToken?.value}`,
       },
       body: JSON.stringify({
-        ...req_data.price,
+        price_id: req_data.price_id,
       }),
     });
 

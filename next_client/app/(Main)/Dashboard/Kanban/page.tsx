@@ -172,32 +172,37 @@ const Kanban = () => {
               {columnsNTicketsList.map((column) => (
                 <KanbanColumn key={column.id} column={column} board={board} />
               ))}
-              {auth.roles?.includes("Admin") && (
-                <button
-                  onClick={() => {
-                    setModalStatus({ ...modalStatus, createColumnModal: true });
-                  }}
-                  className="w-fit h-10 rounded-md border border-gray bg-slate-500 px-3 py-2
+              {auth.roles?.includes("Admin") ||
+                (auth.roles?.includes("Super Admin") && (
+                  <button
+                    onClick={() => {
+                      setModalStatus({
+                        ...modalStatus,
+                        createColumnModal: true,
+                      });
+                    }}
+                    className="w-fit h-10 rounded-md border border-gray bg-slate-500 px-3 py-2
         text-white transition hover:bg-opacity-90 flex"
-                >
-                  <PlusSVG />
-                </button>
-              )}
+                  >
+                    <PlusSVG />
+                  </button>
+                ))}
             </KanbanContainer>
           </>
         ) : null}
       </div>
-      {auth.roles?.includes("Admin") && (
-        <button
-          onClick={() => {
-            setModalStatus({ ...modalStatus, createKanbanModal: true });
-          }}
-          className="fixed right-5 bottom-2 w-fit rounded-md border border-primary bg-primary px-4 py-2
+      {auth.roles?.includes("Admin") ||
+        (auth.roles?.includes("Super Admin") && (
+          <button
+            onClick={() => {
+              setModalStatus({ ...modalStatus, createKanbanModal: true });
+            }}
+            className="fixed right-5 bottom-2 w-fit rounded-md border border-primary bg-primary px-4 py-2
         text-white transition hover:bg-opacity-90 flex"
-        >
-          <PlusSVG />
-        </button>
-      )}
+          >
+            <PlusSVG />
+          </button>
+        ))}
     </>
   );
 };

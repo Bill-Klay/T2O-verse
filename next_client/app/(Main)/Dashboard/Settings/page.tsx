@@ -20,7 +20,7 @@ const SettingsPage = () => {
       const data = await fetchCurrentUser();
       setUserData(data);
 
-      if (auth.roles?.includes("Admin")) {
+      if (auth.roles?.includes("Admin") || auth.roles.includes("Super Admin")) {
         const usersData = await fetchAllUsers();
         const filteredData = usersData.filter(
           (user: UserData) => user.id !== data?.id
@@ -34,14 +34,16 @@ const SettingsPage = () => {
   return (
     <div
       className={`${
-        userData?.roles.includes("Admin")
+        userData?.roles.includes("Admin") ||
+        userData?.roles.includes("Super Admin")
           ? "md:flex lg:flex xl:flex justify-between"
           : "w-full"
       }`}
     >
       {userData && (
         <div className="overflow-hidden rounded-md border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-          {userData.roles.includes("Admin") ? (
+          {userData.roles.includes("Admin") ||
+          userData.roles.includes("Super Admin") ? (
             <div className="flex w-full items-center justify-center text-center">
               <button
                 onClick={() => {
@@ -78,7 +80,8 @@ const SettingsPage = () => {
           </div>
         </div>
       )}
-      {userData?.roles.includes("Admin") ? (
+      {userData?.roles.includes("Admin") ||
+      userData?.roles.includes("Super Admin") ? (
         <div>
           <div className="w-full mx-auto text-center border-stroke bg-white rounded-md border shadow-default dark:border-strokedark dark:bg-boxdark">
             <RoleCmp usersList={usersList as any} />

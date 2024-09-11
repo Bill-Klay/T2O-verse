@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   console.log(req_data);
 
   try {
-    const res = await fetch(`${base_url}/create-price`, {
+    const res = await fetch(`${base_url}/edit-price`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify({
         ...req_data.price,
+        interval: req_data.price.recurring.interval,
       }),
     });
 

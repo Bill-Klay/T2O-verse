@@ -34,21 +34,22 @@ const KanbanColumn = ({ board, column }: Props) => {
           <h2 className="text-title-md mb-2 font-semibold text-black dark:text-white">
             {column.name}
           </h2>
-          {auth.roles?.includes("Admin") && (
-            <button
-              type="submit"
-              onClick={() => {
-                setShowUpdateColumn(!showUpdateColumn);
-              }}
-              onPointerDown={(event) => {
-                event.stopPropagation();
-              }}
-              className="text-left text-sm text-black hover:bg-gray-100"
-              role="menuitem"
-            >
-              <EditSVG />
-            </button>
-          )}
+          {auth.roles?.includes("Admin") ||
+            (auth.roles?.includes("Super Admin") && (
+              <button
+                type="submit"
+                onClick={() => {
+                  setShowUpdateColumn(!showUpdateColumn);
+                }}
+                onPointerDown={(event) => {
+                  event.stopPropagation();
+                }}
+                className="text-left text-sm text-black hover:bg-gray-100"
+                role="menuitem"
+              >
+                <EditSVG />
+              </button>
+            ))}
         </div>
         {column.tickets.map((item) => (
           <KanbanItem

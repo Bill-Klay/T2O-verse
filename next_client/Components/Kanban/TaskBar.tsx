@@ -20,21 +20,22 @@ const TaskBar = ({ board, modalStatus, setModalStatus }: Props) => {
           <h2 className="text-title-md2 font-semibold text-black dark:text-white">
             {board.name}
           </h2>
-          {auth.roles?.includes("Admin") && (
-            <button
-              type="submit"
-              onClick={() => {
-                setModalStatus({ ...modalStatus, updateKanbanModal: true });
-              }}
-              onPointerDown={(event) => {
-                event.stopPropagation();
-              }}
-              className="flex w-full px-4 py-2 text-left text-sm text-black hover:bg-gray-100"
-              role="menuitem"
-            >
-              <EditSVG />
-            </button>
-          )}
+          {auth.roles?.includes("Admin") ||
+            (auth.roles?.includes("Super Admin") && (
+              <button
+                type="submit"
+                onClick={() => {
+                  setModalStatus({ ...modalStatus, updateKanbanModal: true });
+                }}
+                onPointerDown={(event) => {
+                  event.stopPropagation();
+                }}
+                className="flex w-full px-4 py-2 text-left text-sm text-black hover:bg-gray-100"
+                role="menuitem"
+              >
+                <EditSVG />
+              </button>
+            ))}
         </div>
         <button
           onClick={() => {

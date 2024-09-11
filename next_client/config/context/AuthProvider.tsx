@@ -6,12 +6,17 @@ export const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [auth, setAuth] = useState(() => {
-    const savedAuth = localStorage.getItem("auth");
-    return savedAuth ? JSON.parse(savedAuth) : {};
+    if (typeof window !== "undefined") {
+      const savedAuth = localStorage.getItem("auth");
+      return savedAuth ? JSON.parse(savedAuth) : {};
+    }
+    return {}; // Default value if localStorage is not available (SSR)
   });
 
   useEffect(() => {
-    localStorage.setItem("auth", JSON.stringify(auth));
+    if (typeof window !== "undefined") {
+      localStorage.setItem("auth", JSON.stringify(auth));
+    }
   }, [auth]);
 
   return (

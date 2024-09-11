@@ -7,29 +7,12 @@ interface RecurringData {
   interval: string;
 }
 
-interface Tier {
-  up_to: number;
-  unit_amount: number;
-}
-
-interface TransformQuantity {
-  divide_by: number;
-  round: string;
-}
-
 interface PriceData {
   unit_amount: number;
   currency: string;
   product_id: string;
   active?: boolean;
-  billing_scheme?: string;
-  lookup_key?: string;
-  price_metadata?: Record<string, string>;
-  nickname?: string;
-  transform_quantity?: null;
   recurring?: RecurringData;
-  tiers?: null;
-  tiers_mode?: null;
 }
 
 const CreatePriceForm: React.FC = () => {
@@ -50,7 +33,6 @@ const CreatePriceForm: React.FC = () => {
       });
 
       const data = await res.json();
-      console.log("Products >>", data);
       setProducts(data);
     } catch (error) {
       console.log(error);
@@ -66,7 +48,7 @@ const CreatePriceForm: React.FC = () => {
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
-    const { name, value } = e.target as HTMLInputElement | HTMLSelectElement;
+    const { name, value } = e.target;
 
     setFormData((prevData) => ({
       ...prevData,
@@ -79,7 +61,7 @@ const CreatePriceForm: React.FC = () => {
     fieldName: string
   ) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
+    setFormData((prevData: any) => ({
       ...prevData,
       [fieldName]: {
         ...prevData[fieldName],
@@ -92,12 +74,17 @@ const CreatePriceForm: React.FC = () => {
     e.preventDefault();
 
     try {
+      const priceData = {
+        ...formData,
+        billing_scheme: "per_unit", // Set billing scheme to per_unit by default
+      };
+
       const response = await fetch("/api/create_price", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ formData }),
+        body: JSON.stringify({ price: priceData }),
       });
 
       if (response.ok) {
@@ -117,6 +104,7 @@ const CreatePriceForm: React.FC = () => {
   return (
     <form onSubmit={handleSubmit} className="w-full px-6 mx-auto my-6">
       <div className="space-y-4 w-full mx-auto pb-6 text-center">
+        {/* Unit Amount */}
         <div className="flex flex-col">
           <label
             htmlFor="unit_amount"
@@ -131,11 +119,12 @@ const CreatePriceForm: React.FC = () => {
             step="0.01"
             value={formData.unit_amount}
             onChange={handleChange}
-            className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
+            className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
             required
           />
         </div>
 
+        {/* Currency and Product Selection */}
         <div className="flex space-x-4">
           <div className="flex flex-col w-1/2">
             <label
@@ -149,13 +138,14 @@ const CreatePriceForm: React.FC = () => {
               name="currency"
               value={formData.currency}
               onChange={handleChange}
-              className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
+              className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
               required
             >
               <option value="usd">USD</option>
               <option value="eur">EUR</option>
             </select>
           </div>
+
           <div className="flex flex-col w-1/2">
             <label
               htmlFor="product_id"
@@ -168,7 +158,7 @@ const CreatePriceForm: React.FC = () => {
               name="product_id"
               value={formData.product_id}
               onChange={handleChange}
-              className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
+              className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
               required
             >
               <option key={0} value="">
@@ -183,114 +173,31 @@ const CreatePriceForm: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex space-x-4">
-          <div className="flex flex-col w-1/2">
-            <label
-              htmlFor="billing_scheme"
-              className="mb-2.5 font-medium text-black dark:text-white"
-            >
-              Billing Scheme:
-            </label>
-            <select
-              id="billing_scheme"
-              name="billing_scheme"
-              value={formData.billing_scheme || ""}
-              onChange={handleChange}
-              className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
-            >
-              <option value="">Select billing scheme</option>
-              <option value="per_unit">Per Unit</option>
-              <option value="tiered">Tiered</option>
-            </select>
-          </div>
-          <div className="flex flex-col w-1/2">
-            <label
-              htmlFor="lookup_key"
-              className="mb-2.5 font-medium text-black dark:text-white"
-            >
-              Lookup Key:
-            </label>
-            <input
-              id="lookup_key"
-              name="lookup_key"
-              type="text"
-              value={formData.lookup_key || ""}
-              onChange={handleChange}
-              className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
-            />
-          </div>
-        </div>
-
+        {/* Recurring Interval */}
         <div className="flex flex-col">
           <label
-            htmlFor="nickname"
+            htmlFor="recurring_interval"
             className="mb-2.5 font-medium text-black dark:text-white"
           >
-            Nickname:
+            Recurring Interval:
           </label>
-          <input
-            id="nickname"
-            name="nickname"
-            type="text"
-            value={formData.nickname || ""}
-            onChange={handleChange}
-            className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
-          />
-        </div>
-
-        <div className="flex space-x-4">
-          <div className="flex flex-col w-1/2">
-            <label
-              htmlFor="recurring_interval"
-              className="mb-2.5 font-medium text-black dark:text-white"
-            >
-              Recurring Interval:
-            </label>
-            <select
-              id="recurring_interval"
-              name="interval"
-              value={formData.recurring?.interval || ""}
-              onChange={(e) => handleNestedChange(e, "recurring")}
-              className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
-            >
-              <option value="">Select interval</option>
-              <option value="day">Day</option>
-              <option value="week">Week</option>
-              <option value="month">Month</option>
-              <option value="year">Year</option>
-            </select>
-          </div>
-          {/* <div className="flex flex-col w-1/2">
-            <label
-              htmlFor="transform_quantity"
-              className="mb-2.5 font-medium text-black dark:text-white"
-            >
-              Transform Quantity:
-            </label>
-            <div className="flex space-x-4">
-              <input
-                id="divide_by"
-                name="divide_by"
-                type="number"
-                placeholder="Divide By"
-                value={formData.transform_quantity?.divide_by || ""}
-                onChange={(e) => handleNestedChange(e, "transform_quantity")}
-                className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
-              />
-              <input
-                id="round"
-                name="round"
-                type="text"
-                placeholder="Round"
-                value={formData.transform_quantity?.round || ""}
-                onChange={(e) => handleNestedChange(e, "transform_quantity")}
-                className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
-              />
-            </div>
-          </div> */}
+          <select
+            id="recurring_interval"
+            name="interval"
+            value={formData.recurring?.interval || ""}
+            onChange={(e) => handleNestedChange(e, "recurring")}
+            className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
+          >
+            <option value="">Select interval</option>
+            <option value="day">Day</option>
+            <option value="week">Week</option>
+            <option value="month">Month</option>
+            <option value="year">Year</option>
+          </select>
         </div>
       </div>
 
+      {/* Submit Button */}
       <div className="flex justify-end">
         <button
           type="submit"

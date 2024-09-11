@@ -7,9 +7,6 @@ import CreateSubscription from "@/Components/Stripe/CreateSubscription";
 import EditPrice from "@/Components/Stripe/EditPrice";
 import EditProduct from "@/Components/Stripe/EditProduct";
 import EditSubscription from "@/Components/Stripe/EditSubscription";
-import DeleteProduct from "@/Components/Stripe/DeleteProduct";
-import DeletePrice from "@/Components/Stripe/DeletePrice";
-import DeleteSubscription from "@/Components/Stripe/DeleteSubscription";
 
 const StripePage = () => {
   const [action, setAction] = useState("create_product");
@@ -33,9 +30,6 @@ const StripePage = () => {
         <option value="edit_product">Edit Product</option>
         <option value="edit_price">Edit Price</option>
         <option value="edit_subscription">Edit Subscription</option>
-        <option value="delete_product">Delete Product</option>
-        <option value="delete_price">Delete Price</option>
-        <option value="delete_subscription">Delete Subscription</option>
       </select>
       {(() => {
         switch (action) {
@@ -51,12 +45,6 @@ const StripePage = () => {
             return <EditPrice />;
           case "edit_subscription":
             return <EditSubscription />;
-          case "delete_product":
-            return <DeleteProduct />;
-          case "delete_price":
-            return <DeletePrice />;
-          case "delete_subscription":
-            return <DeleteSubscription />;
           default:
             return (
               <div className="flex flex-col items-center">
