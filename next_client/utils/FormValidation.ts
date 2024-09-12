@@ -23,7 +23,7 @@ export const loginFormValidation = Yup.object({
   password: Yup.string()
     .matches(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$%*?&])[A-Za-z\d@$%*?&]{8,}$/,
-      "Min length 8. At least one Numeric, Uppercase and Special character is required."
+      "Invalid Password"
     )
     .required("Password is required"),
 });
@@ -32,13 +32,13 @@ export const passwordValidation = Yup.object({
   password: Yup.string()
     .matches(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$%*?&])[A-Za-z\d@$%*?&]{8,}$/,
-      "Min length 8. At least one Numeric, Uppercase and Special character is required."
+      "Min length 8. Password must contain at least one Numeric, one Uppercase letter, and one Special character (@,$,%,*,&,?)"
     )
     .required("Password is required"),
   confirm_password: Yup.string()
     .matches(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$%*?&])[A-Za-z\d@$%*?&]{8,}$/,
-      "Min length 8. At least one Numeric, Uppercase and Special character is required."
+      "Min length 8. Password must contain at least one Numeric, one Uppercase letter, and one Special character (@,$,%,*,&,?)"
     )
     .required("Password is required"),
 });
@@ -58,7 +58,7 @@ export const signupFormValidation = Yup.object({
   password: Yup.string()
     .matches(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$%*?&])[A-Za-z\d@$%*?&]{8,}$/,
-      "Min length 8. At least one Numeric, Uppercase and Special character is required."
+      "Min length 8. Password must contain at least one Numeric, one Uppercase letter, and one Special character (@,$,%,*,&,?)"
     )
     .required("Password is required"),
 });
@@ -77,6 +77,6 @@ export const profileUpdateValidation = Yup.object({
     .required("Username is required"),
   password: Yup.string().matches(
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$%*?&])[A-Za-z\d@$%*?&]{8,}$/,
-    "Min length 8. At least one Numeric, Uppercase and Special character is required."
+    "Min length 8. Password must contain at least one Numeric, one Uppercase letter, and one Special character (@,$,%,*,&,?)"
   ),
 });

@@ -48,11 +48,7 @@ const SignupPage = () => {
 
         if (!res.ok) {
           const errorData = await res.json();
-          let errorMessage = "Something Went Wrong!";
-          if (errorData) {
-            errorMessage = errorData.message;
-          }
-          throw new Error(errorMessage);
+          throw new Error(errorData.message || "An unknown error occurred");
         }
 
         const data = await res.json();

@@ -54,15 +54,10 @@ const LoginPage = () => {
             return;
           }
           const errorData = await res.json();
-          let errorMessage = "Something Went Wrong!";
-          if (errorData) {
-            errorMessage = errorData.message;
-          }
-          throw new Error(errorMessage);
+          throw new Error(errorData.message || "Something Went Wrong!");
         }
 
         const data = await res.json();
-        console.log("DATA:...", JSON.stringify(data, null, 4));
         const user = data.user;
         setAuth(user);
         runSuccessToast(data.message);
