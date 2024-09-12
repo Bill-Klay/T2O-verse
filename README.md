@@ -63,13 +63,33 @@ A Front-End designed for the Flask Role Management System. The application allow
     /next_client
         /app
             /(Auth)
+               /Login
+               /Signup
+               /TwoFA
+               /Forgot Password
             /(Main)
                 /Dashboard
+                  /Profile
+                  /Logs
+                  /Kanban
+                  /Stripe
+                  /Settings
     /Components
+      ...Page Componenets
     /handlers
+      /Kanban Handlers
+      /Settings Handlers
     /hooks
+      /Auth Hook
+      /Kanban Context Hook
     /lib
+      /Constants.ts
     /Providers
+      /Toast Provider
     /public
+      /Images
     /utils
+      /Change Board Util
+      /Form Validation
+      /Toasts Functions
 ```

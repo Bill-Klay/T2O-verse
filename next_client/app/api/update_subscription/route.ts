@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
   const session = cookies().get("session");
   const CSRFToken = cookies().get("X-CSRFToken");
   const req_data = await req.json();
-  console.log(req_data);
+  console.log("Data", req_data);
 
   try {
     const res = await fetch(`${base_url}/update-subscription`, {
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
         "X-CSRFToken": `${CSRFToken?.value}`,
       },
       body: JSON.stringify({
-        ...req_data.formData,
+        ...req_data,
       }),
     });
 

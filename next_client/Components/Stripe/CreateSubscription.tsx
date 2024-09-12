@@ -1,5 +1,6 @@
 "use client";
 
+import { fetchAllUsers } from "@/handlers/Settings/handlers";
 import { runErrorToast, runSuccessToast } from "@/utils/toast";
 import React, { useEffect, useState } from "react";
 
@@ -17,6 +18,7 @@ const CreateSubscriptionForm: React.FC = () => {
   });
   const [prices, setPrices] = useState<any>();
   const [price, setPrice] = useState();
+  const [users, setUsers] = useState([]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -74,8 +76,18 @@ const CreateSubscriptionForm: React.FC = () => {
     setPrice(selectedPrice.price_id);
   };
 
+  const getUsers = async () => {
+    try {
+      const users_data = await fetchAllUsers();
+      setUsers(users_data);
+    } catch (error) {
+      console.log("Error: ", JSON.stringify(error, null, 4));
+    }
+  };
+
   useEffect(() => {
     getPrices();
+    getUsers();
   }, []);
 
   return (
@@ -111,14 +123,20 @@ const CreateSubscriptionForm: React.FC = () => {
           >
             User ID:
           </label>
-          <input
+          <select
             id="user_id"
             name="user_id"
-            type="text"
             value={formData.user_id || ""}
             onChange={handleChange}
             className="w-full rounded-lg border border-strokedark bg-transparent py-1 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-stroborder-strokedarkdark dark:bg-form-input dark:text-white dark:focus:border-primary"
-          />
+          >
+            <option value="">Select User ID</option> {/* Default option */}
+            {users?.map((user: any) => (
+              <option key={user.id} value={user.id}>
+                {user.id}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="flex flex-col">
