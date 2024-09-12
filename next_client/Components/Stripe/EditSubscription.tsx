@@ -130,18 +130,17 @@ const UpdateSubscriptionForm: React.FC = () => {
 
       if (response.ok) {
         runSuccessToast("Subscription deleted successfully");
-        // Remove the deleted subscription from the list
-        // setSubscriptions((prevSubscriptions) =>
-        //   prevSubscriptions.filter(
-        //     (sub) => sub.subscription_id !== formData.subscription_id
-        //   )
-        // );
-        // setFormData({
-        //   subscription_id: "",
-        //   user_id: "",
-        //   email: "",
-        //   new_price_id: "",
-        // });
+        setSubscriptions((prevSubscriptions) =>
+          prevSubscriptions.filter(
+            (sub) => sub.subscription_id !== formData.subscription_id
+          )
+        );
+        setFormData({
+          subscription_id: "",
+          user_id: "",
+          email: "",
+          new_price_id: "",
+        });
       } else {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
