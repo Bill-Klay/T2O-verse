@@ -11,12 +11,12 @@ POST /prices-for-product: Get all prices for a specific product by ID.
 
 '''
 
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, url_for
 import stripe
 from datetime import datetime
 from flask_server import db
 from flask_server.models.user import User
-from flask_server.models.purchase import StripePrice, StripeProduct, StripeSubscription
+from flask_server.models.purchase import Order, StripePrice, StripeProduct, StripeSubscription
 
 stripe.api_key = current_app.config['STRIPE_PRIVATE_KEY']
 
@@ -656,7 +656,7 @@ def get_subscription():
 def get_user_subscriptions():
     data = request.json
     # user_id = data['user_id']
-    user_id = session.get('user_id')
+    user_id = data.get('user_id')
     try:
         current_app.logger.info("Fetching all subscriptions for user %s", user_id)
         subscriptions = StripeSubscription.query.filter_by(user_id=user_id).all()
@@ -690,7 +690,7 @@ def create_checkout_session():
     """
     data = request.json
     price_id = data.get('price_id')
-    user_id = session.get('user_id')
+    user_id = data.get('user_id')
     quantity = data.get('quantity', 1)
     mode = data.get('mode', 'payment')
 
