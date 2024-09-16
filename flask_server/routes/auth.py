@@ -82,16 +82,24 @@ def login():
 
         user = User.query.filter((User.username == username_or_email) | (User.email == username_or_email)).first()
         
-        if user and user.verify_password(password):
-            if not user.verified:
+        if not user.verified:
                 return jsonify(success=False, message='Please verify your email address before logging in'), 401
-            if user.twofa_enabled:
-                if token is None or not user.verify_totp(token):
-                    # Optionally send OTP via email
-                    msg = Message("Your OTP", sender="your_email@example.com", recipients=[user.email])
-                    msg.body = f"Your OTP is: {pyotp.TOTP(user.twofa_secret).now()}"
-                    mail.send(msg)
-                    return jsonify(success=False, message='2FA token required'), 400
+        else:
+            if user and user.verify_password(password):
+                if user.twofa_enabled:
+                    if token is None or not user.verify_totp(token):
+                        # Optionally send OTP via email
+                        msg = Message("Your OTP", sender="your_email@example.com", recipients=[user.email])
+                        msg.body = f"Your OTP is: {pyotp.TOTP(user.twofa_secret).now()}"
+                        mail.send(msg)
+                        return jsonify(success=False, message='2FA token required'), 400
+                    else:
+                        # session['user_id'] = user.id
+                        login_user(user)
+                        response = jsonify(success=True, message='Login successful', user=user.user_to_dict())
+                        response = make_response(response)
+                        response.set_cookie('X-CSRFToken', generate_csrf(), secure=True, httponly=True, samesite='Strict')
+                        return response, 200
                 else:
                     # session['user_id'] = user.id
                     login_user(user)
@@ -100,14 +108,7 @@ def login():
                     response.set_cookie('X-CSRFToken', generate_csrf(), secure=True, httponly=True, samesite='Strict')
                     return response, 200
             else:
-                # session['user_id'] = user.id
-                login_user(user)
-                response = jsonify(success=True, message='Login successful', user=user.user_to_dict())
-                response = make_response(response)
-                response.set_cookie('X-CSRFToken', generate_csrf(), secure=True, httponly=True, samesite='Strict')
-                return response, 200
-        else:
-            return jsonify(success=False, message='Invalid credentials'), 401
+                return jsonify(success=False, message='Invalid credentials'), 401
     else:
         # Redirect to login page or handle GET request differently
         pass  # Implement rendering the login form here
