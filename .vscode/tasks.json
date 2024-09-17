@@ -1,0 +1,13 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "dev",
+			"path": "next_client",
+			"problemMatcher": [],
+			"label": "npm: dev - next_client",
+			"detail": "next dev"
+		}
+	]
+}
