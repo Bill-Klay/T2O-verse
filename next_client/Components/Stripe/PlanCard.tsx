@@ -1,63 +1,37 @@
 // components/PlanCard.tsx
 import React, { useEffect, useState } from "react";
 
-interface SubscriptionData {
-  subscription_id: string;
-  user_id: string;
-  price_id: string;
-  email: string;
-}
-
-interface RecurringData {
-  interval: string;
-}
-
-interface PriceData {
-  unit_amount: number;
-  currency: string;
-  product_id: string;
-  active?: boolean;
-  recurring?: RecurringData;
-  price_id?: string;
-}
-
 interface Props {
-  subscription: SubscriptionData;
+  price: any;
   isSelected: boolean;
   onSelect: () => void;
 }
 
-const PlanCard: React.FC<Props> = ({ subscription, isSelected, onSelect }) => {
-  const initialPrice: PriceData = {
-    price_id: "",
-    currency: "",
-    product_id: "",
-    active: false,
-    recurring: { interval: "Monthly" },
-    unit_amount: 0,
-  };
-  const [price, setPrice] = useState<PriceData>(initialPrice);
+const PlanCard: React.FC<Props> = ({ price, isSelected, onSelect }) => {
+  const [product, setProduct] = useState<any>();
 
-  const getPriceDetails = async () => {
+  const getProductDetails = async () => {
     try {
-      const res = await fetch("/api/get_price", {
+      const res = await fetch("/api/get_product", {
         method: "POST",
         body: JSON.stringify({
-          price_id: subscription.price_id,
+          product_id: price.product_id,
         }),
       });
 
       const data = await res.json();
-      setPrice(data);
+
+      console.log("DATA: ", data);
+      setProduct(data);
     } catch (error) {
       console.log(error);
     }
   };
 
   useEffect(() => {
-    getPriceDetails();
+    getProductDetails();
   }, []);
-  const priceString = `$${(price.unit_amount / 100).toFixed(2)}`;
+  const priceString = `$${price.unit_amount.toFixed(2)}`;
 
   return (
     <div
@@ -67,7 +41,7 @@ const PlanCard: React.FC<Props> = ({ subscription, isSelected, onSelect }) => {
       }`}
     >
       <h3 className="text-xl font-semibold">{price && priceString}</h3>
-      <p>Per Month</p>
+      <h3 className="text-xl font-semibold">{product?.name}</h3>
     </div>
   );
 };

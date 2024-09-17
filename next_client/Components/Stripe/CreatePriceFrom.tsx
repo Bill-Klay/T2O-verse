@@ -174,7 +174,7 @@ const CreatePriceForm: React.FC = () => {
         </div>
 
         {/* Recurring Interval */}
-        <div className="flex flex-col">
+        {/* <div className="flex flex-col">
           <label
             htmlFor="recurring_interval"
             className="mb-2.5 font-medium text-black dark:text-white"
@@ -194,7 +194,7 @@ const CreatePriceForm: React.FC = () => {
             <option value="month">Month</option>
             <option value="year">Year</option>
           </select>
-        </div>
+        </div> */}
       </div>
 
       {/* Submit Button */}

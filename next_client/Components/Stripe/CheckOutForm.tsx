@@ -1,24 +1,19 @@
 // components/CheckoutForm.tsx
+"use client";
 import PlanCard from "@/Components/Stripe/PlanCard";
+import { useAuth } from "@/hooks/useAuth";
 import { runErrorToast } from "@/utils/toast";
 import { useEffect, useState } from "react";
 
-interface SubscriptionData {
-  subscription_id: string;
-  user_id: string;
-  price_id: string;
-  email: string;
-}
-
 interface Props {
-  subscriptions: SubscriptionData[];
+  prices: any;
 }
 
-const CheckoutForm: React.FC<Props> = ({ subscriptions }) => {
-  const [selectedPlan, setSelectedPlan] = useState<SubscriptionData | null>(
-    null
-  );
+const CheckoutForm: React.FC<Props> = ({ prices }) => {
+  const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [quantity, setQuantity] = useState(1);
+
+  const { auth }: any = useAuth();
 
   const handleCheckout = async () => {
     if (!selectedPlan) return;
@@ -28,8 +23,9 @@ const CheckoutForm: React.FC<Props> = ({ subscriptions }) => {
         method: "POST",
         body: JSON.stringify({
           price_id: selectedPlan.price_id,
+          user_id: auth?.id,
           quantity,
-          mode: "subscription",
+          mode: "payment",
         }),
       });
 
@@ -44,12 +40,12 @@ const CheckoutForm: React.FC<Props> = ({ subscriptions }) => {
   return (
     <div className="max-w-md mx-auto mt-8">
       <div className="space-y-1">
-        {subscriptions.map((subscription) => (
+        {prices.map((price: any) => (
           <PlanCard
-            key={subscription.subscription_id}
-            subscription={subscription}
-            isSelected={selectedPlan === subscription}
-            onSelect={() => setSelectedPlan(subscription)}
+            key={price.price_id}
+            price={price}
+            isSelected={selectedPlan === price}
+            onSelect={() => setSelectedPlan(price)}
           />
         ))}
       </div>

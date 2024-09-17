@@ -5,13 +5,13 @@ import { runErrorToast } from "@/utils/toast";
 import { useState, useEffect } from "react";
 
 const CheckoutPage = () => {
-  const [subscriptions, setSubscriptions] = useState([]);
+  const [prices, setPrices] = useState([]);
 
   useEffect(() => {
-    // Fetch subscriptions from your backend API
+    // Fetch prices from your backend API
     (async () => {
       try {
-        const response = await fetch("/api/subscriptions", {
+        const response = await fetch("/api/get_prices", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -20,13 +20,13 @@ const CheckoutPage = () => {
 
         if (response.ok) {
           const data = await response.json();
-          setSubscriptions(data);
+          setPrices(data);
         } else {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
       } catch (error) {
-        console.error("Error fetching subscriptions:", error);
-        runErrorToast("Error fetching subscriptions");
+        console.error("Error fetching prices:", error);
+        runErrorToast("Error fetching prices");
       }
     })();
   }, []);
@@ -34,10 +34,10 @@ const CheckoutPage = () => {
   return (
     <div className="container mx-auto p-8">
       <h1 className="text-3xl font-bold mb-8">Choose Your Plan</h1>
-      {subscriptions.length > 0 ? (
-        <CheckoutForm subscriptions={subscriptions} />
+      {prices.length > 0 ? (
+        <CheckoutForm prices={prices} />
       ) : (
-        <p>Loading subscriptions...</p>
+        <p>Loading Products...</p>
       )}
     </div>
   );
