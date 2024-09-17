@@ -53,8 +53,7 @@ A comprehensive Flask application designed for managing user roles and permissio
 ##### The deploy script takes care of the following steps for you. Please adjust the environment variables prior to execution
 
 ```
-chmod +x deploy
-./deploy
+./deploy.bat
 ```
 
 4. Set up environment variables:
