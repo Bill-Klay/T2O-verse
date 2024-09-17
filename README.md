@@ -35,7 +35,7 @@ A comprehensive Flask application designed for managing user roles and permissio
 1. Clone the repository:
    ```
    git clone https://github.com/Bill-Klay/T2O-verse.git
-   cd flask-role-management
+   cd T2O-verse
    ```
 
 2. Create a virtual environment and install dependencies:
@@ -199,8 +199,6 @@ chmod +x deploy
   - Example Request: json { "role_id": 1 }
   - Example Response: json { "message": "Role deleted successfully" }
 
-
-
 ### Admin Panel
 
 Access the admin panel to manage roles and permissions. Protected routes require authentication and admin privileges.
@@ -232,6 +230,106 @@ Configure the application through environment variables or a `config.py` file. K
 - `FLASK_ENV`: Environment setting (development, testing, production).
 - `SESSION_COOKIE`: User session cookies
 - `STRIPE_KEY`: Stripe account API keys
+
+# Boiler-Plate Components On NextJS
+
+A Front-End designed for the Flask Role Management System. The application allows for secure Login, Signup, Profile/User Management, Kanban Board, Log Tables (Some features may be restricted to the role of Admin).The Front-End application is built using [NextJs](https://nextjs.org/), [TailwindCss](https://tailwindcss.com/), along with additional libraries to assist with the application features.
+
+## Features
+
+- User Authentication
+- Two-Factor Authentication
+- Profile Interface
+- Log Table Interface
+- Kanban Board
+- Profile/Users Update Interface
+- Role Management (Admin only)
+
+## Getting Started
+
+### Pre-Requisites
+
+> [NodeJs](https://nodejs.org/en)
+>
+> [Git](https://git-scm.com/)
+
+### Installation
+
+1. Clone Repository:
+
+   ```
+   git clone https://github.com/Bill-Klay/T2O-verse.git
+   cd T2O-verse
+   ```
+
+2. Switch to Branch _next-client_:
+
+   ```
+   cd next-client
+   ```
+
+3. Install Dependencies:
+   ```
+   npm install
+   ```
+4. Add Server Url For API Calls:
+
+   > Create a **lib** folder in **next-client** folder.
+   >
+   > In the **lib** folder create a file **Constants.ts**
+   >
+   > In the file created add: export const base_url = "url_of_server"
+
+5. Run Application:
+   ```
+   npm run dev
+   ```
+
+## Project Structure
+
+```
+- */next_client*: The main client-side application built with Next.js.
+
+  - */app*: Contains the main application logic and components.
+  
+    - *(Auth)*: Handles authentication-related components and logic.
+      - */Login*: Component for user login functionality.
+      - */Signup*: Component for user registration.
+      - */TwoFA*: Component for two-factor authentication.
+      - */Forgot Password*: Component for password recovery.
+    
+    - *(Main)*: Contains the main features of the application.
+      - */Dashboard*: Main user interface for accessing different features.
+        - */Profile*: User profile management.
+        - */Logs*: User activity logs.
+        - */Kanban*: Kanban board for task management.
+        - */Stripe*: Integration with Stripe for payment processing.
+        - */Settings*: User settings and preferences.
+
+- */Components*: Reusable UI components used throughout the application.
+
+- */handlers*: Contains logic for handling specific features.
+  - */Kanban Handlers*: Logic for managing Kanban board actions.
+  - */Settings Handlers*: Logic for managing user settings.
+
+- */hooks*: Custom React hooks for managing state and logic.
+  - */Auth Hook*: Hook for managing authentication state.
+  - */Kanban Context Hook*: Hook for managing Kanban board state.
+
+- */lib*: Contains utility libraries and constants.
+  - */Constants.ts*: File for storing application-wide constants.
+
+- */Providers*: Context providers for managing global state.
+  - */Toast Provider*: Provider for managing toast notifications.
+
+- */public*: Public assets accessible by the client.
+  - */Images*: Image assets used in the application.
+
+- */utils*: Utility functions used across the application.
+  - */Change Board Util*: Functions for managing board changes.
+  - */Form Validation*: Functions for validating form inputs.
+  - */Toasts Functions*: Functions for displaying toast notifications.
+```
 
 ## Contributing
 
