@@ -172,7 +172,7 @@ def delete_price():
 
         try:
             # Attempt to deactivate the price in Stripe
-            stripe.Price.modify(price_id, active=False)
+            stripe.Price.delete(price_id)
         except stripe.error.InvalidRequestError as e:
             current_app.logger.warning("Stripe price not found, deleting locally: %s", str(e))  # Log warning
 
@@ -694,7 +694,7 @@ def create_checkout_session():
     quantity = data.get('quantity', 1)
     mode = data.get('mode', 'payment')
 
-    user = User.query.filter_by(user_id=user_id).first()
+    user = User.query.filter_by(id=user_id).first()
 
     if not user:
         return jsonify({'error': 'User not found'}), 404
@@ -726,8 +726,8 @@ def create_checkout_session():
                 },
             ],
             mode=mode,
-            success_url=url_for('checkout_success', _external=True) + '?session_id={CHECKOUT_SESSION_ID}',
-            cancel_url=url_for('checkout_cancel', _external=True),
+            success_url=url_for('stripe.checkout_success', _external=True) + '?session_id={CHECKOUT_SESSION_ID}',
+            cancel_url=url_for('stripe.checkout_cancel', _external=True),
             metadata={
                 'user_id': user_id,
                 'product_id': price_id,
